@@ -9,14 +9,14 @@ set -e
 PLAYBOOK_FILE=${1:-setup.yaml}
 
 # Install Homebrew if not already installed
-if ! command -v brew >/dev/null 2>&1; then
+if [ -x "/opt/homebrew/bin/brew" ] || [ -x "/usr/local/bin/brew" ]; then
+  echo "Homebrew already installed."
+else
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
   eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-  echo "Homebrew already installed."
 fi
 
 # Install Ansible using Homebrew
