@@ -7,52 +7,8 @@
   connection: local
   gather_facts: yes
 
-  vars:
-    # Homebrew configuration
-    homebrew_taps:
-      - homebrew/cask
-      - homebrew/cask-fonts
-      - homebrew/core
-      # Add more taps as needed
-
-    homebrew_formulae:
-      - git
-      - node
-      - python
-      # Add more formulae as needed
-
-    homebrew_casks:
-      - visual-studio-code
-      - powershell
-      - git-lfs
-      - iterm2
-      - font-fira-code
-      # Add more casks as needed
-
-    # PowerShell modules
-    powershell_modules:
-      - PSReadLine
-      - posh-git
-      - oh-my-posh
-      # Add more PowerShell modules as needed
-
-    # pipx modules
-    pipx_modules:
-      - flake8
-      - black
-      - pylint
-      # Add more pipx modules as needed
-
-    # VS Code extensions
-    vscode_extensions:
-      - ms-vscode.powershell
-      - ms-python.python
-      - GitHub.copilot
-      # Add more VS Code extensions as needed
-
-    # Git configuration
-    git_user_email: ""  # Set your email here or pass as a variable
-    git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
+  vars_files:
+    - vars.yml
 
   tasks:
     # Homebrew setup
