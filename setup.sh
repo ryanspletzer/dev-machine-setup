@@ -9,7 +9,7 @@ set -e
 PLAYBOOK_FILE=${1:-setup.yaml}
 
 # Install Homebrew if not already installed
-if [ -x "/opt/homebrew/bin/brew" ] || [ -x "/usr/local/bin/brew" ]; then
+if [ -x "/opt/homebrew/bin/brew" ]; then
   echo "Homebrew already installed."
 else
   echo "Installing Homebrew..."
