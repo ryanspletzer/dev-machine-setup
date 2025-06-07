@@ -80,7 +80,7 @@ echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FIL
 export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 
 # Run the playbook (no -K flag since we're using environment variable)
-run_and_log ansible-playbook "$PLAYBOOK_FILE"
+run_and_log /opt/homebrew/bin/ansible-playbook "$PLAYBOOK_FILE"
 
 # Cleanup
 echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
