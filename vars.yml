@@ -7,7 +7,6 @@ homebrew_taps:
   - azure/bicep
   - aws/tap
   - microsoft/git
-  - homebrew/cask-versions
   # Add more taps as needed
 
 homebrew_formulae:
