@@ -41,7 +41,9 @@ export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 
 # sudo with password
 printf '%s\n' "$SUDO_PASSWORD" | sudo -S -v
+# Start background process to keep sudo alive and store its PID
 ( while true; do sudo -n true; sleep 15; done ) 2>/dev/null &
+SUDO_KEEP_ALIVE_PID=$!
 
 # Install Homebrew if not already installed
 if [ -x "/opt/homebrew/bin/brew" ]; then
@@ -61,7 +63,7 @@ export HOMEBREW_SUDO_ASKPASS="$ASKPASS_SCRIPT"
 
 # Install Ansible using Homebrew
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
-run_and_log brew install ansible
+run_and_log /opt/homebrew/bin/brew install ansible
 
 echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
 echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FILE"
@@ -73,10 +75,59 @@ export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 run_and_log ansible-playbook "$PLAYBOOK_FILE"
 
 # Cleanup
+echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
+
+# Kill the sudo refresh process
+if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
+  echo "Killing sudo keep alive process (PID: $SUDO_KEEP_ALIVE_PID)" | tee -a "$LOG_FILE"
+  kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
+fi
+
+# Unset environment variables
 unset SUDO_ASKPASS
 unset ANSIBLE_SUDO_PASS
 unset HOMEBREW_SUDO_ASKPASS
-rm -f "$ASKPASS_SCRIPT"
+
+# Remove the temporary askpass script
+echo "Removing temporary askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
+if [ -f "$ASKPASS_SCRIPT" ]; then
+  rm -f "$ASKPASS_SCRIPT"
+  if [ -f "$ASKPASS_SCRIPT" ]; then
+    echo "Warning: Failed to remove askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
+  else
+    echo "Successfully removed askpass script" | tee -a "$LOG_FILE"
+  fi
+fi
 
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
+
+# Function to clean up before exit
+cleanup() {
+  echo "Performing cleanup..." | tee -a "$LOG_FILE"
+
+  # Kill the sudo refresh process if it exists
+  if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
+    echo "Killing sudo keep alive process (PID: $SUDO_KEEP_ALIVE_PID)" | tee -a "$LOG_FILE"
+    kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
+  fi
+
+  # Unset environment variables
+  unset SUDO_ASKPASS
+  unset ANSIBLE_SUDO_PASS
+  unset HOMEBREW_SUDO_ASKPASS
+
+  # Remove the temporary askpass script
+  if [ -n "$ASKPASS_SCRIPT" ] && [ -f "$ASKPASS_SCRIPT" ]; then
+    echo "Removing temporary askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
+    rm -f "$ASKPASS_SCRIPT"
+    if [ -f "$ASKPASS_SCRIPT" ]; then
+      echo "Warning: Failed to remove askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
+    else
+      echo "Successfully removed askpass script" | tee -a "$LOG_FILE"
+    fi
+  fi
+}
+
+# Set up trap to ensure cleanup on exit
+trap cleanup EXIT INT TERM
