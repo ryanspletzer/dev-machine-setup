@@ -29,7 +29,7 @@ echo
 
 # Create a temporary askpass script
 ASKPASS_SCRIPT=$(mktemp)
-chmod +x "$ASKPASS_SCRIPT"
+chmod 700 "$ASKPASS_SCRIPT"
 cat > "$ASKPASS_SCRIPT" << EOF
 #!/bin/sh
 echo "$SUDO_PASSWORD"
@@ -38,6 +38,9 @@ EOF
 # Set SUDO_ASKPASS and other environment variables
 export SUDO_ASKPASS="$ASKPASS_SCRIPT"
 export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+
+# For Homebrew
+export HOMEBREW_SUDO_ASKPASS="$ASKPASS_SCRIPT"
 
 # sudo with password
 printf '%s\n' "$SUDO_PASSWORD" | sudo -S -v
@@ -57,9 +60,6 @@ else
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
-
-# Configure Homebrew to use the askpass script for sudo
-export HOMEBREW_SUDO_ASKPASS="$ASKPASS_SCRIPT"
 
 # Install Ansible using Homebrew
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
