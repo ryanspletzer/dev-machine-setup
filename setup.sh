@@ -27,6 +27,18 @@ run_and_log() {
 read -s -p "Enter sudo password: " SUDO_PASSWORD
 echo
 
+# Create a temporary askpass script
+ASKPASS_SCRIPT=$(mktemp)
+chmod +x "$ASKPASS_SCRIPT"
+cat > "$ASKPASS_SCRIPT" << EOF
+#!/bin/sh
+echo "$SUDO_PASSWORD"
+EOF
+
+# Set SUDO_ASKPASS and other environment variables
+export SUDO_ASKPASS="$ASKPASS_SCRIPT"
+export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+
 # sudo with password
 printf '%s\n' "$SUDO_PASSWORD" | sudo -S -v
 ( while true; do sudo -n true; sleep 15; done ) 2>/dev/null &
@@ -44,6 +56,9 @@ else
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Configure Homebrew to use the askpass script for sudo
+export HOMEBREW_SUDO_ASKPASS="$ASKPASS_SCRIPT"
+
 # Install Ansible using Homebrew
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
 run_and_log brew install ansible
@@ -57,8 +72,11 @@ export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 # Run the playbook (no -K flag since we're using environment variable)
 run_and_log ansible-playbook "$PLAYBOOK_FILE"
 
-# Unset the sudo password variable for security
+# Cleanup
+unset SUDO_ASKPASS
 unset ANSIBLE_SUDO_PASS
+unset HOMEBREW_SUDO_ASKPASS
+rm -f "$ASKPASS_SCRIPT"
 
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
