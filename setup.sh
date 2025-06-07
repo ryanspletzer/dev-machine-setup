@@ -33,13 +33,13 @@ echo "Installing Ansible via Homebrew..."
 brew install ansible
 
 echo "Running Ansible playbook: $PLAYBOOK_FILE"
-echo "You will be prompted for your sudo password to perform privileged operations"
+echo "Using provided sudo password for privileged operations"
 
 # Export the sudo password as an environment variable for Ansible
 export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 
-# Run the playbook with the sudo password from the environment variable
-ansible-playbook "$PLAYBOOK_FILE" -K
+# Run the playbook (no -K flag since we're using environment variable)
+ansible-playbook "$PLAYBOOK_FILE"
 
 # Unset the sudo password variable for security
 unset ANSIBLE_SUDO_PASS
