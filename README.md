@@ -150,7 +150,8 @@ This script installs Homebrew (if not already installed) and Ansible. To use it:
 1. Make the script executable:
 
    ```zsh
-   chmod a+x ./install_prerequisites.sh
+   # Make the script executable with restricted permissions (owner only)
+   chmod 700 ./install_prerequisites.sh
    ```
 
 2. Run the script:
@@ -166,7 +167,8 @@ The `setup.sh` script installs prerequisites and runs the Ansible playbook. It s
 1. Make the script executable:
 
    ```zsh
-   chmod a+x ./setup.sh
+   # Make the script executable with restricted permissions (owner only)
+   chmod 700 ./setup.sh
    ```
 
 2. Run the default setup:
@@ -195,7 +197,8 @@ These scripts simplify the process of setting up your macOS development environm
 For convenience, you can use the included shell script to install prerequisites:
 
 ```zsh
-chmod +x install_prerequisites.sh
+# For highest security, use chmod 700 to limit access to only the owner
+chmod 700 install_prerequisites.sh
 ./install_prerequisites.sh
 ```
 
