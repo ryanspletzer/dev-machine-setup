@@ -23,7 +23,7 @@ You can install prerequisites manually (see below), or use the provided script:
 
 ### Quick Install (Recommended)
 
-```pwsh
+```zsh
 ./install_prerequisites.sh
 ```
 
