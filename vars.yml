@@ -11,6 +11,7 @@ homebrew_taps:
 
 homebrew_formulae:
   - git
+  - git-lfs
   - node
   - python
   # Add more formulae as needed
@@ -18,9 +19,7 @@ homebrew_formulae:
 homebrew_casks:
   - visual-studio-code
   - powershell
-  - git-lfs
   - iterm2
-  - font-fira-code
   # Add more casks as needed
 
 # PowerShell modules
@@ -35,6 +34,7 @@ pipx_modules:
   - flake8
   - black
   - pylint
+  - taskcat
   # Add more pipx modules as needed
 
 # VS Code extensions
