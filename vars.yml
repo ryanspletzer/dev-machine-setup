@@ -14,6 +14,7 @@ homebrew_formulae:
   - git-lfs
   - node
   - python
+  - pipx
   # Add more formulae as needed
 
 homebrew_casks:
