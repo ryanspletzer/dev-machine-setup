@@ -24,6 +24,7 @@ echo "Installing Ansible via Homebrew..."
 brew install ansible
 
 echo "Running Ansible playbook: $PLAYBOOK_FILE"
-ansible-playbook "$PLAYBOOK_FILE"
+echo "You will be prompted for your sudo password to perform privileged operations"
+ansible-playbook "$PLAYBOOK_FILE" -K
 
 echo "Setup complete."
