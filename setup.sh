@@ -27,12 +27,20 @@ run_and_log() {
 read -s -p "Enter sudo password: " SUDO_PASSWORD
 echo
 
-# Create a temporary askpass script
+# Store password in keychain with a unique service name
+KEYCHAIN_SERVICE="ansible-devmachinesetup-temp"
+KEYCHAIN_ACCOUNT="sudo-password"
+
+# Store password in keychain (overwrite if exists)
+security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" 2>/dev/null || true
+security add-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w "$SUDO_PASSWORD"
+
+# Create a temporary askpass script that retrieves the password from keychain
 ASKPASS_SCRIPT=$(mktemp)
 chmod 700 "$ASKPASS_SCRIPT"
 cat > "$ASKPASS_SCRIPT" << EOF
 #!/bin/sh
-echo "$SUDO_PASSWORD"
+security find-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w
 EOF
 
 # Set SUDO_ASKPASS and other environment variables
@@ -99,6 +107,15 @@ if [ -f "$ASKPASS_SCRIPT" ]; then
   fi
 fi
 
+# Remove password from keychain
+echo "Removing password from keychain..." | tee -a "$LOG_FILE"
+security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null
+if [ $? -eq 0 ]; then
+  echo "Successfully removed password from keychain" | tee -a "$LOG_FILE"
+else
+  echo "Warning: Failed to remove password from keychain" | tee -a "$LOG_FILE"
+fi
+
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
 
@@ -125,6 +142,17 @@ cleanup() {
       echo "Warning: Failed to remove askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
     else
       echo "Successfully removed askpass script" | tee -a "$LOG_FILE"
+    fi
+  fi
+
+  # Remove password from keychain
+  if [ -n "$KEYCHAIN_SERVICE" ] && [ -n "$KEYCHAIN_ACCOUNT" ]; then
+    echo "Removing password from keychain..." | tee -a "$LOG_FILE"
+    security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null
+    if [ $? -eq 0 ]; then
+      echo "Successfully removed password from keychain" | tee -a "$LOG_FILE"
+    else
+      echo "Warning: Failed to remove password from keychain" | tee -a "$LOG_FILE"
     fi
   fi
 }
