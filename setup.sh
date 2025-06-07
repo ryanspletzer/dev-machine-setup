@@ -32,7 +32,7 @@ KEYCHAIN_SERVICE="ansible-devmachinesetup-temp"
 KEYCHAIN_ACCOUNT="sudo-password"
 
 # Store password in keychain (overwrite if exists)
-security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" 2>/dev/null || true
+security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null || true
 security add-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w "$SUDO_PASSWORD"
 
 # Create a temporary askpass script that retrieves the password from keychain
