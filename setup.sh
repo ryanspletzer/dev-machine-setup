@@ -13,7 +13,7 @@ if [ -x "/opt/homebrew/bin/brew" ]; then
   echo "Homebrew already installed."
 else
   echo "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -25,6 +25,13 @@ brew install ansible
 
 echo "Running Ansible playbook: $PLAYBOOK_FILE"
 echo "You will be prompted for your sudo password to perform privileged operations"
+
+# Prompt for sudo password once and store it securely
+read -s -p "Enter sudo password: " SUDO_PASSWORD
+echo
+export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+
+# Run the playbook with the sudo password from the environment variable
 ansible-playbook "$PLAYBOOK_FILE" -K
 
 echo "Setup complete."
