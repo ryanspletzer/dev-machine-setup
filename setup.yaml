@@ -85,6 +85,16 @@
         - homebrew
         - casks
 
+    # Add PowerShell to /etc/shells
+    - name: Add PowerShell to /etc/shells
+      ansible.builtin.command:
+        cmd: zsh -c 'echo /usr/local/bin/pwsh >> /etc/shells'
+        creates: /etc/shells
+      become: yes
+      tags:
+        - powershell
+        - shells
+
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
