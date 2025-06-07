@@ -1,0 +1,169 @@
+---
+# Ansible playbook for macOS development machine setup
+# Manages Homebrew packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
+
+- name: Setup development environment on macOS
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars:
+    # Homebrew configuration
+    homebrew_taps:
+      - homebrew/cask
+      - homebrew/cask-fonts
+      - homebrew/core
+      # Add more taps as needed
+
+    homebrew_formulae:
+      - git
+      - node
+      - python
+      # Add more formulae as needed
+
+    homebrew_casks:
+      - visual-studio-code
+      - powershell
+      - git-lfs
+      - iterm2
+      - font-fira-code
+      # Add more casks as needed
+
+    # PowerShell modules
+    powershell_modules:
+      - PSReadLine
+      - posh-git
+      - oh-my-posh
+      # Add more PowerShell modules as needed
+
+    # pipx modules
+    pipx_modules:
+      - flake8
+      - black
+      - pylint
+      # Add more pipx modules as needed
+
+    # VS Code extensions
+    vscode_extensions:
+      - ms-vscode.powershell
+      - ms-python.python
+      - GitHub.copilot
+      # Add more VS Code extensions as needed
+
+    # Git configuration
+    git_user_email: ""  # Set your email here or pass as a variable
+    git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
+
+  tasks:
+    # Homebrew setup
+    - name: Ensure Homebrew taps are added
+      community.general.homebrew_tap:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ homebrew_taps }}"
+      tags:
+        - homebrew
+        - taps
+
+    - name: Ensure Homebrew formulae are installed
+      community.general.homebrew:
+        name: "{{ item }}"
+        state: present
+        update_homebrew: yes
+      loop: "{{ homebrew_formulae }}"
+      tags:
+        - homebrew
+        - formulae
+
+    - name: Ensure Homebrew casks are installed
+      community.general.homebrew_cask:
+        name: "{{ item }}"
+        state: present
+        update_homebrew: yes
+      loop: "{{ homebrew_casks }}"
+      tags:
+        - homebrew
+        - casks
+
+    # PowerShell module setup
+    - name: Ensure PowerShell modules are installed
+      ansible.builtin.command:
+        cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+      loop: "{{ powershell_modules }}"
+      register: pwsh_install_result
+      changed_when: "'is already installed' not in pwsh_install_result.stdout"
+      tags:
+        - powershell
+        - modules
+
+    - name: Update PowerShell help
+      ansible.builtin.command:
+        cmd: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+      register: pwsh_help_result
+      changed_when: pwsh_help_result.rc == 0
+      ignore_errors: yes
+      tags:
+        - powershell
+        - help
+
+    # pipx module setup
+    - name: Ensure pipx is available
+      ansible.builtin.command:
+        cmd: which pipx
+      register: pipx_check
+      ignore_errors: yes
+      changed_when: false
+      tags:
+        - pipx
+
+    - name: Ensure pipx modules are installed
+      ansible.builtin.command:
+        cmd: pipx install {{ item }}
+      loop: "{{ pipx_modules }}"
+      when: pipx_check.rc == 0
+      register: pipx_install_result
+      changed_when: "'already installed' not in pipx_install_result.stdout"
+      tags:
+        - pipx
+        - modules
+
+    # VS Code extension setup
+    - name: Ensure VS Code extensions are installed
+      ansible.builtin.command:
+        cmd: code --install-extension {{ item }}
+      loop: "{{ vscode_extensions }}"
+      register: vscode_ext_result
+      changed_when: "'already installed' not in vscode_ext_result.stdout"
+      tags:
+        - vscode
+        - extensions
+
+    # Git LFS setup
+    - name: Ensure Git LFS is initialized
+      ansible.builtin.command:
+        cmd: git lfs install --system
+      register: git_lfs_result
+      changed_when: "'Already initialized' not in git_lfs_result.stdout"
+      tags:
+        - git
+        - lfs
+
+    # Git configuration
+    - name: Configure Git user.name
+      ansible.builtin.command:
+        cmd: git config --global user.name "{{ git_user_name }}"
+      register: git_name_result
+      changed_when: git_name_result.rc == 0
+      tags:
+        - git
+        - config
+
+    - name: Configure Git user.email
+      ansible.builtin.command:
+        cmd: git config --global user.email "{{ git_user_email }}"
+      when: git_user_email != ""
+      register: git_email_result
+      changed_when: git_email_result.rc == 0
+      tags:
+        - git
+        - config
