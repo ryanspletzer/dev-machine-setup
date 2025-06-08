@@ -3,46 +3,218 @@
 
 # Homebrew configuration
 homebrew_taps:
-  - azure/functions
-  - azure/bicep
   - aws/tap
+  - azure/bicep
+  - azure/functions
+  - hashicorp/tap
   - microsoft/git
+  - teamookla/speedtest
   # Add more taps as needed
 
 homebrew_formulae:
+  - aws-sam-cli
+  - awscli
+  - azure-cli
+  - azure-functions-core-tools
+  - azure-functions-core-tools@4
+  - bash
+  - bash-git-prompt
+  - bicep
+  - cfn-lint
+  - chruby
+  - chruby-fish
+  - cmake
+  - direnv
+  - docker-completion
+  - ffmpeg
+  - fzf
+  - gh
   - git
   - git-lfs
+  - go
+  - hashicorp/tap/packer
+  - hashicorp/tap/terraform
+  - hashicorp/tap/vault
+  - istioctl
+  - jq
+  - maven
   - node
-  - python
+  - oh-my-posh
   - pipx
+  - pyenv-virtualenv
+  - python
+  - qemu
+  - ruby-install
+  - rustup
+  - ruff
+  - serverless
+  - teamookla/speedtest/speedtest
+  - uv
+  - wget2
+  - zsh-autocomplete
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
   # Add more formulae as needed
 
 homebrew_casks:
-  - visual-studio-code
-  - powershell
+  - 1password
+  - appcleaner
+  - azure-data-studio
+  - chatgpt
+  - docker
+  - dotnet-sdk
+  - elgato-camera-hub
+  - firefox
+  - font-caskaydia-cove-nerd-font
+  - git-credential-manager
+  - google-chrome
   - iterm2
+  - microsoft-azure-storage-explorer
+  - microsoft-edge
+  - microsoft-office
+  - microsoft-remote-desktop
+  - microsoft-teams
+  - netspot
+  - ngrok
+  - parallels
+  - powershell
+  - rectangle-pro
+  - spotify
+  - steam
+  - synologyassistant
+  - tailscale
+  - utm
+  - virtualbox
+  - visual-studio-code
+  - wine
+  - yubico-yubikey-manager
+  - zoom
   # Add more casks as needed
 
 # PowerShell modules
 powershell_modules:
-  - PSReadLine
-  - posh-git
+  - Az.Accounts
   - oh-my-posh
+  - Pester
+  - platyPS
+  - posh-git
+  - powershell-yaml
+  - PowerShellBuild
+  - psake
+  - PSGraphQL
+  - PSJsonWebToken
+  - PSReadLine
+  - PSScriptAnalyzer
+  - PSTcpIp
+  - Terminal-Icons
   # Add more PowerShell modules as needed
 
 # pipx modules
 pipx_modules:
-  - flake8
-  - black
-  - pylint
   - taskcat
   # Add more pipx modules as needed
 
 # VS Code extensions
 vscode_extensions:
-  - ms-vscode.powershell
+  - 4ops.packer
+  - alefragnani.project-manager
+  - arjun.swagger-viewer
+  - aws-scripting-guy.cform
+  - charliermarsh.ruff
+  - codezombiech.gitignore
+  - davidanson.vscode-markdownlint
+  - dbaeumer.vscode-eslint
+  - docker.docker
+  - donjayamanne.git-extension-pack
+  - donjayamanne.githistory
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+  - fernandoescolar.vscode-solution-explorer
+  - github.copilot
+  - github.copilot-chat
+  - github.vscode-github-actions
+  - github.vscode-pull-request-github
+  - golang.go
+  - grapecity.gc-excelviewer
+  - hbenl.vscode-test-explorer
+  - josin.kusto-syntax-highlighting
+  - k--kato.docomment
+  - medo64.render-crlf
+  - mhutchie.git-graph
+  - mimarec.swagger-doc-viewer
+  - mohsen1.prettify-json
+  - ms-azuretools.vscode-azurefunctions
+  - ms-azuretools.vscode-azureresourcegroups
+  - ms-azuretools.vscode-bicep
+  - ms-azuretools.vscode-containers
+  - ms-azuretools.vscode-docker
+  - ms-dotnettools.csdevkit
+  - ms-dotnettools.csharp
+  - ms-dotnettools.vscode-dotnet-runtime
+  - ms-kubernetes-tools.vscode-kubernetes-tools
+  - ms-mssql.data-workspace-vscode
+  - ms-mssql.mssql
+  - ms-mssql.sql-bindings-vscode
+  - ms-mssql.sql-database-projects-vscode
+  - ms-python.debugpy
+  - ms-python.isort
   - ms-python.python
-  - GitHub.copilot
+  - ms-python.vscode-pylance
+  - ms-toolsai.jupyter
+  - ms-toolsai.jupyter-keymap
+  - ms-toolsai.jupyter-renderers
+  - ms-toolsai.vscode-jupyter-cell-tags
+  - ms-toolsai.vscode-jupyter-slideshow
+  - ms-vscode-remote.remote-containers
+  - ms-vscode-remote.remote-ssh
+  - ms-vscode-remote.remote-ssh-edit
+  - ms-vscode-remote.remote-wsl
+  - ms-vscode-remote.vscode-remote-extensionpack
+  - ms-vscode.cmake-tools
+  - ms-vscode.cpptools
+  - ms-vscode.cpptools-extension-pack
+  - ms-vscode.cpptools-themes
+  - ms-vscode.hexeditor
+  - ms-vscode.makefile-tools
+  - ms-vscode.powershell
+  - ms-vscode.remote-explorer
+  - ms-vscode.remote-server
+  - ms-vscode.test-adapter-converter
+  - ms-vsliveshare.vsliveshare
+  - msazurermtools.azurerm-vscode-tools
+  - octref.vetur
+  - oderwat.indent-rainbow
+  - parallelsdesktop.parallels-desktop
+  - pspester.pester-test
+  - rangav.vscode-thunder-client
+  - redhat.java
+  - redhat.vscode-commons
+  - redhat.vscode-yaml
+  - samirat.csharp-test-adapter
+  - sibiraj-s.vscode-scss-formatter
+  - stkb.rewrap
+  - streetsidesoftware.code-spell-checker
+  - takumii.markdowntable
+  - teamsdevapp.ms-teams-vscode-extension
+  - teamsdevapp.vscode-adaptive-cards
+  - twxs.cmake
+  - tylerleonhardt.vscode-inline-values-powershell
+  - tyriar.sort-lines
+  - usernamehw.errorlens
+  - visualstudioexptteam.intellicode-api-usage-examples
+  - visualstudioexptteam.vscodeintellicode
+  - vscjava.vscode-gradle
+  - vscjava.vscode-java-debug
+  - vscjava.vscode-java-dependency
+  - vscjava.vscode-java-pack
+  - vscjava.vscode-java-test
+  - vscjava.vscode-maven
+  - vscode-icons-team.vscode-icons
+  - vsls-contrib.codetour
+  - vue.volar
+  - waderyan.gitblame
+  - yzhang.markdown-all-in-one
+  - ziyasal.vscode-open-in-github
   # Add more VS Code extensions as needed
 
 # Git configuration
