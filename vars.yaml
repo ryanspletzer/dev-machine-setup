@@ -275,13 +275,49 @@ custom_commands:
   - defaults write com.apple.Safari IncludeDevelopMenu -bool true
   - defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
   - defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+  # Auto-hide the Dock and change delay and animation speed
+  - echo "Configuring Dock auto-hide settings..."
+  - defaults write com.apple.dock autohide -bool true
+  - defaults write com.apple.dock autohide-delay -float 0
+  - defaults write com.apple.dock autohide-time-modifier -float 0
+  # Turn off "Show suggested and recent apps in Dock"
+  - echo "Turning off suggested and recent apps in Dock..."
+  - defaults write com.apple.dock show-recents -bool false
+  - defaults write com.apple.dock show-suggested-and-recent-apps -int 0
+  # Configure TextEdit to use plain text by default
+  - echo "Setting TextEdit to use plain text by default..."
+  - defaults write com.apple.TextEdit RichText -int 0
+  # Trackpad gesture settings
+  - echo "Configuring trackpad settings..."
+  # Set tracking speed (just past middle, value around 1.5)
+  - defaults write -g com.apple.trackpad.scaling -float 1
+  # Turn off natural scrolling
+  - defaults write -g com.apple.swipescrolldirection -bool false
+  # Turn off swipe between pages
+  - defaults write -g AppleEnableSwipeNavigateWithScrolls -bool false
+  # Set App Expose to swipe down with three fingers
+  - defaults write com.apple.dock showAppExposeGestureEnabled -bool true
+  - defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int 2
+  - defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture -int 2
+  # Hide desktop icons
+  - echo "Hiding desktop icons..."
+  - defaults write com.apple.finder CreateDesktop -bool false
+  # Keep folders on top when sorting by name in Finder
+  - echo "Setting Finder to keep folders on top when sorting by name..."
+  - defaults write com.apple.finder _FXSortFoldersFirst -bool true
+  # Add fish to /etc/shells if not already present
+  - echo "Adding fish shell to /etc/shells..."
+  - if ! grep -q "/opt/homebrew/bin/fish" /etc/shells; then
+      echo "/opt/homebrew/bin/fish" | sudo tee -a /etc/shells
+    fi
+  # Change default shell to PowerShell
+  - chsh -s /usr/local/bin/pwsh
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
   - killall Dock
   - killall Safari 2>/dev/null || true
-  # Change default shell to PowerShell
-  - chsh -s /usr/local/bin/pwsh
+  - killall TextEdit 2>/dev/null || true
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
