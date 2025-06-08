@@ -99,7 +99,7 @@ echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
 
 # Run the playbook with increased verbosity for better progress tracking
 echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
-/opt/homebrew/bin/ansible-playbook -v "$PLAYBOOK_FILE"
+/opt/homebrew/bin/ansible-playbook "$PLAYBOOK_FILE"
 
 # Cleanup
 echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
