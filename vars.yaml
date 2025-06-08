@@ -100,8 +100,10 @@ homebrew_formulae:
 
 # PowerShell modules
 powershell_modules:
+  - AWS.Tools.Common
   - Az.Accounts
   - oh-my-posh
+  - Microsoft.Graph.Authentication
   - Pester
   - platyPS
   - posh-git
