@@ -164,7 +164,7 @@
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
-        cmd: code --install-extension {{ item }}
+        cmd: /opt/homebrew/bin/code --install-extension {{ item }}
       loop: "{{ vscode_extensions }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
