@@ -54,16 +54,6 @@
         - rosetta
 
     # Homebrew setup
-    - name: Ensure Homebrew formulae are installed
-      community.general.homebrew:
-        name: "{{ item }}"
-        state: present
-        update_homebrew: yes
-      loop: "{{ homebrew_formulae }}"
-      tags:
-        - homebrew
-        - formulae
-
     - name: Ensure Homebrew taps are added
       community.general.homebrew_tap:
         name: "{{ item }}"
@@ -85,6 +75,16 @@
       tags:
         - homebrew
         - casks
+
+    - name: Ensure Homebrew formulae are installed
+      community.general.homebrew:
+        name: "{{ item }}"
+        state: present
+        update_homebrew: yes
+      loop: "{{ homebrew_formulae }}"
+      tags:
+        - homebrew
+        - formulae
 
     # Add PowerShell to /etc/shells if it's not already there
     - name: Check if PowerShell is in /etc/shells
