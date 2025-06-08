@@ -87,7 +87,7 @@ homebrew_formulae:
   - python
   - qemu
   - ruby-install
-  - rustup-init
+  - rustup
   - ruff
   - serverless
   - teamookla/speedtest/speedtest

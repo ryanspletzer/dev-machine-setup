@@ -205,12 +205,14 @@
 
     # Custom macOS commands and preferences
     - name: Execute custom macOS commands
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: "{{ item }}"
       loop: "{{ custom_commands | default([]) }}"
       register: custom_command_result
       changed_when: custom_command_result.rc == 0
       ignore_errors: yes
+      become: yes
+      become_method: sudo
       tags:
         - macos
         - preferences
