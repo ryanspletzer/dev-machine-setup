@@ -79,8 +79,27 @@ echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FIL
 # Export the sudo password as an environment variable for Ansible
 export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 
-# Run the playbook (no -K flag since we're using environment variable)
-run_and_log /opt/homebrew/bin/ansible-playbook "$PLAYBOOK_FILE"
+# Create Ansible configuration directory if it doesn't exist
+mkdir -p ~/.ansible/
+
+# Configure Ansible logging
+cat > ~/.ansible/ansible.cfg << EOF
+[defaults]
+log_path = $PWD/$LOG_FILE
+stdout_callback = yaml
+display_skipped_hosts = True
+display_ok_hosts = True
+callbacks_enabled = profile_tasks
+
+[callback_profile_tasks]
+task_output_limit = 100
+EOF
+
+echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
+
+# Run the playbook with increased verbosity for better progress tracking
+echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
+/opt/homebrew/bin/ansible-playbook -v "$PLAYBOOK_FILE"
 
 # Cleanup
 echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
