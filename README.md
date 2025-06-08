@@ -173,6 +173,36 @@ ansible-playbook setup.yaml --extra-vars '{"git_additional_configs": {"core.edit
 
 This allows you to configure any Git setting that you would normally set with `git config --global` commands.
 
+#### Custom Commands and Scripts
+
+The setup supports running custom commands and scripts for any additional configurations you might need:
+
+- `custom_commands`: A list of shell commands to run at the end of the setup
+- `custom_script`: Path to a custom script file to execute
+- `custom_script_args`: Arguments to pass to the custom script
+
+Example configuration in `vars.yaml`:
+
+```yaml
+# Custom commands and scripts (optional)
+custom_commands:
+  # Show hidden files in Finder
+  - defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
+  # Dark mode
+  - defaults write -g AppleInterfaceStyle Dark
+  # Key repeat settings
+  - defaults write -g InitialKeyRepeat -int 15
+  - defaults write -g KeyRepeat -int 2
+
+# Custom script path (optional)
+custom_script: "/Users/username/custom_setup.sh"
+custom_script_args: "--option1 value1 --option2 value2"
+```
+
+This feature is perfect for setting macOS system preferences or any other custom configurations that aren't covered by the main setup components.
+
+> **Note**: An example script is provided in the `examples/custom_macos_settings.sh` file that demonstrates how to configure common macOS settings like showing hidden files, disabling .DS_Store file creation on network volumes, and more.
+
 #### Customizing Installed Packages
 
 Edit the `vars.yaml` file to customize:
@@ -187,7 +217,9 @@ Edit the `vars.yaml` file to customize:
 - `git_user_name`: Git user name (defaults to macOS full name)
 - `git_user_email`: Git user email
 - `git_additional_configs`: Additional Git configurations
-- `vscode_extensions`: VS Code extensions to install
+- `custom_commands`: Custom shell commands to execute at the end of setup
+- `custom_script`: Path to a custom script to execute
+- `custom_script_args`: Arguments for the custom script
 
 ## Running the Scripts
 

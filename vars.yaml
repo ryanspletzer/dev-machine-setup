@@ -114,6 +114,7 @@ powershell_modules:
 
 # pipx modules
 pipx_modules:
+  - poetry
   - taskcat
   # Add more pipx modules as needed
 
@@ -247,3 +248,20 @@ git_additional_configs:
   # alias.ci: "commit"
   # alias.st: "status"
   # Add more git config options as needed
+
+# Custom commands and scripts (optional)
+# These will be executed at the end of the setup process
+custom_commands:
+  # Show hidden files in Finder
+  - defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
+  # Example: Dark mode
+  # - defaults write -g AppleInterfaceStyle Dark
+  # Example: Key repeat settings
+  # - defaults write -g InitialKeyRepeat -int 15
+  # - defaults write -g KeyRepeat -int 2
+  # Add more commands as needed
+
+# Custom script path (optional)
+# Provide the path to a custom script that will be executed at the end of the setup
+# custom_script: "/path/to/your/custom_script.sh"
+# custom_script_args: "--option1 value1 --option2 value2"
