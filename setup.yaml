@@ -191,3 +191,14 @@
       tags:
         - git
         - config
+
+    # Additional Git configurations
+    - name: Configure additional Git settings
+      ansible.builtin.command:
+        cmd: git config --global {{ item.key }} "{{ item.value }}"
+      loop: "{{ git_additional_configs | default({}) | dict2items }}"
+      register: git_config_result
+      changed_when: git_config_result.rc == 0
+      tags:
+        - git
+        - config

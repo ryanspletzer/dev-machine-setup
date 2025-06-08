@@ -225,3 +225,17 @@ vscode_extensions:
 # Git configuration
 git_user_email: ""  # Set your email here or pass as a variable
 git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
+
+# Additional Git configurations (optional)
+# These will be set as git config --global key value
+git_additional_configs:
+  # Examples (uncomment to use):
+  # core.editor: "code --wait"
+  # pull.rebase: "true"
+  # init.defaultBranch: "main"
+  # color.ui: "auto"
+  # alias.co: "checkout"
+  # alias.br: "branch"
+  # alias.ci: "commit"
+  # alias.st: "status"
+  # Add more git config options as needed

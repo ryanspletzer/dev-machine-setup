@@ -15,7 +15,9 @@ The playbook automates the installation and configuration of:
 - **Visual Studio Code extensions**
   - Developer productivity extensions
 - **Git configuration**
-  - User settings and Git LFS setup
+  - User settings (name, email)
+  - Additional Git configurations (editor, aliases, default branch, etc.)
+  - Git LFS setup
 
 ## Prerequisites
 
@@ -134,18 +136,42 @@ ansible-playbook setup.yaml --extra-vars "install_rosetta=true"
 
 Or update the `vars.yaml` file to set `install_rosetta: true`.
 
-#### Git User Settings
+#### Git Configuration
 
-The playbook sets Git user information:
+The playbook sets Git user information and additional configurations:
 
 - `user.name`: OPTIONAL - Defaults to your macOS full name (from `id -F`)
 - `user.email`: REQUIRED - Empty by default and should be set before running
+- Additional Git configurations: OPTIONAL - Configure any Git settings through the `git_additional_configs` dictionary
 
 To provide your email when running the playbook:
 
 ```bash
 ansible-playbook setup.yaml --extra-vars "git_user_email=your.email@example.com"
 ```
+
+You can set additional Git configurations in the `vars.yaml` file under the `git_additional_configs` section:
+
+```yaml
+git_additional_configs:
+  core.editor: "code --wait"
+  pull.rebase: "true"
+  init.defaultBranch: "main"
+  color.ui: "auto"
+  alias.co: "checkout"
+  alias.br: "branch"
+  alias.ci: "commit"
+  alias.st: "status"
+  # Add more configurations as needed
+```
+
+Or via command line:
+
+```bash
+ansible-playbook setup.yaml --extra-vars '{"git_additional_configs": {"core.editor": "code --wait", "pull.rebase": "true"}}'
+```
+
+This allows you to configure any Git setting that you would normally set with `git config --global` commands.
 
 #### Customizing Installed Packages
 
@@ -158,6 +184,9 @@ Edit the `vars.yaml` file to customize:
 - `powershell_modules`: PowerShell modules to install
 - `pipx_modules`: Python applications to install via pipx
 - `vscode_extensions`: VS Code extensions to install
+- `git_user_name`: Git user name (defaults to macOS full name)
+- `git_user_email`: Git user email
+- `git_additional_configs`: Additional Git configurations
 - `vscode_extensions`: VS Code extensions to install
 
 ## Running the Scripts
