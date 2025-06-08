@@ -11,6 +11,43 @@ homebrew_taps:
   - teamookla/speedtest
   # Add more taps as needed
 
+homebrew_casks:
+  - 1password
+  - appcleaner
+  - azure-data-studio
+  - chatgpt
+  - docker
+  - dotnet-sdk
+  - elgato-camera-hub
+  - firefox
+  - font-caskaydia-cove-nerd-font
+  - git-credential-manager
+  - google-chrome
+  - iterm2
+  - microsoft-azure-storage-explorer
+  - microsoft-edge
+  - microsoft-office
+  - microsoft-remote-desktop
+  - microsoft-teams
+  - netspot
+  - ngrok
+  # Doesn't work without Rosetta 2
+  # - parallels
+  - powershell
+  - rectangle-pro
+  - spotify
+  - steam
+  - synologyassistant
+  - tailscale
+  - utm
+  - virtualbox
+  - visual-studio-code
+  - wine-stable
+  # Doesn't work without Rosetta 2
+  # - yubico-yubikey-manager
+  - zoom
+  # Add more casks as needed
+
 homebrew_formulae:
   - aws-sam-cli
   - awscli
@@ -24,7 +61,6 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
-  - docker-completion
   - ffmpeg
   - fzf
   - gh
@@ -54,41 +90,6 @@ homebrew_formulae:
   - zsh-autosuggestions
   - zsh-syntax-highlighting
   # Add more formulae as needed
-
-homebrew_casks:
-  - 1password
-  - appcleaner
-  - azure-data-studio
-  - chatgpt
-  - docker
-  - dotnet-sdk
-  - elgato-camera-hub
-  - firefox
-  - font-caskaydia-cove-nerd-font
-  - git-credential-manager
-  - google-chrome
-  - iterm2
-  - microsoft-azure-storage-explorer
-  - microsoft-edge
-  - microsoft-office
-  - microsoft-remote-desktop
-  - microsoft-teams
-  - netspot
-  - ngrok
-  - parallels
-  - powershell
-  - rectangle-pro
-  - spotify
-  - steam
-  - synologyassistant
-  - tailscale
-  - utm
-  - virtualbox
-  - visual-studio-code
-  - wine
-  - yubico-yubikey-manager
-  - zoom
-  # Add more casks as needed
 
 # PowerShell modules
 powershell_modules:

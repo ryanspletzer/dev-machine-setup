@@ -15,15 +15,6 @@
 
   tasks:
     # Homebrew setup
-    - name: Ensure Homebrew taps are added
-      community.general.homebrew_tap:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ homebrew_taps }}"
-      tags:
-        - homebrew
-        - taps
-
     - name: Ensure Homebrew formulae are installed
       community.general.homebrew:
         name: "{{ item }}"
@@ -33,6 +24,15 @@
       tags:
         - homebrew
         - formulae
+
+    - name: Ensure Homebrew taps are added
+      community.general.homebrew_tap:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ homebrew_taps }}"
+      tags:
+        - homebrew
+        - taps
 
     - name: Ensure Homebrew casks are installed
       ansible.builtin.shell:
