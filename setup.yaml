@@ -11,7 +11,7 @@
     ansible_become_pass: "{{ lookup('env', 'ANSIBLE_SUDO_PASS') }}"
 
   vars_files:
-    - vars.yml
+    - vars.yaml
 
   tasks:
     # Homebrew setup
