@@ -14,6 +14,45 @@
     - vars.yaml
 
   tasks:
+    # Rosetta 2 installation (optional)
+    - name: Check if system is Apple Silicon
+      ansible.builtin.command:
+        cmd: uname -m
+      register: arch_check
+      changed_when: false
+      when: install_rosetta | bool
+      tags:
+        - system
+        - rosetta
+
+    - name: Check if Rosetta 2 is already installed
+      ansible.builtin.command:
+        cmd: /usr/bin/pgrep -q oahd
+      register: rosetta_check
+      ignore_errors: yes
+      changed_when: false
+      when:
+        - install_rosetta | bool
+        - arch_check.stdout == "arm64"
+      tags:
+        - system
+        - rosetta
+
+    - name: Install Rosetta 2 (with become_method=sudo)
+      ansible.builtin.command:
+        cmd: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      become: yes
+      become_method: sudo
+      when:
+        - install_rosetta | bool
+        - arch_check.stdout == "arm64"
+        - rosetta_check.rc != 0
+      register: rosetta_install
+      changed_when: rosetta_install.rc == 0
+      tags:
+        - system
+        - rosetta
+
     # Homebrew setup
     - name: Ensure Homebrew formulae are installed
       community.general.homebrew:

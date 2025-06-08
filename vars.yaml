@@ -1,6 +1,9 @@
 # vars.yml
 # Externalized variables for Ansible setup
 
+# System configuration
+install_rosetta: false  # Set to true to install Rosetta 2 (required for some Intel-based applications on Apple Silicon)
+
 # Homebrew configuration
 homebrew_taps:
   - aws/tap

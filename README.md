@@ -93,6 +93,9 @@ ansible-playbook setup.yaml
 You can use tags to run specific parts of the setup:
 
 ```bash
+# Install only Rosetta 2 (if enabled)
+ansible-playbook setup.yaml --tags "rosetta"
+
 # Install only Homebrew packages
 ansible-playbook setup.yaml --tags "homebrew"
 
@@ -117,6 +120,20 @@ ansible-playbook setup.yaml --tags "homebrew,vscode"
 
 ### Configuration
 
+#### System Configuration
+
+The playbook can optionally install Rosetta 2, which is required for running Intel-based applications on Apple Silicon Macs:
+
+- `install_rosetta`: Set to `true` to install Rosetta 2, defaults to `false`
+
+To enable Rosetta 2 installation when running the playbook:
+
+```bash
+ansible-playbook setup.yaml --extra-vars "install_rosetta=true"
+```
+
+Or update the `vars.yaml` file to set `install_rosetta: true`.
+
 #### Git User Settings
 
 The playbook sets Git user information:
@@ -132,13 +149,15 @@ ansible-playbook setup.yaml --extra-vars "git_user_email=your.email@example.com"
 
 #### Customizing Installed Packages
 
-Edit the `vars` section of `setup.yaml` to customize:
+Edit the `vars.yaml` file to customize:
 
+- `install_rosetta`: Set to `true` to install Rosetta 2 for Apple Silicon Macs
 - `homebrew_taps`: Homebrew tap repositories
 - `homebrew_formulae`: CLI tools and libraries
 - `homebrew_casks`: macOS applications
 - `powershell_modules`: PowerShell modules to install
 - `pipx_modules`: Python applications to install via pipx
+- `vscode_extensions`: VS Code extensions to install
 - `vscode_extensions`: VS Code extensions to install
 
 ## Running the Scripts
@@ -231,6 +250,7 @@ Or follow these manual steps:
 - **Permission errors**: Some commands may require sudo access
 - **Network issues**: Ensure you have a stable internet connection
 - **Homebrew errors**: Run `brew doctor` to diagnose Homebrew problems
+- **Application compatibility on Apple Silicon**: Some applications may require Rosetta 2. Set `install_rosetta: true` in `vars.yaml` or use `--extra-vars "install_rosetta=true"` when running the playbook
 
 If you encounter errors with specific tasks, you can run with verbose output:
 
