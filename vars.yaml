@@ -65,6 +65,7 @@ homebrew_formulae:
   - cmake
   - direnv
   - ffmpeg
+  - fish
   - fzf
   - gh
   - git
@@ -232,8 +233,6 @@ git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full 
 git_additional_configs:
   # Examples (uncomment to use):
   commit.gpgsign: true
-  credential.helper: /usr/local/share/gcm-core/git-credential-manager
-  "credential.https://dev.azure.com.useHttpPath": true
   init.defaultBranch: main
   gpg.program: /opt/homebrew/bin/gpg
   push.default: current
