@@ -36,7 +36,7 @@
 
     - name: Ensure Homebrew casks are installed
       ansible.builtin.shell:
-        cmd: "brew install --cask {{ item }}"
+        cmd: "/opt/homebrew/bin/brew install --cask {{ item }}"
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
         HOMEBREW_SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
