@@ -118,6 +118,9 @@ pipx_modules:
   # Add more pipx modules as needed
 
 # VS Code extensions
+# You can list your VS Code extensions with the command:
+# code --list-extensions
+# and then format them as shown below.
 vscode_extensions:
   - 4ops.packer
   - alefragnani.project-manager
@@ -195,7 +198,6 @@ vscode_extensions:
   - redhat.vscode-yaml
   - samirat.csharp-test-adapter
   - sibiraj-s.vscode-scss-formatter
-  - stkb.rewrap
   - streetsidesoftware.code-spell-checker
   - takumii.markdowntable
   - teamsdevapp.ms-teams-vscode-extension
