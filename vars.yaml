@@ -310,9 +310,7 @@ custom_commands:
   - defaults write com.apple.finder _FXSortFoldersFirst -bool true
   # Add fish to /etc/shells if not already present
   - echo "Adding fish shell to /etc/shells..."
-  - if ! grep -q "/opt/homebrew/bin/fish" /etc/shells; then
-      echo "/opt/homebrew/bin/fish" | sudo tee -a /etc/shells
-    fi
+  - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
   # Change default shell to PowerShell
   - chsh -s /usr/local/bin/pwsh
   # Restart affected applications
