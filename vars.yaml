@@ -19,8 +19,10 @@ homebrew_casks:
   - appcleaner
   - azure-data-studio
   - chatgpt
+  - citrix-workspace
   - docker
   - dotnet-sdk
+  - drawio
   - elgato-camera-hub
   - firefox
   - font-caskaydia-cove-nerd-font
@@ -42,6 +44,7 @@ homebrew_casks:
   - steam
   - synologyassistant
   - tailscale
+  - temurin
   - utm
   - virtualbox
   - visual-studio-code
@@ -84,7 +87,7 @@ homebrew_formulae:
   - python
   - qemu
   - ruby-install
-  - rustup
+  - rustup-init
   - ruff
   - serverless
   - teamookla/speedtest/speedtest
