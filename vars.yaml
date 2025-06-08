@@ -254,8 +254,8 @@ git_additional_configs:
   # Add more git config options as needed
 
 # Custom commands and scripts (optional)
-# These will be executed at the end of the setup process
-custom_commands:
+# These commands will be executed as the current user (non-elevated)
+custom_commands_user:
   # Show hidden files in Finder
   - echo "Showing hidden files in Finder..."
   - defaults write com.apple.finder AppleShowAllFiles -bool true
@@ -310,11 +310,6 @@ custom_commands:
   # Keep folders on top when sorting by name in Finder
   - echo "Setting Finder to keep folders on top when sorting by name..."
   - defaults write com.apple.finder _FXSortFoldersFirst -bool true
-  # Add fish to /etc/shells if not already present
-  - echo "Adding fish shell to /etc/shells..."
-  - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
-  # Change default shell to PowerShell
-  - chsh -s /usr/local/bin/pwsh
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
@@ -330,6 +325,15 @@ custom_commands:
   # - defaults write -g InitialKeyRepeat -int 15
   # - defaults write -g KeyRepeat -int 2
   # Add more commands as needed
+
+# These commands will be executed with elevated privileges (sudo)
+custom_commands_elevated:
+  # Add fish to /etc/shells if not already present
+  - echo "Adding fish shell to /etc/shells..."
+  - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
+  # Change default shell to PowerShell
+  - chsh -s /usr/local/bin/pwsh
+  # Add more commands requiring sudo as needed
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup

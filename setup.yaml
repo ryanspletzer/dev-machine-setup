@@ -197,31 +197,58 @@
         - git
         - config
 
-    # Custom macOS commands and preferences
-    - name: Execute custom macOS commands
+    # Custom macOS commands and preferences - Non-elevated (user) commands
+    - name: Execute custom macOS commands (non-elevated)
       ansible.builtin.shell:
         cmd: "{{ item }}"
         executable: /bin/bash
-      loop: "{{ custom_commands | default([]) }}"
-      register: custom_command_result
-      changed_when: custom_command_result.rc == 0
+      loop: "{{ custom_commands_user | default([]) }}"
+      register: custom_command_user_result
+      changed_when: custom_command_user_result.rc == 0
+      ignore_errors: yes
+      loop_control:
+        label: "Executing user command: '{{ item | truncate(40) }}'"
+      tags:
+        - macos
+        - preferences
+        - user-commands
+
+    # Custom macOS commands that require elevated privileges
+    - name: Execute custom macOS commands (elevated)
+      ansible.builtin.shell:
+        cmd: "{{ item }}"
+        executable: /bin/bash
+      loop: "{{ custom_commands_elevated | default([]) }}"
+      register: custom_command_elevated_result
+      changed_when: custom_command_elevated_result.rc == 0
       ignore_errors: yes
       become: yes
       become_method: sudo
       loop_control:
-        label: "Executing custom command: '{{ item | truncate(40) }}'"
+        label: "Executing elevated command: '{{ item | truncate(40) }}'"
       tags:
         - macos
         - preferences
+        - elevated-commands
 
     # Display results for debugging custom commands
-    - name: Show custom command results
+    - name: Show custom command results (non-elevated)
       ansible.builtin.debug:
-        var: custom_command_result
-      when: custom_command_result is defined
+        var: custom_command_user_result
+      when: custom_command_user_result is defined
       tags:
         - macos
         - preferences
+        - user-commands
+
+    - name: Show custom command results (elevated)
+      ansible.builtin.debug:
+        var: custom_command_elevated_result
+      when: custom_command_elevated_result is defined
+      tags:
+        - macos
+        - preferences
+        - elevated-commands
 
     # Execute custom script if defined
     - name: Check if custom script exists
