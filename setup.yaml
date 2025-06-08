@@ -139,20 +139,10 @@
         - help
 
     # pipx module setup
-    - name: Ensure pipx is available
-      ansible.builtin.command:
-        cmd: which pipx
-      register: pipx_check
-      ignore_errors: yes
-      changed_when: false
-      tags:
-        - pipx
-
     - name: Ensure pipx modules are installed
       ansible.builtin.command:
-        cmd: pipx install {{ item }}
+        cmd: /opt/homebrew/bin/pipx install {{ item }}
       loop: "{{ pipx_modules }}"
-      when: pipx_check.rc == 0
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:
