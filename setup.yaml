@@ -201,6 +201,7 @@
     - name: Execute custom macOS commands
       ansible.builtin.shell:
         cmd: "{{ item }}"
+        executable: /bin/bash
       loop: "{{ custom_commands | default([]) }}"
       register: custom_command_result
       changed_when: custom_command_result.rc == 0
@@ -209,6 +210,15 @@
       become_method: sudo
       loop_control:
         label: "Executing custom command: '{{ item | truncate(40) }}'"
+      tags:
+        - macos
+        - preferences
+
+    # Display results for debugging custom commands
+    - name: Show custom command results
+      ansible.builtin.debug:
+        var: custom_command_result
+      when: custom_command_result is defined
       tags:
         - macos
         - preferences

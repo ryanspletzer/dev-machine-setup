@@ -135,41 +135,6 @@ else
 fi
 
 echo "Setup complete." | tee -a "$LOG_FILE"
-
-# Execute custom commands if defined in vars.yaml
-if [ -f "vars.yaml" ]; then
-  echo "Checking for custom commands in vars.yaml..." | tee -a "$LOG_FILE"
-
-  # Extract and execute custom commands
-  CUSTOM_COMMANDS=$(grep "^  - " vars.yaml | grep -A 100 "custom_commands:" | grep -B 100 -m 1 "^#" | grep "^  - " | sed 's/^  - //')
-
-  if [ -n "$CUSTOM_COMMANDS" ]; then
-    echo "Executing custom commands..." | tee -a "$LOG_FILE"
-    echo "$CUSTOM_COMMANDS" | while IFS= read -r cmd; do
-      if [ -n "$cmd" ]; then
-        echo "Running custom command: $cmd" | tee -a "$LOG_FILE"
-        eval "$cmd" 2>&1 | tee -a "$LOG_FILE"
-      fi
-    done
-  else
-    echo "No custom commands found in vars.yaml" | tee -a "$LOG_FILE"
-  fi
-
-  # Execute custom script if defined
-  CUSTOM_SCRIPT=$(grep "^custom_script:" vars.yaml | sed 's/^custom_script: //' | sed 's/"//g')
-  CUSTOM_SCRIPT_ARGS=$(grep "^custom_script_args:" vars.yaml | sed 's/^custom_script_args: //' | sed 's/"//g')
-
-  if [ -n "$CUSTOM_SCRIPT" ] && [ "$CUSTOM_SCRIPT" != "#custom_script:" ]; then
-    echo "Executing custom script: $CUSTOM_SCRIPT $CUSTOM_SCRIPT_ARGS" | tee -a "$LOG_FILE"
-    if [ -f "$CUSTOM_SCRIPT" ]; then
-      chmod 700 "$CUSTOM_SCRIPT"
-      "$CUSTOM_SCRIPT" $CUSTOM_SCRIPT_ARGS 2>&1 | tee -a "$LOG_FILE"
-    else
-      echo "Warning: Custom script not found: $CUSTOM_SCRIPT" | tee -a "$LOG_FILE"
-    fi
-  fi
-fi
-
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
 
 # Function to clean up before exit
