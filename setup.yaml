@@ -128,16 +128,6 @@
         - powershell
         - modules
 
-    - name: Update PowerShell help
-      ansible.builtin.command:
-        cmd: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
-      register: pwsh_help_result
-      changed_when: pwsh_help_result.rc == 0
-      ignore_errors: yes
-      tags:
-        - powershell
-        - help
-
     # pipx module setup
     - name: Ensure pipx modules are installed
       ansible.builtin.command:

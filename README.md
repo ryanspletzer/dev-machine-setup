@@ -9,7 +9,7 @@ The playbook automates the installation and configuration of:
 - **Homebrew packages**
   - Taps, formulae, and casks (installed in this specific order to ensure dependencies are available)
 - **PowerShell modules**
-  - Includes automatic help update
+  - PowerShell modules installation
 - **pipx modules**
   - Python tools installation
 - **Visual Studio Code extensions**

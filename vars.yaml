@@ -319,6 +319,9 @@ custom_commands:
   - killall Dock
   - killall Safari 2>/dev/null || true
   - killall TextEdit 2>/dev/null || true
+  # Update PowerShell help
+  - echo "Updating PowerShell help documentation..."
+  - pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
