@@ -202,3 +202,55 @@
       tags:
         - git
         - config
+
+    # Custom macOS commands and preferences
+    - name: Execute custom macOS commands
+      ansible.builtin.command:
+        cmd: "{{ item }}"
+      loop: "{{ custom_commands | default([]) }}"
+      register: custom_command_result
+      changed_when: custom_command_result.rc == 0
+      ignore_errors: yes
+      tags:
+        - macos
+        - preferences
+
+    # Execute custom script if defined
+    - name: Check if custom script exists
+      ansible.builtin.stat:
+        path: "{{ custom_script | default('') }}"
+      register: script_stat
+      when: custom_script is defined and custom_script != ""
+      tags:
+        - custom
+        - script
+
+    - name: Make custom script executable
+      ansible.builtin.file:
+        path: "{{ custom_script }}"
+        mode: '0755'
+      when:
+        - custom_script is defined and custom_script != ""
+        - script_stat.stat.exists | bool
+      tags:
+        - custom
+        - script
+
+    - name: Execute custom script
+      ansible.builtin.command:
+        cmd: "{{ custom_script }} {{ custom_script_args | default('') }}"
+      register: custom_script_result
+      changed_when: custom_script_result.rc == 0
+      when:
+        - custom_script is defined and custom_script != ""
+        - script_stat.stat.exists | bool
+      tags:
+        - custom
+        - script
+
+    # Notify user of completion
+    - name: Setup complete
+      ansible.builtin.debug:
+        msg: "Development environment setup completed successfully!"
+      tags:
+        - always
