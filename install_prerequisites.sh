@@ -6,7 +6,7 @@
 set -e
 
 # Install Homebrew if not already installed
-if [ -x "/opt/homebrew/bin/brew" ] || [ -x "/usr/local/bin/brew" ]; then
+if [ -x "/opt/homebrew/bin/brew" ]; then
   echo "Homebrew already installed."
 else
   echo "Installing Homebrew..."
@@ -17,5 +17,5 @@ else
 fi
 
 echo "Installing Ansible via Homebrew..."
-brew install ansible
+/opt/homebrew/bin/brew install ansible
 echo "Prerequisites installation complete."
