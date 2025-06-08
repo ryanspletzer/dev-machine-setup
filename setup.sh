@@ -58,9 +58,9 @@ SUDO_KEEP_ALIVE_PID=$!
 
 # Install Homebrew if not already installed
 if [ -x "/opt/homebrew/bin/brew" ]; then
-  echo "Homebrew already installed."
+  echo "Homebrew already installed." | tee -a "$LOG_FILE"
 else
-  echo "Installing Homebrew..."
+  echo "Installing Homebrew..." | tee -a "$LOG_FILE"
   # Use NONINTERACTIVE to avoid prompts during Homebrew installation
   NONINTERACTIVE=1 /bin/bash \
     -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "$LOG_FILE"
@@ -73,7 +73,6 @@ fi
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
 run_and_log /opt/homebrew/bin/brew install ansible
 
-echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
 echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FILE"
 
 # Export the sudo password as an environment variable for Ansible
