@@ -60,7 +60,7 @@
         state: present
       loop: "{{ homebrew_taps }}"
       loop_control:
-        label: "Adding tap: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Adding tap: {{ item }}"
       tags:
         - homebrew
         - taps
@@ -75,7 +75,7 @@
       register: brew_cask_result
       changed_when: "'already installed' not in brew_cask_result.stdout"
       loop_control:
-        label: "Installing cask: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Installing cask: {{ item }}"
       tags:
         - homebrew
         - casks
@@ -87,7 +87,7 @@
         update_homebrew: yes
       loop: "{{ homebrew_formulae }}"
       loop_control:
-        label: "Installing formula: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Installing formula: {{ item }}"
       tags:
         - homebrew
         - formulae
@@ -123,7 +123,7 @@
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
       loop_control:
-        label: "Installing PowerShell module: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Installing PowerShell module: {{ item }}"
       tags:
         - powershell
         - modules
@@ -156,7 +156,7 @@
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:
-        label: "Installing pipx module: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Installing pipx module: {{ item }}"
       tags:
         - pipx
         - modules
@@ -169,7 +169,7 @@
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
       loop_control:
-        label: "Installing VS Code extension: {{ item }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Installing VS Code extension: {{ item }}"
       tags:
         - vscode
         - extensions
@@ -212,7 +212,7 @@
       register: git_config_result
       changed_when: git_config_result.rc == 0
       loop_control:
-        label: "Setting git config: {{ item.key }}={{ item.value }} ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Setting git config: {{ item.key }}={{ item.value }}"
       tags:
         - git
         - config
@@ -228,7 +228,7 @@
       become: yes
       become_method: sudo
       loop_control:
-        label: "Executing custom command: '{{ item | truncate(40) }}' ({{ ansible_loop.index }} of {{ ansible_loop.length }})"
+        label: "Executing custom command: '{{ item | truncate(40) }}'"
       tags:
         - macos
         - preferences
