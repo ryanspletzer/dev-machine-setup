@@ -93,29 +93,6 @@
         - homebrew
         - formulae
 
-    # Add PowerShell to /etc/shells if it's not already there
-    - name: Check if PowerShell is in /etc/shells
-      ansible.builtin.command:
-        cmd: grep -q "/usr/local/bin/pwsh" /etc/shells
-      register: pwsh_in_shells
-      changed_when: false
-      failed_when: false
-      tags:
-        - powershell
-        - shells
-
-    - name: Add PowerShell to /etc/shells (with become_method=sudo)
-      ansible.builtin.lineinfile:
-        path: /etc/shells
-        line: /usr/local/bin/pwsh
-        state: present
-      become: yes
-      become_method: sudo
-      when: pwsh_in_shells.rc != 0
-      tags:
-        - powershell
-        - shells
-
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
