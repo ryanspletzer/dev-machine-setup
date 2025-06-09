@@ -275,14 +275,6 @@ custom_commands_user:
   # Use list view in all Finder windows by default
   - echo "Setting Finder default view to list view..."
   - defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-  # Enable Safari developer menu
-  # TODO: DEBUG FAILURES FOR SAFARI DEVELOPER MENU
-  - echo "Launching Safari to initialize preferences..."
-  - (open -a Safari && sleep 10 && killall Safari) || true
-  - echo "Enabling Safari developer menu..."
-  - defaults write com.apple.Safari IncludeDevelopMenu -bool true
-  - defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-  - defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
   # Auto-hide the Dock and change delay and animation speed
   - echo "Configuring Dock auto-hide settings..."
   - defaults write com.apple.dock autohide -bool true
