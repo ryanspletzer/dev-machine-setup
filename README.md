@@ -90,6 +90,20 @@ To run the entire playbook:
 ansible-playbook setup.yaml
 ```
 
+Or use the setup script (which also installs prerequisites):
+
+```bash
+./setup.sh
+```
+
+For increased verbosity during the setup:
+
+```bash
+./setup.sh -v       # Verbosity level 1
+./setup.sh -vv      # Verbosity level 2
+./setup.sh -vvv     # Verbosity level 3
+```
+
 ### Run Specific Components
 
 You can use tags to run specific parts of the setup:
@@ -242,7 +256,7 @@ This script installs Homebrew (if not already installed) and Ansible. To use it:
 
 ### Using `setup.sh`
 
-The `setup.sh` script installs prerequisites and runs the Ansible playbook. It supports an optional parameter to specify a custom YAML file. If no parameter is provided, it defaults to `setup.yaml`.
+The `setup.sh` script installs prerequisites and runs the Ansible playbook. It supports an optional parameter to specify a custom YAML file. If no parameter is provided, it defaults to `setup.yaml`. It also supports a `-v` flag for verbosity which can be repeated (e.g., `-vv`, `-vvv`) to increase the verbosity level.
 
 1. Make the script executable:
 
@@ -257,10 +271,24 @@ The `setup.sh` script installs prerequisites and runs the Ansible playbook. It s
    ./setup.sh
    ```
 
-3. Run a custom setup with a specific YAML file:
+3. Run with increased verbosity:
+
+   ```zsh
+   ./setup.sh -v       # Verbosity level 1
+   ./setup.sh -vv      # Verbosity level 2
+   ./setup.sh -vvv     # Verbosity level 3
+   ```
+
+4. Run a custom setup with a specific YAML file:
 
    ```zsh
    ./setup.sh custom_setup.yaml
+   ```
+
+5. Combine verbosity with a custom YAML file:
+
+   ```zsh
+   ./setup.sh -v custom_setup.yaml
    ```
 
 These scripts simplify the process of setting up your macOS development environment. Ensure you have the necessary permissions to execute them.
@@ -316,8 +344,16 @@ Or follow these manual steps:
 If you encounter errors with specific tasks, you can run with verbose output:
 
 ```bash
+# Using ansible-playbook directly
 ansible-playbook setup.yaml -vvv
+
+# Or using the setup script with verbosity flags
+./setup.sh -v       # Verbosity level 1
+./setup.sh -vv      # Verbosity level 2
+./setup.sh -vvv     # Verbosity level 3
 ```
+
+The setup script automatically creates a timestamped log file (e.g., `setup_20250609_123456.txt`) that captures all output, making it easier to diagnose issues.
 
 ## License
 
