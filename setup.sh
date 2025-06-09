@@ -147,12 +147,12 @@ if [ -z "$GIT_EMAIL" ]; then
     # Check if git_user_email is empty in vars.yaml
     EMAIL_VALUE=$(grep "^git_user_email:" vars.yaml | awk -F': ' '{print $2}' | xargs)
     if [ -z "$EMAIL_VALUE" ] || [ "$EMAIL_VALUE" = '""' ] || [ "$EMAIL_VALUE" = "''" ]; then
-      echo "Warning: Git email is not provided via command line and is empty in vars.yaml" | tee -a "$LOG_FILE"
-      echo "You will be prompted to provide a Git email during the setup" | tee -a "$LOG_FILE"
+      echo "Note: Git email is not provided via command line and is empty in vars.yaml" | tee -a "$LOG_FILE"
+      echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
     fi
   else
-    echo "Warning: Git email is not provided via command line and not found in vars.yaml" | tee -a "$LOG_FILE"
-    echo "You will be prompted to provide a Git email during the setup" | tee -a "$LOG_FILE"
+    echo "Note: Git email is not provided via command line and not found in vars.yaml" | tee -a "$LOG_FILE"
+    echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
   fi
 fi
 
