@@ -148,6 +148,7 @@
         cmd: git config --global user.name "{{ git_user_name }}"
       register: git_name_result
       changed_when: git_name_result.rc == 0
+      when: git_user_name is defined and git_user_name != ""
       tags:
         - git
         - config
