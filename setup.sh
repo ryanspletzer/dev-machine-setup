@@ -115,6 +115,8 @@ stdout_callback = yaml
 display_skipped_hosts = True
 display_ok_hosts = True
 callbacks_enabled = profile_tasks
+localhost_warning = False
+deprecation_warnings = False
 
 [callback_profile_tasks]
 task_output_limit = 100

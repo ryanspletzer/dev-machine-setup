@@ -340,6 +340,7 @@ Or follow these manual steps:
 - **Network issues**: Ensure you have a stable internet connection
 - **Homebrew errors**: Run `brew doctor` to diagnose Homebrew problems
 - **Application compatibility on Apple Silicon**: Some applications may require Rosetta 2. Set `install_rosetta: true` in `vars.yaml` or use `--extra-vars "install_rosetta=true"` when running the playbook
+- **Ansible warnings about inventory**: These are normal when running locally and are automatically suppressed in the setup script
 
 If you encounter errors with specific tasks, you can run with verbose output:
 

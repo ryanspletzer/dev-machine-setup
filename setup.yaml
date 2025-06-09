@@ -9,6 +9,7 @@
   # Define the become password at the play level so it's available to all tasks
   vars:
     ansible_become_pass: "{{ lookup('env', 'ANSIBLE_SUDO_PASS') }}"
+    ansible_connection: local
 
   vars_files:
     - vars.yaml
