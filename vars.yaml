@@ -230,7 +230,7 @@ vscode_extensions:
   # Add more VS Code extensions as needed
 
 # Git configuration
-git_user_email: ryan.spletzer@autodesk.com  # Set your email here or pass as a variable
+git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
 git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
 
 # Additional Git configurations (optional)

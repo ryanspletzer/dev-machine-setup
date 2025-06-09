@@ -175,10 +175,18 @@
         - git
         - config
 
+    # Check if Git email is set
+    - name: Fail if Git user.email is not set
+      ansible.builtin.fail:
+        msg: "Git user.email is required. Please set it in vars.yaml or pass it using the -e flag with setup.sh"
+      when: git_user_email is not defined or git_user_email == ""
+      tags:
+        - git
+        - config
+
     - name: Configure Git user.email
       ansible.builtin.command:
         cmd: git config --global user.email "{{ git_user_email }}"
-      when: git_user_email != ""
       register: git_email_result
       changed_when: git_email_result.rc == 0
       tags:

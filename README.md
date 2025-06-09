@@ -155,14 +155,36 @@ Or update the `vars.yaml` file to set `install_rosetta: true`.
 The playbook sets Git user information and additional configurations:
 
 - `user.name`: OPTIONAL - Defaults to your macOS full name (from `id -F`)
-- `user.email`: REQUIRED - Empty by default and should be set before running
+- `user.email`: REQUIRED - Must be set either in vars.yaml or via command line
 - Additional Git configurations: OPTIONAL - Configure any Git settings through the `git_additional_configs` dictionary
 
-To provide your email when running the playbook:
+To provide your Git email (REQUIRED):
 
 ```bash
+# Via ansible-playbook directly
 ansible-playbook setup.yaml --extra-vars "git_user_email=your.email@example.com"
+
+# Or more easily via the setup.sh script
+./setup.sh -e "your.email@example.com"
 ```
+
+To override the default Git name:
+
+```bash
+# Via ansible-playbook directly
+ansible-playbook setup.yaml --extra-vars "git_user_name=Your Name"
+
+# Or more easily via the setup.sh script
+./setup.sh -n "Your Name"
+```
+
+You can combine both parameters:
+
+```bash
+./setup.sh -e "your.email@example.com" -n "Your Name"
+```
+
+If you don't provide a Git email via command line or in vars.yaml, the setup will fail with a clear error message.
 
 You can set additional Git configurations in the `vars.yaml` file under the `git_additional_configs` section:
 
@@ -256,7 +278,12 @@ This script installs Homebrew (if not already installed) and Ansible. To use it:
 
 ### Using `setup.sh`
 
-The `setup.sh` script installs prerequisites and runs the Ansible playbook. It supports an optional parameter to specify a custom YAML file. If no parameter is provided, it defaults to `setup.yaml`. It also supports a `-v` flag for verbosity which can be repeated (e.g., `-vv`, `-vvv`) to increase the verbosity level.
+The `setup.sh` script installs prerequisites and runs the Ansible playbook. It supports the following parameters:
+
+- **Verbosity**: `-v` flag which can be repeated (e.g., `-vv`, `-vvv`) to increase the verbosity level
+- **Git Email**: `-e` flag followed by your email to set the Git user email (e.g., `-e "your.email@example.com"`)
+- **Git Name**: `-n` flag followed by your name to set the Git user name (e.g., `-n "Your Name"`)
+- **Custom YAML file**: Optional parameter to specify a custom YAML file. If no parameter is provided, it defaults to `setup.yaml`
 
 1. Make the script executable:
 
@@ -279,16 +306,28 @@ The `setup.sh` script installs prerequisites and runs the Ansible playbook. It s
    ./setup.sh -vvv     # Verbosity level 3
    ```
 
-4. Run a custom setup with a specific YAML file:
+4. Run with a specific Git email:
+
+   ```zsh
+   ./setup.sh -e "your.email@example.com"
+   ```
+
+5. Run with a specific Git name:
+
+   ```zsh
+   ./setup.sh -n "Your Name"
+   ```
+
+6. Run a custom setup with a specific YAML file:
 
    ```zsh
    ./setup.sh custom_setup.yaml
    ```
 
-5. Combine verbosity with a custom YAML file:
+7. Combine options:
 
    ```zsh
-   ./setup.sh -v custom_setup.yaml
+   ./setup.sh -v -e "your.email@example.com" -n "Your Name" custom_setup.yaml
    ```
 
 These scripts simplify the process of setting up your macOS development environment. Ensure you have the necessary permissions to execute them.

@@ -7,9 +7,11 @@ set -e
 
 # Initialize verbosity level as empty
 VERBOSITY=""
+GIT_EMAIL=""
+GIT_NAME=""
 
 # Parse command line arguments
-while getopts "v" opt; do
+while getopts "ve:n:" opt; do
   case $opt in
     v)
       # Count the number of 'v's to determine verbosity level
@@ -20,6 +22,14 @@ while getopts "v" opt; do
       elif [ "$VERBOSITY" = "-vv" ]; then
         VERBOSITY="-vvv"
       fi
+      ;;
+    e)
+      # Git email parameter
+      GIT_EMAIL="$OPTARG"
+      ;;
+    n)
+      # Git name parameter
+      GIT_NAME="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -129,7 +139,50 @@ echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
 if [ -n "$VERBOSITY" ]; then
   echo "Using verbosity level: $VERBOSITY" | tee -a "$LOG_FILE"
 fi
-/opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
+
+# Check vars.yaml for git_user_email if not provided via command line
+if [ -z "$GIT_EMAIL" ]; then
+  # Check if git_user_email is defined in vars.yaml
+  if grep -q "^git_user_email:" vars.yaml; then
+    # Check if git_user_email is empty in vars.yaml
+    EMAIL_VALUE=$(grep "^git_user_email:" vars.yaml | awk -F': ' '{print $2}' | xargs)
+    if [ -z "$EMAIL_VALUE" ] || [ "$EMAIL_VALUE" = '""' ] || [ "$EMAIL_VALUE" = "''" ]; then
+      echo "Warning: Git email is not provided via command line and is empty in vars.yaml" | tee -a "$LOG_FILE"
+      echo "You will be prompted to provide a Git email during the setup" | tee -a "$LOG_FILE"
+    fi
+  else
+    echo "Warning: Git email is not provided via command line and not found in vars.yaml" | tee -a "$LOG_FILE"
+    echo "You will be prompted to provide a Git email during the setup" | tee -a "$LOG_FILE"
+  fi
+fi
+
+# Prepare extra vars for Git email if provided
+EXTRA_VARS=""
+
+# Build extra vars string for Git email and name if provided
+if [ -n "$GIT_EMAIL" ] || [ -n "$GIT_NAME" ]; then
+  EXTRA_VARS="--extra-vars=\""
+
+  if [ -n "$GIT_EMAIL" ]; then
+    echo "Using provided Git email: $GIT_EMAIL" | tee -a "$LOG_FILE"
+    EXTRA_VARS="${EXTRA_VARS}git_user_email=$GIT_EMAIL"
+  fi
+
+  if [ -n "$GIT_NAME" ]; then
+    echo "Using provided Git name: $GIT_NAME" | tee -a "$LOG_FILE"
+    if [ -n "$GIT_EMAIL" ]; then
+      # Add space if we already have email in the extra vars
+      EXTRA_VARS="${EXTRA_VARS} "
+    fi
+    EXTRA_VARS="${EXTRA_VARS}git_user_name=$GIT_NAME"
+  fi
+
+  EXTRA_VARS="${EXTRA_VARS}\""
+  # Use eval to properly handle the quotes in the extra vars
+  eval "/opt/homebrew/bin/ansible-playbook $VERBOSITY $EXTRA_VARS \"$PLAYBOOK_FILE\""
+else
+  /opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
+fi
 
 # Cleanup
 echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
