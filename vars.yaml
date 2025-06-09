@@ -276,6 +276,9 @@ custom_commands_user:
   - echo "Setting Finder default view to list view..."
   - defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
   # Enable Safari developer menu
+  # TODO: DEBUG FAILURES FOR SAFARI DEVELOPER MENU
+  - echo "Launching Safari to initialize preferences..."
+  - (open -a Safari && sleep 10 && killall Safari) || true
   - echo "Enabling Safari developer menu..."
   - defaults write com.apple.Safari IncludeDevelopMenu -bool true
   - defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
@@ -332,7 +335,8 @@ custom_commands_elevated:
   - echo "Adding fish shell to /etc/shells..."
   - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
   # Change default shell to PowerShell
-  - chsh -s /usr/local/bin/pwsh
+  # TODO: FIGURE OUT AN APPROCH TO CHANGE THE DEFAULT SHELL
+  # - chsh -s /usr/local/bin/pwsh
   # Add more commands requiring sudo as needed
 
 # Custom script path (optional)
