@@ -9,15 +9,17 @@ set -e
 VERBOSITY=""
 
 # Parse command line arguments
-while getopts "v:p:" opt; do
+while getopts "v" opt; do
   case $opt in
     v)
-      # Set verbosity level based on number of v's
-      case $OPTARG in
-        v) VERBOSITY="-vv" ;;
-        vv) VERBOSITY="-vvv" ;;
-        *) VERBOSITY="-v" ;;
-      esac
+      # Count the number of 'v's to determine verbosity level
+      if [ -z "$VERBOSITY" ]; then
+        VERBOSITY="-v"
+      elif [ "$VERBOSITY" = "-v" ]; then
+        VERBOSITY="-vv"
+      elif [ "$VERBOSITY" = "-vv" ]; then
+        VERBOSITY="-vvv"
+      fi
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
