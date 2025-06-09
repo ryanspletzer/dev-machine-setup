@@ -231,11 +231,13 @@
         - preferences
         - elevated-commands
 
-    # Display results for debugging custom commands
+    # Display results for debugging custom commands (only when verbose)
     - name: Show custom command results (non-elevated)
       ansible.builtin.debug:
         var: custom_command_user_result
-      when: custom_command_user_result is defined
+      when:
+        - custom_command_user_result is defined
+        - ansible_verbosity > 0
       tags:
         - macos
         - preferences
@@ -244,7 +246,9 @@
     - name: Show custom command results (elevated)
       ansible.builtin.debug:
         var: custom_command_elevated_result
-      when: custom_command_elevated_result is defined
+      when:
+        - custom_command_elevated_result is defined
+        - ansible_verbosity > 0
       tags:
         - macos
         - preferences
