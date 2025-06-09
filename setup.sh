@@ -5,6 +5,30 @@
 # Exit on error
 set -e
 
+# Initialize verbosity level as empty
+VERBOSITY=""
+
+# Parse command line arguments
+while getopts "v:p:" opt; do
+  case $opt in
+    v)
+      # Set verbosity level based on number of v's
+      case $OPTARG in
+        v) VERBOSITY="-vv" ;;
+        vv) VERBOSITY="-vvv" ;;
+        *) VERBOSITY="-v" ;;
+      esac
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Reset argument pointer
+shift $((OPTIND-1))
+
 # Check for optional YAML file argument
 PLAYBOOK_FILE=${1:-setup.yaml}
 
@@ -98,7 +122,10 @@ echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
 
 # Run the playbook with increased verbosity for better progress tracking
 echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
-/opt/homebrew/bin/ansible-playbook "$PLAYBOOK_FILE"
+if [ -n "$VERBOSITY" ]; then
+  echo "Using verbosity level: $VERBOSITY" | tee -a "$LOG_FILE"
+fi
+/opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
 
 # Cleanup
 echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
