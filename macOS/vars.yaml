@@ -44,7 +44,6 @@ homebrew_casks:
   - steam
   - synologyassistant
   - tailscale
-  - temurin
   - utm
   - virtualbox
   - visual-studio-code
@@ -52,6 +51,7 @@ homebrew_casks:
   # Doesn't work without Rosetta 2
   # - yubico-yubikey-manager
   - zoom
+  - zulu
   # Add more casks as needed
 
 homebrew_formulae:
@@ -87,8 +87,8 @@ homebrew_formulae:
   - python
   - qemu
   - ruby-install
-  - rustup
   - ruff
+  - rustup
   - serverless
   - teamookla/speedtest/speedtest
   - uv
