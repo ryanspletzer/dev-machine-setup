@@ -1,6 +1,5 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
-
 # Modern Windows Developer Machine Setup with DSC 3.0
 # This script bootstraps a Windows development environment using:
 # - PowerShell (pwsh) from Chocolatey
@@ -31,11 +30,7 @@ param (
 
     [Parameter()]
     [string]
-    $TemplateFile = "setup.yaml",
-
-    [Parameter()]
-    [string]
-    $ValuesFile = "vars.yaml"
+    $VarsFile = "vars.yaml"
 )
 
 # Function to refresh the PATH environment variable
@@ -119,9 +114,11 @@ if (-not (Get-Module -Name powershell-yaml -ListAvailable)) {
 Import-Module -Name powershell-yaml
 
 # Define paths
-$templatePath = Join-Path -Path $PSScriptRoot -ChildPath $TemplateFile
-$valuesPath = Join-Path -Path $PSScriptRoot -ChildPath $ValuesFile
-$configPath = Join-Path -Path $PSScriptRoot -ChildPath "config.yaml"
+$varsPath = Join-Path -Path $PSScriptRoot -ChildPath $VarsFile
+
+# Load variables from vars.yaml
+Write-Output -InputObject "Loading configuration from $varsPath..."
+$vars = ConvertFrom-Yaml -Yaml (Get-Content -Path $varsPath -Raw)
 
 # Create the base configuration object
 $dscConfig = @{
@@ -132,23 +129,23 @@ $dscConfig = @{
         @{
             name = "Windows_Features"
             type = "WindowsFeature"
-            properties = $varsYaml.WindowsFeatures
+            properties = $vars.WindowsFeatures
         },
         @{
             name = "ChocolateyPackages"
             type = "ChocolateyPackage"
-            properties = $varsYaml.ChocolateyPackages
+            properties = $vars.ChocolateyPackages
         },
         @{
             name = "PowerShellModules"
             type = "PSModuleResource"
-            properties = $varsYaml.PowerShellModules
+            properties = $vars.PowerShellModules
         }
     )
 }
 
 # Optionally add Git configuration if values are provided
-if ($varsYaml.ContainsKey('GitUserEmail') -and $varsYaml.ContainsKey('GitUserName')) {
+if ($vars.ContainsKey('GitUserEmail') -and $vars.ContainsKey('GitUserName')) {
     $gitResource = @{
         name = "GitConfig"
         type = "Script"
@@ -167,14 +164,14 @@ $emailConfigured = -not [string]::IsNullOrEmpty($gitEmail)
 $nameConfigured = -not [string]::IsNullOrEmpty($gitName)
 return $emailConfigured -and $nameConfigured
 '@
-            setScript = $varsYaml.GitConfigScript
+            setScript = $vars.GitConfigScript.Replace('${GitUserEmail}', $vars.GitUserEmail).Replace('${GitUserName}', $vars.GitUserName)
         }
     }
     $dscConfig.resources += $gitResource
 }
 
 # Optionally add custom commands
-if ($varsYaml.ContainsKey('CustomCommands')) {
+if ($vars.ContainsKey('CustomCommands')) {
     $customCommandsResource = @{
         name = "CustomCommands"
         type = "Script"
@@ -188,7 +185,7 @@ return @{
 # Always return false to ensure the setScript runs
 return $false
 '@
-            setScript = $varsYaml.CustomCommands
+            setScript = $vars.CustomCommands
         }
     }
     $dscConfig.resources += $customCommandsResource
@@ -219,13 +216,13 @@ Write-Host "DSC configuration has been generated at: $setupPath"
 $verbosityFlag = if ($DscVerbose) { "--verbose" } else { "" }
 
 # Apply DSC configuration using the dsc CLI tool
-Write-Output -InputObject "Applying DSC configuration from dscconfig.yaml..."
+Write-Output -InputObject "Applying DSC configuration from config.yaml..."
 try {
     if ($verbosityFlag) {
-        & pwsh -NoProfile -Command "dsc config set --file $configPath $verbosityFlag"
+        & pwsh -NoProfile -Command "dsc config set --file $setupPath $verbosityFlag"
     }
     else {
-        & pwsh -NoProfile -Command "dsc config set --file $configPath"
+        & pwsh -NoProfile -Command "dsc config set --file $setupPath"
     }
 
     if ($LASTEXITCODE -ne 0) {
