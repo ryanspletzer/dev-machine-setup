@@ -22,9 +22,8 @@ chocolatey_packages:
   - fiddler
   - firefox
   - gh
-  # Git has special parameters - using dictionary format for params
-  - name: git
-    params: '"/WindowsTerminal /NoShellIntegration"'
+  - |
+    git -params '"/WindowsTerminal /NoShellIntegration"'
   - gnupg
   - go
   # May have a warning about not being signed...
@@ -104,18 +103,18 @@ windows_features:
   - Microsoft-Windows-Subsystem-Linux
   # Required for WSL 2
   - VirtualMachinePlatform
-  - Microsoft-Hyper-V
+  # Only enable if you need this
+  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
+  # - Microsoft-Hyper-V
   - Containers
-  - Microsoft-Windows-Sandbox
+  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
+  # - Microsoft-Windows-Sandbox
   # Add more Windows features as needed
 
-# Custom commands and scripts (optional)
+# Custom commands (optional)
 # These commands will be executed as the current user
-custom_commands_user:
-  - name: "Set WSL 2 as default"
-    command: "wsl --set-default-version 2"
+custom_commands:
+  - wsl --install --no-distribution
+  # If you want to install a specific WSL distribution, uncomment the next line
+  # - wsl --install --d Ubuntu-22.04
   # Add more custom user commands as needed
-
-# These commands will be executed with elevated privileges
-custom_commands_elevated:
-  # Add commands requiring admin privileges as needed
