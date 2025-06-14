@@ -79,9 +79,7 @@ if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue)) {
 
 # Check if we need to install or update required DSC resources
 $requiredModules = @(
-    @{ Name = 'PSDesiredStateConfiguration'; Version = '2.0.7' },
-    @{ Name = 'ChocolateyDsc'; Version = '1.0.0' },
-    @{ Name = 'ComputerManagementDsc'; Version = '10.0.0' }
+    @{ Name = 'cChoco'; Version = '2.6.0' }
 )
 
 Write-Output -InputObject "Installing required DSC resources..."
@@ -134,7 +132,7 @@ $dscConfig = @{
 foreach ($feature in $vars.WindowsFeatures) {
     $dscConfig.resources += @{
         name       = "WindowsFeature_$($feature.name)"
-        type       = "WindowsFeature"
+        type       = "PSDesiredStateConfiguration/WindowsFeature"
         properties = $feature
     }
 }
@@ -143,7 +141,7 @@ foreach ($feature in $vars.WindowsFeatures) {
 foreach ($package in $vars.ChocolateyPackages) {
     $dscConfig.resources += @{
         name       = "ChocolateyPackage_$($package.name)"
-        type       = "ChocolateyPackage"
+        type       = "cChoco/cChocoPackageInstaller"
         properties = $package
     }
 }
@@ -152,7 +150,7 @@ foreach ($package in $vars.ChocolateyPackages) {
 foreach ($module in $vars.PowerShellModules) {
     $dscConfig.resources += @{
         name       = "PSModule_$($module.name)"
-        type       = "PSModuleResource"
+        type       = "PSResourceGet/PSResource"
         properties = $module
     }
 }
