@@ -1,24 +1,12 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
 
-# Bootstrap Chocolatey, Python, pipx, and Ansible on Windows
-#
-# .SYNOPSIS
-# Installs prerequisites and runs Ansible playbook for Windows development environment setup
-#
-# .PARAMETER Verbosity
-# Sets the verbosity level for Ansible (0-3)
-#
-# .PARAMETER PrereqsOnly
-# Only installs prerequisites (Chocolatey, Python, pipx, and Ansible) without running the Ansible playbook
-#
-# .EXAMPLE
-# .\setup.ps1 -PrereqsOnly
-# Installs only the prerequisites without running the Ansible playbook
-#
-# .EXAMPLE
-# .\setup.ps1 -Verbosity 2
-# Runs the complete setup with increased verbosity level for Ansible
+# Modern Windows Developer Machine Setup with DSC 3.0
+# This script bootstraps a Windows development environment using:
+# - PowerShell 7.4+ from Chocolatey
+# - DSC 3.0 with YAML configuration
+# - PowerShell modules from PSGallery using PSResource
+
 [CmdletBinding()]
 param (
     [Parameter()]
@@ -28,7 +16,27 @@ param (
 
     [Parameter()]
     [switch]
-    $PrereqsOnly
+    $PrereqsOnly,
+
+    [Parameter()]
+    [switch]
+    $Force,
+
+    [Parameter()]
+    [string]
+    $GitUserEmail,
+
+    [Parameter()]
+    [string]
+    $GitUserName,
+
+    [Parameter()]
+    [string]
+    $TemplateFile = "setup.yaml",
+
+    [Parameter()]
+    [string]
+    $ValuesFile = "vars.yaml"
 )
 
 # Function to refresh the PATH environment variable
@@ -39,95 +47,221 @@ function Update-PathEnvironment {
     return $env:Path
 }
 
-Start-Transcript
+# Define the transcript file path
+$transcriptFile = "setup_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+Start-Transcript -Path $transcriptFile
 
-# Install Chocolatey
+# Function to output messages with timestamps and log level
+function Write-Log {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [string]$Message,
+
+        [Parameter()]
+        [ValidateSet('INFO', 'WARNING', 'ERROR')]
+        [string]$Level = 'INFO'
+    )
+
+    $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $formattedMessage = "[$timestamp] [$Level] $Message"
+
+    switch ($Level) {
+        'INFO' { Write-Host $formattedMessage -ForegroundColor Cyan }
+        'WARNING' { Write-Host $formattedMessage -ForegroundColor Yellow }
+        'ERROR' { Write-Host $formattedMessage -ForegroundColor Red }
+    }
+}
+
+#region Install Prerequisites
+
+# Install Chocolatey if not already installed
 if (-not (Get-Command -Name choco -ErrorAction SilentlyContinue)) {
-    Write-Output -InputObject "Installing Chocolatey..."
+    Write-Log "Installing Chocolatey..."
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
     Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    Update-PathEnvironment
 }
 
 # Install Python using Chocolatey
-Write-Output -InputObject "Installing Python..."
+Write-Log "Installing Python..."
 choco install python -y
 Update-PathEnvironment
 
 # Install pipx using Python
 if (-not (Get-Command -Name pipx -ErrorAction SilentlyContinue)) {
-    Write-Output -InputObject "Installing pipx..."
+    Write-Log "Installing pipx..."
     python -m pip install --user pipx
     python -m pipx ensurepath
 
     Update-PathEnvironment
 }
 
-# Install Ansible using pipx
-if (-not (Get-Command -Name ansible -ErrorAction SilentlyContinue)) {
-    Write-Output -InputObject "Installing Ansible..."
-    pipx install ansible --include-deps
+# Install PowerShell 7.4+ if not already installed or if Force is specified
+$pwshInstalled = $false
+$pwsh = Get-Command -Name pwsh -ErrorAction SilentlyContinue
+if ($pwsh) {
+    $pwshVersion = & pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()'
+    $pwshMajor = $pwshVersion.Split('.')[0]
+    $pwshMinor = $pwshVersion.Split('.')[1]
 
-    # Refresh PATH to include pipx binaries
-    Update-PathEnvironment
-
-    # Get the user's AppData local directory for pipx
-    $pipxBinPath = Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'py\Scripts'
-    if (Test-Path -Path $pipxBinPath) {
-        Write-Output -InputObject "Adding pipx bin directory to PATH: $pipxBinPath"
-        $env:Path = "$pipxBinPath;$env:Path"
+    if ([int]$pwshMajor -ge 7 -and [int]$pwshMinor -ge 4) {
+        $pwshInstalled = $true
+        Write-Log "PowerShell $pwshVersion already installed."
     }
 }
 
-Write-Output -InputObject "Bootstrap complete. Ansible is ready to use."
+if (-not $pwshInstalled -or $Force) {
+    Write-Log "Installing PowerShell 7.4+ using Chocolatey..."
+    choco install powershell-core -y --no-progress
+    Update-PathEnvironment
+}
+
+# Install Microsoft.DSC and dsc CLI
+if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue) -or $Force) {
+    Write-Log "Installing DSC CLI tool using Chocolatey..."
+    choco install dsc -y --no-progress
+    Update-PathEnvironment
+}
+
+# Install PSResource module if not already installed
+$psresourceModule = Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResource -ErrorAction SilentlyContinue
+if (-not $psresourceModule -or $Force) {
+    Write-Log "Installing PSResource module..."
+    if (-not (Get-Module -ListAvailable -Name PowerShellGet -ErrorAction SilentlyContinue)) {
+        Install-Module -Name PowerShellGet -Force -AllowClobber -Scope CurrentUser
+    }
+    Install-Module -Name Microsoft.PowerShell.PSResource -Force -AllowClobber -Scope CurrentUser
+}
+
+# Check if we need to install or update required DSC resources
+$requiredModules = @(
+    @{ Name = 'Microsoft.DSC.Core'; MinimumVersion = '0.1.0' },
+    @{ Name = 'PSDesiredStateConfiguration'; MinimumVersion = '2.0.7' },
+    @{ Name = 'ChocolateyDsc'; MinimumVersion = '1.0.0' },
+    @{ Name = 'ComputerManagementDsc'; MinimumVersion = '9.0.0' },
+    @{ Name = 'WindowsFeaturesDsc'; MinimumVersion = '1.0.0' }
+)
+
+Write-Log "Installing required DSC resources..."
+foreach ($module in $requiredModules) {
+    Write-Log "  Installing $($module.Name) (minimum version: $($module.MinimumVersion))..."
+    # Use pwsh to ensure we're using PowerShell 7+
+    & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -MinimumVersion $($module.MinimumVersion) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Warning: Failed to install $($module.Name) using Install-PSResource. Trying Install-Module..." -Level WARNING
+        & pwsh -NoProfile -Command "Install-Module -Name $($module.Name) -MinimumVersion $($module.MinimumVersion) -Force -AllowClobber -Scope CurrentUser" -ErrorAction SilentlyContinue
+    }
+}
+
+Write-Log "Prerequisites installation complete."
 
 # Exit if prerequisites only mode
 if ($PrereqsOnly) {
-    Write-Output -InputObject "Prerequisites installation complete. Skipping Ansible playbook execution (-PrereqsOnly switch specified)."
+    Write-Log "Skipping DSC configuration application (-PrereqsOnly switch specified)."
     Stop-Transcript
     exit 0
 }
 
-# Set verbosity for Ansible based on parameter
+#region Generate and Apply DSC Configuration
+
+# Install powershell-yaml module if not already installed
+if (-not (Get-Module -Name powershell-yaml -ListAvailable)) {
+    Write-Log "Installing powershell-yaml module..."
+    Install-Module -Name powershell-yaml -Force -Scope CurrentUser
+}
+Import-Module powershell-yaml
+
+# Define paths
+$templatePath = Join-Path -Path $PSScriptRoot -ChildPath $TemplateFile
+$valuesPath = Join-Path -Path $PSScriptRoot -ChildPath $ValuesFile
+$dscConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "dscconfig.yaml"
+
+Write-Log "Generating DSC configuration from template and values..."
+try {
+    # Read template and values files
+    $templateContent = Get-Content -Path $templatePath -Raw
+    $valuesContent = Get-Content -Path $valuesPath -Raw
+
+    # Convert values YAML to PowerShell object
+    $values = ConvertFrom-Yaml -Yaml $valuesContent
+
+    # Replace variables in template with values
+    $configContent = $templateContent
+
+    # Process WindowsFeatures
+    if ($values.WindowsFeatures) {
+        $featuresYaml = ConvertTo-Yaml -Data $values.WindowsFeatures -OutFile $null
+        $configContent = $configContent -replace '\$\{WindowsFeatures\}', $featuresYaml
+    }
+
+    # Process ChocolateyPackages
+    if ($values.ChocolateyPackages) {
+        $packagesYaml = ConvertTo-Yaml -Data $values.ChocolateyPackages -OutFile $null
+        $configContent = $configContent -replace '\$\{ChocolateyPackages\}', $packagesYaml
+    }
+
+    # Process PowerShellModules
+    if ($values.PowerShellModules) {
+        $modulesYaml = ConvertTo-Yaml -Data $values.PowerShellModules -OutFile $null
+        $configContent = $configContent -replace '\$\{PowerShellModules\}', $modulesYaml
+    }
+
+    # Process GitConfigScript - replace variables in the script itself
+    if ($values.GitConfigScript) {
+        $gitScript = $values.GitConfigScript
+        $gitScript = $gitScript -replace '\$\{GitUserEmail\}', $GitUserEmail
+        $gitScript = $gitScript -replace '\$\{GitUserName\}', $GitUserName
+        $configContent = $configContent -replace '\$\{GitConfigScript\}', $gitScript
+    }
+
+    # Process CustomCommands
+    if ($values.CustomCommands) {
+        $configContent = $configContent -replace '\$\{CustomCommands\}', $values.CustomCommands
+    }
+
+    # Write the generated configuration to file
+    $configContent | Set-Content -Path $dscConfigPath -Force
+    Write-Log "DSC configuration generated successfully at $dscConfigPath"
+}
+catch {
+    Write-Log "Error generating DSC configuration: $_" -Level ERROR
+    exit 1
+}
+
+# Set verbosity for DSC based on parameter
 $verbosityFlag = ""
 switch ($Verbosity) {
-    1 { $verbosityFlag = "-v" }
-    2 { $verbosityFlag = "-vv" }
-    3 { $verbosityFlag = "-vvv" }
+    1 { $verbosityFlag = "--verbose" }
+    2 { $verbosityFlag = "--verbose" }  # DSC doesn't have multiple verbosity levels, so we map both to --verbose
+    3 { $verbosityFlag = "--verbose" }
 }
 
-if ($verbosityFlag) {
-    Write-Output -InputObject "Using Ansible verbosity level: $verbosityFlag"
-}
-
-# Ensure ansible-playbook is in the PATH
-$ansiblePlaybook = Get-Command -Name ansible-playbook -ErrorAction SilentlyContinue
-if (-not $ansiblePlaybook) {
-    # Try to find it in common locations
-    $potentialPaths = @(
-        # Standard pipx location in AppData
-        (Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'py\Scripts\ansible-playbook.exe'),
-        # Legacy pipx location
-        (Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'pipx\venvs\ansible\Scripts\ansible-playbook.exe'),
-        # Python user base location
-        (Join-Path -Path (python -m site --user-base) -ChildPath 'Scripts\ansible-playbook.exe')
-    )
-
-    foreach ($path in $potentialPaths) {
-        if (Test-Path $path) {
-            Write-Output -InputObject "Found ansible-playbook at: $path"
-            $ansiblePlaybook = $path
-            break
-        }
+# Apply DSC configuration using the dsc CLI tool
+Write-Log "Applying DSC configuration from dscconfig.yaml..."
+try {
+    if ($verbosityFlag) {
+        & pwsh -NoProfile -Command "dsc config apply $dscConfigPath $verbosityFlag"
+    }
+    else {
+        & pwsh -NoProfile -Command "dsc config apply $dscConfigPath"
     }
 
-    if (-not $ansiblePlaybook) {
-        Write-Error -Message "Could not find ansible-playbook. Please ensure it is installed and in your PATH."
-        exit 1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Error applying DSC configuration. Exit code: $LASTEXITCODE" -Level ERROR
+        exit $LASTEXITCODE
     }
+
+    Write-Log "DSC configuration applied successfully."
+}
+catch {
+    Write-Log "Error applying DSC configuration: $_" -Level ERROR
+    exit 1
 }
 
-Write-Output -InputObject "Running Ansible playbook to set up the environment..."
-& $ansiblePlaybook -i localhost, $verbosityFlag setup.yaml
-
+Write-Log "Setup complete."
 Stop-Transcript
+
+Write-Host "`nSetup completed successfully!" -ForegroundColor Green
+Write-Host "Full log available at: $transcriptFile" -ForegroundColor Green

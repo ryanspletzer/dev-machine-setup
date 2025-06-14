@@ -1,23 +1,56 @@
-- name: Setup Windows Development Environment
-  hosts: localhost
-  vars_files:
-    - vars.yaml
-  tasks:
-    - name: Install chocolatey packages
-      win_chocolatey:
-        name: "{{ item.name | default(item) }}"
-        params: "{{ item.params | default(omit) }}"
-        state: present
-      loop: "{{ chocolatey_packages }}"
+# DSC 3.0 configuration template for Windows developer machine setup
+# This file defines the desired state configuration for a Windows developer environment
 
-    - name: Enable Windows features
-      win_feature:
-        name: "{{ item }}"
-        state: present
-        include_management_tools: yes
-      loop: "{{ windows_features }}"
-      register: win_feature_result
+# Documentation: https://learn.microsoft.com/en-us/powershell/dsc/concepts/dsc3-overview
 
-    - name: Reboot if required by Windows features installation
-      win_reboot:
-      when: win_feature_result.reboot_required
+# Define version
+version: 1.0.0
+name: WindowsDevMachineSetup
+
+# Define resources to be applied
+resources:
+  # Enable Windows Features
+  - name: Windows_Features
+    type: WindowsFeature
+    properties: ${WindowsFeatures}
+
+  # Install Chocolatey packages
+  - name: ChocolateyPackages
+    type: ChocolateyPackage
+    properties: ${ChocolateyPackages}
+
+  # Install PowerShell Modules
+  - name: PowerShellModules
+    type: PSModuleResource
+    properties: ${PowerShellModules}
+
+  # Configure Git settings
+  - name: GitConfig
+    type: Script
+    properties:
+      getScript: |
+        $gitEmail = git config --global --get user.email
+        $gitName = git config --global --get user.name
+        return @{
+          Result = "Git configuration: Email=$gitEmail, Name=$gitName"
+        }
+      testScript: |
+        $gitEmail = git config --global --get user.email
+        $gitName = git config --global --get user.name
+        $emailConfigured = -not [string]::IsNullOrEmpty($gitEmail)
+        $nameConfigured = -not [string]::IsNullOrEmpty($gitName)
+        return $emailConfigured -and $nameConfigured
+      setScript: ${GitConfigScript}
+
+  # Custom commands (like WSL installation)
+  - name: CustomCommands
+    type: Script
+    properties:
+      getScript: |
+        return @{
+          Result = "Custom commands execution status"
+        }
+      testScript: |
+        # Always return false to ensure the setScript runs
+        return $false
+      setScript: ${CustomCommands}

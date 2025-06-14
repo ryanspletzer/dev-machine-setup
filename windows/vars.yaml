@@ -1,100 +1,194 @@
-# vars.yaml
-# Externalized variables for Ansible setup
+# Configuratio# Chocolatey packages to install
+ChocolateyPackages:
+  - name: 1password
+    ensure: Present
+  - name: adoptopenjdk
+    ensure: Present
+  - name: awscli
+    ensure: Present
+  - name: awssamcli
+    ensure: Present
+  - name: azure-cli
+    ensure: Presents for DSC 3.0 Windows dev machine setup
 
-# Chocolatey configuration
-chocolatey_packages:
+# Windows Features to enable
+WindowsFeatures:
+  - name: Microsoft-Windows-Subsystem-Linux
+    ensure: Present
+    includeAllSubFeature: true
+  - name: VirtualMachinePlatform
+    ensure: Present
+    includeAllSubFeature: true
+  - name: Containers
+    ensure: Present
+    includeAllSubFeature: true
+
+# Chocolatey packages to install
+ChocolateyPackages:
   - 1password
   - adoptopenjdk
   - awscli
   - awssamcli
   - azure-cli
-  - azure-data-studio
-  - azure-functions-core-tools
-  - bicep
-  - cascadiacode
-  - citrix-workspace
-  - docker
-  - dotnet-sdk
-  # - dotnetcore-sdk # versions 3 and lower
-  - dotnetfx
-  - drawio
-  - ffmpeg
-  - fiddler
-  - firefox
-  - gh
-  - |
-    git -params '"/WindowsTerminal /NoShellIntegration"'
-  - gnupg
-  - go
+  - name: azure-data-studio
+    ensure: Present
+  - name: azure-functions-core-tools
+    ensure: Present
+  - name: bicep
+    ensure: Present
+  - name: cascadiacode
+    ensure: Present
+  - name: citrix-workspace
+    ensure: Present
+  - name: docker
+    ensure: Present
+  - name: dotnet-sdk
+    ensure: Present
+  # - name: dotnetcore-sdk # versions 3 and lower
+  #   ensure: Present
+  - name: dotnetfx
+    ensure: Present
+  - name: drawio
+    ensure: Present
+  - name: ffmpeg
+    ensure: Present
+  - name: fiddler
+    ensure: Present
+  - name: firefox
+    ensure: Present
+  - name: gh
+    ensure: Present
+  - name: git
+    ensure: Present
+    params: "/WindowsTerminal /NoShellIntegration"
+  - name: gnupg
+    ensure: Present
+  - name: go
+    ensure: Present
   # May have a warning about not being signed...
   # The Chrome setup process is weird.
   # https://community.chocolatey.org/packages/GoogleChrome
-  - googlechrome
-  - ilspy
-  - jq
-  - maven
-  - microsoftazurestorageexplorer
-  - ngrok
-  - nodejs
-  - notepadplusplus
-  - office365business
-  - oh-my-posh
-  - packer
-  - postman
-  - python
-  - pwsh
-  - qemu
-  - ruff
-  - rsat
-  - rustup.install
-  - serverless
-  - servicebusexplorer
-  - slack
-  - sql-server-management-studio
-  - tailscale
-  - terraform
-  - uv
-  - vault
-  - visualstudio2022enterprise
-  - visualstudiocode
-  - windows-sdk-10-version-2004-all
-  - zoom
-  - zulu
-  # Add more chocolatey packages as needed
+  - name: googlechrome
+    ensure: Present
+  - name: ilspy
+    ensure: Present
+  - name: jq
+    ensure: Present
+  - name: maven
+    ensure: Present
+  - name: microsoftazurestorageexplorer
+    ensure: Present
+  - name: ngrok
+    ensure: Present
+  - name: nodejs
+    ensure: Present
+  - name: notepadplusplus
+    ensure: Present
+  - name: office365business
+    ensure: Present
+  - name: oh-my-posh
+    ensure: Present
+  - name: packer
+    ensure: Present
+  - name: postman
+    ensure: Present
+  - name: python
+    ensure: Present
+  - name: pwsh
+    ensure: Present
+  - name: qemu
+    ensure: Present
+  - name: ruff
+    ensure: Present
+  - name: rsat
+    ensure: Present
+  - name: rustup.install
+    ensure: Present
+  - name: serverless
+    ensure: Present
+  - name: servicebusexplorer
+    ensure: Present
+  - name: slack
+    ensure: Present
+  - name: sql-server-management-studio
+    ensure: Present
+  - name: tailscale
+    ensure: Present
+  - name: terraform
+    ensure: Present
+  - name: uv
+    ensure: Present
+  - name: vault
+    ensure: Present
+  - name: visualstudio2022enterprise
+    ensure: Present
+  - name: visualstudiocode
+    ensure: Present
+  - name: windows-sdk-10-version-2004-all
+    ensure: Present
+  - name: zoom
+    ensure: Present
+  - name: zulu
+    ensure: Present
 
-# PowerShell modules (placeholder - add your modules if needed)
-powershell_modules:
-  - AWS.Tools.Common
-  - Az.Accounts
-  - Microsoft.Graph.Authentication
-  - Pester
-  - platyPS
-  - posh-git
-  - powershell-yaml
-  - PowerShellBuild
-  - psake
-  - PSGraphQL
-  - PSJsonWebToken
-  - PSReadLine
-  - PSScriptAnalyzer
-  - PSTcpIp
-  - Terminal-Icons
-  # Add more PowerShell modules as needed
+# PowerShell modules to install
+PowerShellModules:
+  - name: AWS.Tools.Common
+    ensure: Present
+  - name: Az.Accounts
+    ensure: Present
+  - name: Microsoft.Graph.Authentication
+    ensure: Present
+  - name: Pester
+    ensure: Present
+  - name: platyPS
+    ensure: Present
+  - name: posh-git
+    ensure: Present
+  - name: powershell-yaml
+    ensure: Present
+  - name: PowerShellBuild
+    ensure: Present
+  - name: psake
+    ensure: Present
+  - name: PSGraphQL
+    ensure: Present
+  - name: PSJsonWebToken
+    ensure: Present
+  - name: PSReadLine
+    ensure: Present
+  - name: PSScriptAnalyzer
+    ensure: Present
+  - name: PSTcpIp
+    ensure: Present
+  - name: Terminal-Icons
+    ensure: Present
 
-# VS Code extensions (placeholder - add your extensions if needed)
-vscode_extensions:
-  # Add VS Code extensions as needed
+# Git configuration script
+GitConfigScript: |
+  # Git user configuration
+  if (-not [string]::IsNullOrEmpty('${GitUserEmail}')) {
+    git config --global user.email '${GitUserEmail}'
+  }
+  if (-not [string]::IsNullOrEmpty('${GitUserName}')) {
+    git config --global user.name '${GitUserName}'
+  }
 
-# Git configuration
-git_user_email: ''  # REQUIRED: Set your email here or pass via command line
-git_user_name: ''   # REQUIRED: Set your name here or pass via command line
+  # Additional Git configurations
+  git config --global init.defaultBranch main
+  git config --global push.default current
+  git config --global push.autoSetupRemote true
+  git config --global core.autocrlf true
 
-# Additional Git configurations (optional)
-git_additional_configs:
-  # Examples (uncomment to use):
-  # init.defaultBranch: main
-  # push.default: current
-  # push.autoSetupRemote: true
+# Custom commands to execute after setup
+CustomCommands: |
+  # Install WSL without a distribution
+  Write-Output "Installing WSL infrastructure..."
+  wsl --install --no-distribution
+
+  # Additional custom commands can be added here
+  # For example, to install a specific WSL distribution:
+  # wsl --install -d Ubuntu-22.04
   # Add more git config options as needed
 
 # Windows Features to enable
