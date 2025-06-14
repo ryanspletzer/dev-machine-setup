@@ -3,16 +3,15 @@
 
 # Modern Windows Developer Machine Setup with DSC 3.0
 # This script bootstraps a Windows development environment using:
-# - PowerShell 7.4+ from Chocolatey
+# - PowerShell 7.5+ from Chocolatey
 # - DSC 3.0 with YAML configuration
 # - PowerShell modules from PSGallery using PSResource
 
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet(0, 1, 2, 3)]
-    [int]
-    $Verbosity = 0,
+    [switch]
+    $DscVerbose,
 
     [Parameter()]
     [switch]
@@ -227,12 +226,7 @@ catch {
 }
 
 # Set verbosity for DSC based on parameter
-$verbosityFlag = ""
-switch ($Verbosity) {
-    1 { $verbosityFlag = "--verbose" }
-    2 { $verbosityFlag = "--verbose" }  # DSC doesn't have multiple verbosity levels, so we map both to --verbose
-    3 { $verbosityFlag = "--verbose" }
-}
+$verbosityFlag = if ($DscVerbose) { "--verbose" } else { "" }
 
 # Apply DSC configuration using the dsc CLI tool
 Write-Log "Applying DSC configuration from dscconfig.yaml..."
