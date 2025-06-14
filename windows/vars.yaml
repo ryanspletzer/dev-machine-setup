@@ -92,8 +92,6 @@ ChocolateyPackages:
     ensure: Present
   - name: packer
     ensure: Present
-  - name: postman
-    ensure: Present
   - name: python
     ensure: Present
   - name: pwsh
