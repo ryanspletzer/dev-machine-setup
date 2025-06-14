@@ -184,6 +184,9 @@ GitConfigScript: |
 
 # Custom commands to execute after setup
 CustomCommands: |
+  python -m pip install --user pipx
+  python -m pipx ensurepath
+
   # Install WSL without a distribution
   Write-Output "Installing WSL infrastructure..."
   wsl --install --no-distribution
@@ -192,3 +195,4 @@ CustomCommands: |
   # For example, to install a specific WSL distribution:
   # wsl --install -d Ubuntu-22.04
   # Add more git config options as needed
+

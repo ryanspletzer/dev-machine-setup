@@ -8,6 +8,7 @@ version: 1.0.0
 name: WindowsDevMachineSetup
 
 # Define resources to be applied
+$schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
 resources:
   # Enable Windows Features
   - name: Windows_Features
