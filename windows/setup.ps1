@@ -31,6 +31,14 @@ param (
     $PrereqsOnly
 )
 
+# Function to refresh the PATH environment variable
+function Update-PathEnvironment {
+    $machinePath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
+    $userPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
+    $env:Path = "$machinePath;$userPath"
+    return $env:Path
+}
+
 Start-Transcript
 
 # Install Chocolatey
@@ -44,7 +52,7 @@ if (-not (Get-Command -Name choco -ErrorAction SilentlyContinue)) {
 # Install Python using Chocolatey
 Write-Output -InputObject "Installing Python..."
 choco install python -y
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+Update-PathEnvironment
 
 # Install pipx using Python
 if (-not (Get-Command -Name pipx -ErrorAction SilentlyContinue)) {
@@ -52,13 +60,23 @@ if (-not (Get-Command -Name pipx -ErrorAction SilentlyContinue)) {
     python -m pip install --user pipx
     python -m pipx ensurepath
 
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    Update-PathEnvironment
 }
 
 # Install Ansible using pipx
 if (-not (Get-Command -Name ansible -ErrorAction SilentlyContinue)) {
     Write-Output -InputObject "Installing Ansible..."
-    pipx install ansible
+    pipx install ansible --include-deps
+
+    # Refresh PATH to include pipx binaries
+    Update-PathEnvironment
+
+    # Get the user's AppData local directory for pipx
+    $pipxBinPath = Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'py\Scripts'
+    if (Test-Path -Path $pipxBinPath) {
+        Write-Output -InputObject "Adding pipx bin directory to PATH: $pipxBinPath"
+        $env:Path = "$pipxBinPath;$env:Path"
+    }
 }
 
 Write-Output -InputObject "Bootstrap complete. Ansible is ready to use."
@@ -82,7 +100,34 @@ if ($verbosityFlag) {
     Write-Output -InputObject "Using Ansible verbosity level: $verbosityFlag"
 }
 
+# Ensure ansible-playbook is in the PATH
+$ansiblePlaybook = Get-Command -Name ansible-playbook -ErrorAction SilentlyContinue
+if (-not $ansiblePlaybook) {
+    # Try to find it in common locations
+    $potentialPaths = @(
+        # Standard pipx location in AppData
+        (Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'py\Scripts\ansible-playbook.exe'),
+        # Legacy pipx location
+        (Join-Path -Path ([Environment]::GetFolderPath('LocalApplicationData')) -ChildPath 'pipx\venvs\ansible\Scripts\ansible-playbook.exe'),
+        # Python user base location
+        (Join-Path -Path (python -m site --user-base) -ChildPath 'Scripts\ansible-playbook.exe')
+    )
+
+    foreach ($path in $potentialPaths) {
+        if (Test-Path $path) {
+            Write-Output -InputObject "Found ansible-playbook at: $path"
+            $ansiblePlaybook = $path
+            break
+        }
+    }
+
+    if (-not $ansiblePlaybook) {
+        Write-Error -Message "Could not find ansible-playbook. Please ensure it is installed and in your PATH."
+        exit 1
+    }
+}
+
 Write-Output -InputObject "Running Ansible playbook to set up the environment..."
-ansible-playbook -i localhost, $verbosityFlag setup.yaml
+& $ansiblePlaybook -i localhost, $verbosityFlag setup.yaml
 
 Stop-Transcript
