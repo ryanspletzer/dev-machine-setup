@@ -166,6 +166,10 @@ PowerShellModules:
   - name: Terminal-Icons
     ensure: Present
 
+# Git user configuration - uncomment and set these values as needed
+# GitUserEmail: your.email@example.com
+# GitUserName: Your Name
+
 # Git configuration script
 GitConfigScript: |
   # Git user configuration

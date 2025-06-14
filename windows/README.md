@@ -138,3 +138,50 @@ If you encounter issues:
 2. Check the log file for specific error messages
 3. Ensure your user account has administrative privileges
 4. Try running with `-Force` to reinstall prerequisites
+
+# Windows Developer Machine Setup
+
+This directory contains DSC 3.0 configuration files for setting up a Windows developer machine.
+
+## How to Use
+
+1. Customize the `vars.yaml` file with your desired configuration:
+   - Windows Features
+   - Chocolatey packages
+   - PowerShell modules
+   - Git configuration
+   - Custom commands
+
+2. Generate the DSC configuration file by running:
+   ```powershell
+   Import-Module powershell-yaml
+   ./Generate-DscConfig.ps1
+   ```
+
+3. Apply the configuration using DSC:
+   ```powershell
+   # Install DSC v3 if you don't have it yet
+   Install-Module Microsoft.DSC -AllowPrerelease
+
+   # Apply the configuration
+   Start-DscConfiguration -Path ./setup.yaml
+   ```
+
+## Configuration Components
+
+- **Windows Features**: Enable Windows components like WSL, Hyper-V, etc.
+- **Chocolatey Packages**: Install development tools and applications
+- **PowerShell Modules**: Install PowerShell modules for development
+- **Git Configuration**: Set up Git with your preferred settings
+- **Custom Commands**: Run additional setup steps
+
+## Customization
+
+To customize Git settings, uncomment and set the `GitUserEmail` and `GitUserName` variables in `vars.yaml`.
+
+## Requirements
+
+- Windows 10/11
+- PowerShell 7+
+- [DSC v3](https://learn.microsoft.com/en-us/powershell/dsc/concepts/dsc3-overview)
+- PowerShell-YAML module (`Install-Module powershell-yaml -Scope CurrentUser`)
