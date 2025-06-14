@@ -127,23 +127,34 @@ $dscConfig = @{
         version = "1.0.0"
     }
     '$schema' = "https://aka.ms/dsc/schemas/v3/bundled/config/document.json"
-    resources = @(
-        @{
-            name       = "Windows_Features"
-            type       = "WindowsFeature"
-            properties = $vars.WindowsFeatures
-        },
-        @{
-            name       = "ChocolateyPackages"
-            type       = "ChocolateyPackage"
-            properties = $vars.ChocolateyPackages
-        },
-        @{
-            name       = "PowerShellModules"
-            type       = "PSModuleResource"
-            properties = $vars.PowerShellModules
-        }
-    )
+    resources = @()
+}
+
+# Add Windows Features
+foreach ($feature in $vars.WindowsFeatures) {
+    $dscConfig.resources += @{
+        name       = "WindowsFeature_$($feature.name)"
+        type       = "WindowsFeature"
+        properties = $feature
+    }
+}
+
+# Add Chocolatey Packages
+foreach ($package in $vars.ChocolateyPackages) {
+    $dscConfig.resources += @{
+        name       = "ChocolateyPackage_$($package.name)"
+        type       = "ChocolateyPackage"
+        properties = $package
+    }
+}
+
+# Add PowerShell Modules
+foreach ($module in $vars.PowerShellModules) {
+    $dscConfig.resources += @{
+        name       = "PSModule_$($module.name)"
+        type       = "PSModuleResource"
+        properties = $module
+    }
 }
 
 # Optionally add Git configuration if values are provided
