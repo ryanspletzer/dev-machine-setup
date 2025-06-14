@@ -112,6 +112,8 @@ if ($PrereqsOnly) {
 # Install powershell-yaml module if not already installed
 if (-not (Get-Module -Name powershell-yaml -ListAvailable)) {
     Write-Output -InputObject "Installing powershell-yaml module..."
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Set-PackageSource -Name PSGallery -Trusted
     Install-Module -Name powershell-yaml -Force -Scope CurrentUser
 }
 Import-Module -Name powershell-yaml
