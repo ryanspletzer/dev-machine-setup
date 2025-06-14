@@ -1,0 +1,122 @@
+# vars.yaml
+# Externalized variables for Ansible setup
+
+# Chocolatey configuration
+chocolatey_packages:
+  - 1password
+  - adoptopenjdk
+  - awscli
+  - awssamcli
+  - azure-cli
+  - azure-data-studio
+  - azure-functions-core-tools
+  - bicep
+  - cascadiacode
+  - citrix-workspace
+  - docker
+  - dotnet-sdk
+  # - dotnetcore-sdk # versions 3 and lower
+  - dotnetfx
+  - drawio
+  - ffmpeg
+  - fiddler
+  - firefox
+  - gh
+  # Git has special parameters - using dictionary format for params
+  - name: git
+    params: '"/WindowsTerminal /NoShellIntegration"'
+  - gnupg
+  - go
+  # May have a warning about not being signed...
+  # The Chrome setup process is weird.
+  # https://community.chocolatey.org/packages/GoogleChrome
+  - googlechrome
+  - ilspy
+  - jq
+  - maven
+  - microsoftazurestorageexplorer
+  - ngrok
+  - nodejs
+  - notepadplusplus
+  - office365business
+  - oh-my-posh
+  - packer
+  - postman
+  - python
+  - pwsh
+  - qemu
+  - ruff
+  - rsat
+  - rustup.install
+  - serverless
+  - servicebusexplorer
+  - slack
+  - sql-server-management-studio
+  - tailscale
+  - terraform
+  - uv
+  - vault
+  - visualstudio2022enterprise
+  - visualstudiocode
+  - windows-sdk-10-version-2004-all
+  - zoom
+  - zulu
+  # Add more chocolatey packages as needed
+
+# PowerShell modules (placeholder - add your modules if needed)
+powershell_modules:
+  - AWS.Tools.Common
+  - Az.Accounts
+  - oh-my-posh
+  - Microsoft.Graph.Authentication
+  - Pester
+  - platyPS
+  - posh-git
+  - powershell-yaml
+  - PowerShellBuild
+  - psake
+  - PSGraphQL
+  - PSJsonWebToken
+  - PSReadLine
+  - PSScriptAnalyzer
+  - PSTcpIp
+  - Terminal-Icons
+  # Add more PowerShell modules as needed
+
+# VS Code extensions (placeholder - add your extensions if needed)
+vscode_extensions:
+  # Add VS Code extensions as needed
+
+# Git configuration
+git_user_email: ''  # REQUIRED: Set your email here or pass via command line
+git_user_name: ''   # REQUIRED: Set your name here or pass via command line
+
+# Additional Git configurations (optional)
+git_additional_configs:
+  # Examples (uncomment to use):
+  # init.defaultBranch: main
+  # push.default: current
+  # push.autoSetupRemote: true
+  # Add more git config options as needed
+
+# Windows Features to enable
+windows_features:
+  # Required for both WSL 1 and 2
+  - Microsoft-Windows-Subsystem-Linux
+  # Required for WSL 2
+  - VirtualMachinePlatform
+  - Microsoft-Hyper-V
+  - Containers
+  - Microsoft-Windows-Sandbox
+  # Add more Windows features as needed
+
+# Custom commands and scripts (optional)
+# These commands will be executed as the current user
+custom_commands_user:
+  - name: "Set WSL 2 as default"
+    command: "wsl --set-default-version 2"
+  # Add more custom user commands as needed
+
+# These commands will be executed with elevated privileges
+custom_commands_elevated:
+  # Add commands requiring admin privileges as needed

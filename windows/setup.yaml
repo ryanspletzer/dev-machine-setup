@@ -1,0 +1,23 @@
+- name: Setup Windows Development Environment
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Install chocolatey packages
+      win_chocolatey:
+        name: "{{ item.name | default(item) }}"
+        params: "{{ item.params | default(omit) }}"
+        state: present
+      loop: "{{ chocolatey_packages }}"
+
+    - name: Enable Windows features
+      win_feature:
+        name: "{{ item }}"
+        state: present
+        include_management_tools: yes
+      loop: "{{ windows_features }}"
+      register: win_feature_result
+
+    - name: Reboot if required by Windows features installation
+      win_reboot:
+      when: win_feature_result.reboot_required
