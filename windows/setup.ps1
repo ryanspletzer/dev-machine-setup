@@ -2,12 +2,33 @@
 #Requires -Version 5.1
 
 # Bootstrap Chocolatey, Python, pipx, and Ansible on Windows
+#
+# .SYNOPSIS
+# Installs prerequisites and runs Ansible playbook for Windows development environment setup
+#
+# .PARAMETER Verbosity
+# Sets the verbosity level for Ansible (0-3)
+#
+# .PARAMETER PrereqsOnly
+# Only installs prerequisites (Chocolatey, Python, pipx, and Ansible) without running the Ansible playbook
+#
+# .EXAMPLE
+# .\setup.ps1 -PrereqsOnly
+# Installs only the prerequisites without running the Ansible playbook
+#
+# .EXAMPLE
+# .\setup.ps1 -Verbosity 2
+# Runs the complete setup with increased verbosity level for Ansible
 [CmdletBinding()]
 param (
     [Parameter()]
     [ValidateSet(0, 1, 2, 3)]
     [int]
-    $Verbosity = 0
+    $Verbosity = 0,
+
+    [Parameter()]
+    [switch]
+    $PrereqsOnly
 )
 
 Start-Transcript
@@ -41,6 +62,13 @@ if (-not (Get-Command -Name ansible -ErrorAction SilentlyContinue)) {
 }
 
 Write-Output -InputObject "Bootstrap complete. Ansible is ready to use."
+
+# Exit if prerequisites only mode
+if ($PrereqsOnly) {
+    Write-Output -InputObject "Prerequisites installation complete. Skipping Ansible playbook execution (-PrereqsOnly switch specified)."
+    Stop-Transcript
+    exit 0
+}
 
 # Set verbosity for Ansible based on parameter
 $verbosityFlag = ""
