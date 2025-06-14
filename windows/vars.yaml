@@ -1,4 +1,26 @@
-# Configuratio# Chocolatey packages to install
+# vars.yml
+# Externalized variables for DSC 3.0 setup
+
+# Windows Features to enable
+WindowsFeatures:
+  # Required for both WSL 1 and 2
+  - name: Microsoft-Windows-Subsystem-Linux
+    ensure: Present
+    includeAllSubFeature: true
+  # Required for WSL 2
+  - name: VirtualMachinePlatform
+    ensure: Present
+    includeAllSubFeature: true
+  # Only enable if you need this
+  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
+  # - name: Microsoft-Hyper-V
+  #   ensure: Present
+  #   includeAllSubFeature: true
+  - name: Containers
+    ensure: Present
+    includeAllSubFeature: true
+
+# Chocolatey packages to install
 ChocolateyPackages:
   - name: 1password
     ensure: Present
@@ -9,27 +31,7 @@ ChocolateyPackages:
   - name: awssamcli
     ensure: Present
   - name: azure-cli
-    ensure: Presents for DSC 3.0 Windows dev machine setup
-
-# Windows Features to enable
-WindowsFeatures:
-  - name: Microsoft-Windows-Subsystem-Linux
     ensure: Present
-    includeAllSubFeature: true
-  - name: VirtualMachinePlatform
-    ensure: Present
-    includeAllSubFeature: true
-  - name: Containers
-    ensure: Present
-    includeAllSubFeature: true
-
-# Chocolatey packages to install
-ChocolateyPackages:
-  - 1password
-  - adoptopenjdk
-  - awscli
-  - awssamcli
-  - azure-cli
   - name: azure-data-studio
     ensure: Present
   - name: azure-functions-core-tools
@@ -190,25 +192,3 @@ CustomCommands: |
   # For example, to install a specific WSL distribution:
   # wsl --install -d Ubuntu-22.04
   # Add more git config options as needed
-
-# Windows Features to enable
-windows_features:
-  # Required for both WSL 1 and 2
-  - Microsoft-Windows-Subsystem-Linux
-  # Required for WSL 2
-  - VirtualMachinePlatform
-  # Only enable if you need this
-  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
-  # - Microsoft-Hyper-V
-  - Containers
-  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
-  # - Microsoft-Windows-Sandbox
-  # Add more Windows features as needed
-
-# Custom commands (optional)
-# These commands will be executed as the current user
-custom_commands:
-  - wsl --install --no-distribution
-  # If you want to install a specific WSL distribution, uncomment the next line
-  # - wsl --install --d Ubuntu-22.04
-  # Add more custom user commands as needed

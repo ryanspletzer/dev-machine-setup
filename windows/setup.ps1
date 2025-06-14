@@ -126,7 +126,7 @@ if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue) -or $Force) {
 }
 
 # Install PSResource module if not already installed
-$psresourceModule = Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResource -ErrorAction SilentlyContinue
+$psresourceModule = Get-Module -ListAvailable -Name Microsoft.PowerShell.PSResourceGet -ErrorAction SilentlyContinue
 if (-not $psresourceModule -or $Force) {
     Write-Log "Installing PSResource module..."
     if (-not (Get-Module -ListAvailable -Name PowerShellGet -ErrorAction SilentlyContinue)) {
@@ -190,36 +190,32 @@ try {
     # Replace variables in template with values
     $configContent = $templateContent
 
-    # Process WindowsFeatures
-    if ($values.WindowsFeatures) {
-        $featuresYaml = ConvertTo-Yaml -Data $values.WindowsFeatures -OutFile $null
-        $configContent = $configContent -replace '\$\{WindowsFeatures\}', $featuresYaml
+    # Process variables by type
+    foreach ($key in $values.Keys) {
+        $value = $values[$key]
+
+        # Handle array/collection values specially
+        if ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string])) {
+            if ($key -eq "CustomCommands" -or $key -eq "GitConfigScript") {
+                # For script blocks, join with newlines
+                $joined = ($value -join "`r`n")
+                $configContent = $configContent -replace "\$\{$key\}", $joined
+            }
+            else {
+                # Convert array to YAML format
+                $valueYaml = ConvertTo-Yaml -Data $value -OutFile $null
+                $configContent = $configContent -replace "\$\{$key\}", $valueYaml
+            }
+        }
+        else {
+            # Handle simple string replacement
+            $configContent = $configContent -replace "\$\{$key\}", $value
+        }
     }
 
-    # Process ChocolateyPackages
-    if ($values.ChocolateyPackages) {
-        $packagesYaml = ConvertTo-Yaml -Data $values.ChocolateyPackages -OutFile $null
-        $configContent = $configContent -replace '\$\{ChocolateyPackages\}', $packagesYaml
-    }
-
-    # Process PowerShellModules
-    if ($values.PowerShellModules) {
-        $modulesYaml = ConvertTo-Yaml -Data $values.PowerShellModules -OutFile $null
-        $configContent = $configContent -replace '\$\{PowerShellModules\}', $modulesYaml
-    }
-
-    # Process GitConfigScript - replace variables in the script itself
-    if ($values.GitConfigScript) {
-        $gitScript = $values.GitConfigScript
-        $gitScript = $gitScript -replace '\$\{GitUserEmail\}', $GitUserEmail
-        $gitScript = $gitScript -replace '\$\{GitUserName\}', $GitUserName
-        $configContent = $configContent -replace '\$\{GitConfigScript\}', $gitScript
-    }
-
-    # Process CustomCommands
-    if ($values.CustomCommands) {
-        $configContent = $configContent -replace '\$\{CustomCommands\}', $values.CustomCommands
-    }
+    # Special handling for git user details
+    $configContent = $configContent -replace '\$\{GitUserEmail\}', $GitUserEmail
+    $configContent = $configContent -replace '\$\{GitUserName\}', $GitUserName
 
     # Write the generated configuration to file
     $configContent | Set-Content -Path $dscConfigPath -Force

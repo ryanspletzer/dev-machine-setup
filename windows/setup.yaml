@@ -25,32 +25,32 @@ resources:
     properties: ${PowerShellModules}
 
   # Configure Git settings
-  - name: GitConfig
-    type: Script
-    properties:
-      getScript: |
-        $gitEmail = git config --global --get user.email
-        $gitName = git config --global --get user.name
-        return @{
-          Result = "Git configuration: Email=$gitEmail, Name=$gitName"
-        }
-      testScript: |
-        $gitEmail = git config --global --get user.email
-        $gitName = git config --global --get user.name
-        $emailConfigured = -not [string]::IsNullOrEmpty($gitEmail)
-        $nameConfigured = -not [string]::IsNullOrEmpty($gitName)
-        return $emailConfigured -and $nameConfigured
-      setScript: ${GitConfigScript}
+  # - name: GitConfig
+  #   type: Script
+  #   properties:
+  #     getScript: |
+  #       $gitEmail = git config --global --get user.email
+  #       $gitName = git config --global --get user.name
+  #       return @{
+  #         Result = "Git configuration: Email=$gitEmail, Name=$gitName"
+  #       }
+  #     testScript: |
+  #       $gitEmail = git config --global --get user.email
+  #       $gitName = git config --global --get user.name
+  #       $emailConfigured = -not [string]::IsNullOrEmpty($gitEmail)
+  #       $nameConfigured = -not [string]::IsNullOrEmpty($gitName)
+  #       return $emailConfigured -and $nameConfigured
+  #     setScript: ${GitConfigScript}
 
   # Custom commands (like WSL installation)
-  - name: CustomCommands
-    type: Script
-    properties:
-      getScript: |
-        return @{
-          Result = "Custom commands execution status"
-        }
-      testScript: |
-        # Always return false to ensure the setScript runs
-        return $false
-      setScript: ${CustomCommands}
+  # - name: CustomCommands
+  #   type: Script
+  #   properties:
+  #     getScript: |
+  #       return @{
+  #         Result = "Custom commands execution status"
+  #       }
+  #     testScript: |
+  #       # Always return false to ensure the setScript runs
+  #       return $false
+  #     setScript: ${CustomCommands}
