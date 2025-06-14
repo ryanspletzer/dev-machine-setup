@@ -176,10 +176,10 @@ $verbosityFlag = if ($DscVerbose) { "--verbose" } else { "" }
 Write-Output -InputObject "Applying DSC configuration from dscconfig.yaml..."
 try {
     if ($verbosityFlag) {
-        & pwsh -NoProfile -Command "dsc config apply $configPath $verbosityFlag"
+        & pwsh -NoProfile -Command "dsc config set --file $configPath $verbosityFlag"
     }
     else {
-        & pwsh -NoProfile -Command "dsc config apply $configPath"
+        & pwsh -NoProfile -Command "dsc config set --file $configPath"
     }
 
     if ($LASTEXITCODE -ne 0) {
