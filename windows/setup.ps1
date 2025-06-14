@@ -84,16 +84,16 @@ if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue)) {
 
 # Check if we need to install or update required DSC resources
 $requiredModules = @(
-    @{ Name = 'PSDesiredStateConfiguration'; RequiredVersion = '2.0.7' },
-    @{ Name = 'ChocolateyDsc'; RequiredVersion = '1.0.0' },
-    @{ Name = 'ComputerManagementDsc'; RequiredVersion = '10.0.0' }
+    @{ Name = 'PSDesiredStateConfiguration'; Version = '2.0.7' },
+    @{ Name = 'ChocolateyDsc'; Version = '1.0.0' },
+    @{ Name = 'ComputerManagementDsc'; Version = '10.0.0' }
 )
 
 Write-Output -InputObject "Installing required DSC resources..."
 foreach ($module in $requiredModules) {
-    Write-Verbose -Message "Installing $($module.Name) (required version: $($module.RequiredVersion))..."
+    Write-Verbose -Message "Installing $($module.Name) (required version: $($module.Version))..."
     # Use pwsh to ensure we're using PowerShell 7+
-    & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -RequiredVersion $($module.RequiredVersion) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
+    & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -Version $($module.Version) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
 }
 
 Write-Output -InputObject "Prerequisites installation complete."
