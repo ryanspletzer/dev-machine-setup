@@ -19,17 +19,19 @@ The playbook automates the installation and configuration of:
   - Additional Git configurations (editor, aliases, default branch, etc.)
   - Git LFS setup
 
-## Prerequisites
+## Prerequisites (Optional)
 
-You can install prerequisites manually (see below), or use the provided script:
+The setup.sh script will install pre-requisites _and_ run Ansible.
+
+You can install prerequisites only using the setup script with the `-p` flag, if you want more control over running Ansible directly:
 
 ### Quick Install (Recommended)
 
 ```zsh
-./install_prerequisites.sh
+./setup.sh -p
 ```
 
-This script will install Homebrew (if not already installed) and Ansible using Homebrew.
+This will install Homebrew (if not already installed) and Ansible using Homebrew without running the Ansible playbook.
 
 ---
 
@@ -90,10 +92,37 @@ To run the entire playbook:
 ansible-playbook setup.yaml
 ```
 
-Or use the setup script (which also installs prerequisites):
+Or use the setup script (which also installs prerequisites if needed):
 
 ```bash
 ./setup.sh
+```
+
+### Setup Script Options
+
+The `setup.sh` script supports several options:
+
+```bash
+./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+```
+
+- `-v`: Enable verbose output (can be repeated for more verbosity)
+- `-e git_email`: Specify Git user email
+- `-n git_name`: Specify Git user name
+- `-p`: Install prerequisites only (Homebrew and Ansible), don't run Ansible playbook
+- `playbook_file`: Optional playbook file name (defaults to setup.yaml)
+
+Examples:
+
+```bash
+# Install prerequisites only
+./setup.sh -p
+
+# Run with specific Git configuration
+./setup.sh -e "your.email@example.com" -n "Your Name"
+
+# Verbose output with a custom playbook
+./setup.sh -v custom_playbook.yaml
 ```
 
 For increased verbosity during the setup:

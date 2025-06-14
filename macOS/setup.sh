@@ -1,6 +1,13 @@
 #!/bin/sh
 # setup.sh
 # Installs prerequisites and runs the Ansible playbook
+#
+# Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+#   -v              Enable verbose output (can be repeated for more verbosity)
+#   -e git_email    Specify Git user email
+#   -n git_name     Specify Git user name
+#   -p              Install prerequisites only (Homebrew and Ansible), don't run Ansible playbook
+#   playbook_file   Optional playbook file name (defaults to setup.yaml)
 
 # Exit on error
 set -e
@@ -9,9 +16,10 @@ set -e
 VERBOSITY=""
 GIT_EMAIL=""
 GIT_NAME=""
+PREREQS_ONLY=false
 
 # Parse command line arguments
-while getopts "ve:n:" opt; do
+while getopts "ve:n:p" opt; do
   case $opt in
     v)
       # Count the number of 'v's to determine verbosity level
@@ -30,6 +38,10 @@ while getopts "ve:n:" opt; do
     n)
       # Git name parameter
       GIT_NAME="$OPTARG"
+      ;;
+    p)
+      # Prerequisites only mode
+      PREREQS_ONLY=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -108,6 +120,13 @@ fi
 # Install Ansible using Homebrew
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
 run_and_log /opt/homebrew/bin/brew install ansible
+
+# Check if we're in "prereqs only" mode
+if [ "$PREREQS_ONLY" = true ]; then
+  echo "Prerequisites installation complete." | tee -a "$LOG_FILE"
+  echo "Skipping Ansible playbook execution as requested (-p flag)." | tee -a "$LOG_FILE"
+  exit 0
+fi
 
 echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FILE"
 
