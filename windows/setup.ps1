@@ -123,24 +123,24 @@ $vars = ConvertFrom-Yaml -Yaml (Get-Content -Path $varsPath -Raw)
 # Create the base configuration object
 $dscConfig = @{
     metadata = @{
-        name: "WindowsDevMachineSetup"
-        version: "1.0.0"
+        name    = "WindowsDevMachineSetup"
+        version = "1.0.0"
     }
     '$schema' = "https://aka.ms/dsc/schemas/v3/bundled/config/document.json"
     resources = @(
         @{
-            name = "Windows_Features"
-            type = "WindowsFeature"
+            name       = "Windows_Features"
+            type       = "WindowsFeature"
             properties = $vars.WindowsFeatures
         },
         @{
-            name = "ChocolateyPackages"
-            type = "ChocolateyPackage"
+            name       = "ChocolateyPackages"
+            type       = "ChocolateyPackage"
             properties = $vars.ChocolateyPackages
         },
         @{
-            name = "PowerShellModules"
-            type = "PSModuleResource"
+            name       = "PowerShellModules"
+            type       = "PSModuleResource"
             properties = $vars.PowerShellModules
         }
     )
