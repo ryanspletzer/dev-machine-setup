@@ -122,8 +122,10 @@ $vars = ConvertFrom-Yaml -Yaml (Get-Content -Path $varsPath -Raw)
 
 # Create the base configuration object
 $dscConfig = @{
-    version = "1.0.0"
-    name = "WindowsDevMachineSetup"
+    metadata = @{
+        name: "WindowsDevMachineSetup"
+        version: "1.0.0"
+    }
     '$schema' = "https://aka.ms/dsc/schemas/v3/bundled/config/document.json"
     resources = @(
         @{
