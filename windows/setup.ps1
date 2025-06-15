@@ -45,12 +45,6 @@ function Update-PathEnvironment {
 $transcriptFile = "setup_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 Start-Transcript -Path $transcriptFile
 
-# We'll use built-in PowerShell cmdlets for logging:
-# - Write-Output for standard information
-# - Write-Verbose for detailed information
-# - Write-Warning for warnings
-# - Write-Error for errors
-
 #region Install Prerequisites
 
 # Install Chocolatey if not already installed
@@ -62,12 +56,36 @@ if (-not (Get-Command -Name choco -ErrorAction SilentlyContinue)) {
     Update-PathEnvironment
 }
 
-
-# Install PowerShell 7.4+ if not already installed or if Force is specified
+# Install PowerShell (pwsh) if not already installed or if Force is specified
 if (-not (Get-Command -Name pwsh -ErrorAction SilentlyContinue)) {
     Write-Output -InputObject "Installing PowerShell (pwsh) using Chocolatey..."
     choco install pwsh -yes --no-progress
     Update-PathEnvironment
+}
+
+# Check if we're running in Windows PowerShell (5.1) instead of PowerShell Core (pwsh)
+if ($PSVersionTable.PSEdition -eq 'Desktop') {
+    Write-Output -InputObject "Detected Windows PowerShell. Switching to PowerShell Core (pwsh)..."
+
+    # Build the parameter string to pass to pwsh
+    $paramString = ""
+    if ($DscVerbose) { $paramString += " -DscVerbose" }
+    if ($PrereqsOnly) { $paramString += " -PrereqsOnly" }
+    if ($Force) { $paramString += " -Force" }
+    if ($GitUserEmail) { $paramString += " -GitUserEmail `"$GitUserEmail`"" }
+    if ($GitUserName) { $paramString += " -GitUserName `"$GitUserName`"" }
+    if ($VarsFile -ne "vars.yaml") { $paramString += " -VarsFile `"$VarsFile`"" }
+
+    # Re-run the script with the same parameters in pwsh
+    $scriptPath = $MyInvocation.MyCommand.Path
+    $command = "& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"$paramString"
+
+    Write-Output -InputObject "Executing: $command"
+    Invoke-Expression -Command $command
+
+    # Exit the current Windows PowerShell session
+    Stop-Transcript
+    exit 0
 }
 
 # Install Microsoft.DSC and dsc CLI
@@ -77,9 +95,13 @@ if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue)) {
     Update-PathEnvironment
 }
 
+# Set PSResourceRepository PSGallery as trusted
+Set-PSResourceRepository -Name PSGallery -Trusted
+
 # Check if we need to install or update required DSC resources
 $requiredModules = @(
-    @{ Name = 'cChoco'; Version = '2.6.0' }
+    @{ Name = 'cChoco'; Version = '2.6.0' },
+    @{ Name = 'PSDesiredStateConfiguration'; Version = '2.0.7' }
 )
 
 Write-Output -InputObject "Installing required DSC resources..."
@@ -103,13 +125,10 @@ if ($PrereqsOnly) {
 #region Generate and Apply DSC Configuration
 
 # Install powershell-yaml module if not already installed
-if (-not (Get-Module -Name powershell-yaml -ListAvailable)) {
+if (-not (Get-PSResource -Name powershell-yaml -ErrorAction SilentlyContinue)) {
     Write-Output -InputObject "Installing powershell-yaml module..."
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Set-PackageSource -Name PSGallery -Trusted
     Install-Module -Name powershell-yaml -Force -Scope CurrentUser
 }
-Import-Module -Name powershell-yaml
 
 # Define paths
 $varsPath = Join-Path -Path $PSScriptRoot -ChildPath $VarsFile
@@ -123,37 +142,48 @@ $dscConfig = @{
     metadata = @{
         name    = "WindowsDevMachineSetup"
         version = "1.0.0"
+        'Microsoft.DSC' = @{
+            securityContext = 'elevated'
+        }
     }
     '$schema' = "https://aka.ms/dsc/schemas/v3/bundled/config/document.json"
-    resources = @()
+    resources = @(
+        @{
+            name       = "Configuration"
+            type       = "Microsoft.Windows/WindowsPowerShell"
+            properties = @{
+                resources = @()
+            }
+        }
+    )
 }
 
 # Add Windows Features
 foreach ($feature in $vars.WindowsFeatures) {
-    $dscConfig.resources += @{
-        name       = "WindowsFeature_$($feature.name)"
-        type       = "PSDesiredStateConfiguration/WindowsFeature"
-        properties = $feature
+    $dscConfig.resources[0].properties.resources += @{
+        Name       = "WindowsFeature_$($feature.name)"
+        Type       = "PSDesiredStateConfiguration/WindowsOptionalFeature"
+        Properties = $feature
     }
 }
 
 # Add Chocolatey Packages
-foreach ($package in $vars.ChocolateyPackages) {
-    $dscConfig.resources += @{
-        name       = "ChocolateyPackage_$($package.name)"
-        type       = "cChoco/cChocoPackageInstaller"
-        properties = $package
-    }
-}
+# foreach ($package in $vars.ChocolateyPackages) {
+#     $dscConfig.resources[0].properties.resources += @{
+#         Name       = "ChocolateyPackage_$($package.name)"
+#         Type       = "cChoco/cChocoPackageInstaller"
+#         Properties = $package
+#     }
+# }
 
 # Add PowerShell Modules
-foreach ($module in $vars.PowerShellModules) {
-    $dscConfig.resources += @{
-        name       = "PSModule_$($module.name)"
-        type       = "PSResourceGet/PSResource"
-        properties = $module
-    }
-}
+# foreach ($module in $vars.PowerShellModules) {
+#     $dscConfig.resources += @{
+#         name       = "PSResource_$($module.name)"
+#         type       = "PSResourceGet/PSResource"
+#         properties = $module
+#     }
+# }
 
 # Optionally add Git configuration if values are provided
 if ($vars.ContainsKey('GitUserEmail') -and $vars.ContainsKey('GitUserName')) {
@@ -182,25 +212,25 @@ return $emailConfigured -and $nameConfigured
 }
 
 # Optionally add custom commands
-if ($vars.ContainsKey('CustomCommands')) {
-    $customCommandsResource = @{
-        name = "CustomCommands"
-        type = "Script"
-        properties = @{
-            getScript = @'
-return @{
-    Result = "Custom commands execution status"
-}
-'@
-            testScript = @'
-# Always return false to ensure the setScript runs
-return $false
-'@
-            setScript = $vars.CustomCommands
-        }
-    }
-    $dscConfig.resources += $customCommandsResource
-}
+# if ($vars.ContainsKey('CustomCommands')) {
+#     $customCommandsResource = @{
+#         name = "CustomCommands"
+#         type = "Script"
+#         properties = @{
+#             getScript = @'
+# return @{
+#     Result = "Custom commands execution status"
+# }
+# '@
+#             testScript = @'
+# # Always return false to ensure the setScript runs
+# return $false
+# '@
+#             setScript = $vars.CustomCommands
+#         }
+#     }
+#     $dscConfig.resources += $customCommandsResource
+# }
 
 # Convert to YAML
 $yamlContent = $dscConfig | ConvertTo-Yaml
@@ -225,6 +255,22 @@ Write-Host "DSC configuration has been generated at: $setupPath"
 
 # Set verbosity for DSC based on parameter
 $verbosityFlag = if ($DscVerbose) { "--verbose" } else { "" }
+
+# Ensure NetConnectionProfiles are set to Private or Domain, if not set Public ones to Private
+$netConnectionProfiles = Get-NetConnectionProfile
+if ($netConnectionProfiles) {
+    foreach ($profile in $netConnectionProfiles) {
+        if ($profile.NetworkCategory -eq 'Public') {
+            Write-Output -InputObject "Setting network profile '$($profile.Name)' to Private..."
+            Set-NetConnectionProfile -InterfaceIndex $profile.InterfaceIndex -NetworkCategory Private
+        }
+    }
+} else {
+    Write-Warning -Message "No network connection profiles found."
+}
+
+# Ensure WinRM is enabled -- this is required for DSC to work
+winrm quickconfig -q
 
 # Apply DSC configuration using the dsc CLI tool
 Write-Output -InputObject "Applying DSC configuration from config.yaml..."
