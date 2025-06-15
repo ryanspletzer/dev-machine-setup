@@ -106,7 +106,7 @@ $requiredModules = @(
 
 Write-Output -InputObject "Installing required DSC resources..."
 foreach ($module in $requiredModules) {
-    Write-Verbose -Message "Installing $($module.Name) (required version: $($module.Version))..."
+    Write-Output -Message "Installing $($module.Name) (required version: $($module.Version))..."
     # Use pwsh to ensure we're using PowerShell 7+
     & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -Version $($module.Version) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
 }
@@ -160,7 +160,7 @@ $dscConfig = @{
 
 # Add Windows Features
 foreach ($feature in $vars.WindowsFeatures) {
-    $dscConfig.resources[0].resources += @{
+    $dscConfig.resources[0].properties.resources += @{
         name       = "WindowsFeature_$($feature.name)"
         type       = "PSDesiredStateConfiguration/WindowsOptionalFeature"
         properties = $feature
@@ -169,7 +169,7 @@ foreach ($feature in $vars.WindowsFeatures) {
 
 # Add Chocolatey Packages
 foreach ($package in $vars.ChocolateyPackages) {
-    $dscConfig.resources[0].resources += @{
+    $dscConfig.resources[0].properties.resources += @{
         name       = "ChocolateyPackage_$($package.name)"
         type       = "cChoco/cChocoPackageInstaller"
         properties = $package
