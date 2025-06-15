@@ -9,8 +9,9 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [switch]
-    $DscVerbose,
+    [ValidateSet('error', 'warning', 'info', 'debug', 'trace')]
+    [string]
+    $DscTraceLevel = 'trace',
 
     [Parameter()]
     [switch]
@@ -69,7 +70,7 @@ if ($PSVersionTable.PSEdition -eq 'Desktop') {
 
     # Build the parameter string to pass to pwsh
     $paramString = ""
-    if ($DscVerbose) { $paramString += " -DscVerbose" }
+    if ($DscTraceLevel -ne 'trace') { $paramString += " -DscTraceLevel `"$DscTraceLevel`"" }
     if ($PrereqsOnly) { $paramString += " -PrereqsOnly" }
     if ($Force) { $paramString += " -Force" }
     if ($GitUserEmail) { $paramString += " -GitUserEmail `"$GitUserEmail`"" }
@@ -107,7 +108,7 @@ $requiredModules = @(
 Write-Output -InputObject "Installing required DSC resources..."
 foreach ($module in $requiredModules) {
     Write-Output -Message "Installing $($module.Name) (required version: $($module.Version))..."
-    # Use pwsh to ensure we're using PowerShell 7+
+    # Use pwsh to install the module
     & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -Version $($module.Version) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
 }
 
@@ -253,9 +254,6 @@ $finalYamlContent | Out-File -FilePath $setupPath -Encoding utf8 -Force
 
 Write-Host "DSC configuration has been generated at: $setupPath"
 
-# Set verbosity for DSC based on parameter
-$verbosityFlag = if ($DscVerbose) { "--verbose" } else { "" }
-
 # Ensure NetConnectionProfiles are set to Private or Domain, if not set Public ones to Private
 $netConnectionProfiles = Get-NetConnectionProfile
 if ($netConnectionProfiles) {
@@ -275,13 +273,7 @@ winrm quickconfig -q
 # Apply DSC configuration using the dsc CLI tool
 Write-Output -InputObject "Applying DSC configuration from config.yaml..."
 try {
-    if ($verbosityFlag) {
-        & pwsh -NoProfile -Command "dsc config set --file $setupPath $verbosityFlag"
-    }
-    else {
-        & pwsh -NoProfile -Command "dsc config set --file $setupPath"
-    }
-
+    dsc --trace-level $DscTraceLevel config set --file $setupPath
     if ($LASTEXITCODE -ne 0) {
         Write-Error -Message "Error applying DSC configuration. Exit code: $LASTEXITCODE"
         exit $LASTEXITCODE
