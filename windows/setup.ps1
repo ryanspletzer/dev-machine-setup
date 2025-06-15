@@ -160,21 +160,21 @@ $dscConfig = @{
 
 # Add Windows Features
 foreach ($feature in $vars.WindowsFeatures) {
-    $dscConfig.resources[0].properties.resources += @{
-        Name       = "WindowsFeature_$($feature.name)"
-        Type       = "PSDesiredStateConfiguration/WindowsOptionalFeature"
-        Properties = $feature
+    $dscConfig.resources[0].resources += @{
+        name       = "WindowsFeature_$($feature.name)"
+        type       = "PSDesiredStateConfiguration/WindowsOptionalFeature"
+        properties = $feature
     }
 }
 
 # Add Chocolatey Packages
-# foreach ($package in $vars.ChocolateyPackages) {
-#     $dscConfig.resources[0].properties.resources += @{
-#         Name       = "ChocolateyPackage_$($package.name)"
-#         Type       = "cChoco/cChocoPackageInstaller"
-#         Properties = $package
-#     }
-# }
+foreach ($package in $vars.ChocolateyPackages) {
+    $dscConfig.resources[0].resources += @{
+        name       = "ChocolateyPackage_$($package.name)"
+        type       = "cChoco/cChocoPackageInstaller"
+        properties = $package
+    }
+}
 
 # Add PowerShell Modules
 # foreach ($module in $vars.PowerShellModules) {

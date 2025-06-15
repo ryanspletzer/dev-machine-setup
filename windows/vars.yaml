@@ -4,165 +4,165 @@
 # Windows Features to enable
 WindowsFeatures:
   # Required for both WSL 1 and 2
-  - name: Microsoft-Windows-Subsystem-Linux
-    ensure: Present
-    includeAllSubFeature: true
+  - Name: Microsoft-Windows-Subsystem-Linux
+    Ensure: Present
+    IncludeAllSubFeature: true
   # Required for WSL 2
-  - name: VirtualMachinePlatform
-    ensure: Present
-    includeAllSubFeature: true
+  - Name: VirtualMachinePlatform
+    Ensure: Present
+    IncludeAllSubFeature: true
   # Only enable if you need this
   # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
-  # - name: Microsoft-Hyper-V
-  #   ensure: Present
-  #   includeAllSubFeature: true
-  - name: Containers
-    ensure: Present
-    includeAllSubFeature: true
+  # - Name: Microsoft-Hyper-V
+  #   Ensure: Present
+  #   IncludeAllSubFeature: true
+  - Name: Containers
+    Ensure: Present
+    IncludeAllSubFeature: true
 
 # Chocolatey packages to install
 ChocolateyPackages:
-  - name: 1password
-    ensure: Present
-  - name: adoptopenjdk
-    ensure: Present
-  - name: awscli
-    ensure: Present
-  - name: awssamcli
-    ensure: Present
-  - name: azure-cli
-    ensure: Present
-  - name: azure-data-studio
-    ensure: Present
-  - name: azure-functions-core-tools
-    ensure: Present
-  - name: bicep
-    ensure: Present
-  - name: cascadiacode
-    ensure: Present
-  - name: citrix-workspace
-    ensure: Present
-  - name: docker
-    ensure: Present
-  - name: dotnet-sdk
-    ensure: Present
-  # - name: dotnetcore-sdk # versions 3 and lower
-  #   ensure: Present
-  - name: dotnetfx
-    ensure: Present
-  - name: drawio
-    ensure: Present
-  - name: ffmpeg
-    ensure: Present
-  - name: fiddler
-    ensure: Present
-  - name: firefox
-    ensure: Present
-  - name: gh
-    ensure: Present
-  - name: git
-    ensure: Present
+  - Name: 1password
+    Ensure: Present
+  - Name: adoptopenjdk
+    Ensure: Present
+  - Name: awscli
+    Ensure: Present
+  - Name: awssamcli
+    Ensure: Present
+  - Name: azure-cli
+    Ensure: Present
+  - Name: azure-data-studio
+    Ensure: Present
+  - Name: azure-functions-core-tools
+    Ensure: Present
+  - Name: bicep
+    Ensure: Present
+  - Name: cascadiacode
+    Ensure: Present
+  - Name: citrix-workspace
+    Ensure: Present
+  - Name: docker
+    Ensure: Present
+  - Name: dotnet-sdk
+    Ensure: Present
+  # - Name: dotnetcore-sdk # versions 3 and lower
+  #   Ensure: Present
+  - Name: dotnetfx
+    Ensure: Present
+  - Name: drawio
+    Ensure: Present
+  - Name: ffmpeg
+    Ensure: Present
+  - Name: fiddler
+    Ensure: Present
+  - Name: firefox
+    Ensure: Present
+  - Name: gh
+    Ensure: Present
+  - Name: git
+    Ensure: Present
     params: "/WindowsTerminal /NoShellIntegration"
-  - name: gnupg
-    ensure: Present
-  - name: go
-    ensure: Present
+  - Name: gnupg
+    Ensure: Present
+  - Name: go
+    Ensure: Present
   # May have a warning about not being signed...
   # The Chrome setup process is weird.
   # https://community.chocolatey.org/packages/GoogleChrome
-  - name: googlechrome
-    ensure: Present
-  - name: ilspy
-    ensure: Present
-  - name: jq
-    ensure: Present
-  - name: maven
-    ensure: Present
-  - name: microsoftazurestorageexplorer
-    ensure: Present
-  - name: ngrok
-    ensure: Present
-  - name: nodejs
-    ensure: Present
-  - name: notepadplusplus
-    ensure: Present
-  - name: office365business
-    ensure: Present
-  - name: oh-my-posh
-    ensure: Present
-  - name: packer
-    ensure: Present
-  - name: python
-    ensure: Present
-  - name: pwsh
-    ensure: Present
-  - name: qemu
-    ensure: Present
-  - name: ruff
-    ensure: Present
-  - name: rsat
-    ensure: Present
-  - name: rustup.install
-    ensure: Present
-  - name: serverless
-    ensure: Present
-  - name: servicebusexplorer
-    ensure: Present
-  - name: slack
-    ensure: Present
-  - name: sql-server-management-studio
-    ensure: Present
-  - name: tailscale
-    ensure: Present
-  - name: terraform
-    ensure: Present
-  - name: uv
-    ensure: Present
-  - name: vault
-    ensure: Present
-  - name: visualstudio2022enterprise
-    ensure: Present
-  - name: visualstudiocode
-    ensure: Present
-  - name: windows-sdk-10-version-2004-all
-    ensure: Present
-  - name: zoom
-    ensure: Present
-  - name: zulu
-    ensure: Present
+  - Name: googlechrome
+    Ensure: Present
+  - Name: ilspy
+    Ensure: Present
+  - Name: jq
+    Ensure: Present
+  - Name: maven
+    Ensure: Present
+  - Name: microsoftazurestorageexplorer
+    Ensure: Present
+  - Name: ngrok
+    Ensure: Present
+  - Name: nodejs
+    Ensure: Present
+  - Name: notepadplusplus
+    Ensure: Present
+  - Name: office365business
+    Ensure: Present
+  - Name: oh-my-posh
+    Ensure: Present
+  - Name: packer
+    Ensure: Present
+  - Name: python
+    Ensure: Present
+  - Name: pwsh
+    Ensure: Present
+  - Name: qemu
+    Ensure: Present
+  - Name: ruff
+    Ensure: Present
+  - Name: rsat
+    Ensure: Present
+  - Name: rustup.install
+    Ensure: Present
+  - Name: serverless
+    Ensure: Present
+  - Name: servicebusexplorer
+    Ensure: Present
+  - Name: slack
+    Ensure: Present
+  - Name: sql-server-management-studio
+    Ensure: Present
+  - Name: tailscale
+    Ensure: Present
+  - Name: terraform
+    Ensure: Present
+  - Name: uv
+    Ensure: Present
+  - Name: vault
+    Ensure: Present
+  - Name: visualstudio2022enterprise
+    Ensure: Present
+  - Name: visualstudiocode
+    Ensure: Present
+  - Name: windows-sdk-10-version-2004-all
+    Ensure: Present
+  - Name: zoom
+    Ensure: Present
+  - Name: zulu
+    Ensure: Present
 
 # PowerShell modules to install
 PowerShellModules:
-  - name: AWS.Tools.Common
-    ensure: Present
-  - name: Az.Accounts
-    ensure: Present
-  - name: Microsoft.Graph.Authentication
-    ensure: Present
-  - name: Pester
-    ensure: Present
-  - name: platyPS
-    ensure: Present
-  - name: posh-git
-    ensure: Present
-  - name: powershell-yaml
-    ensure: Present
-  - name: PowerShellBuild
-    ensure: Present
-  - name: psake
-    ensure: Present
-  - name: PSGraphQL
-    ensure: Present
-  - name: PSJsonWebToken
-    ensure: Present
-  - name: PSReadLine
-    ensure: Present
-  - name: PSScriptAnalyzer
-    ensure: Present
-  - name: PSTcpIp
-    ensure: Present
-  - name: Terminal-Icons
-    ensure: Present
+  - Name: AWS.Tools.Common
+    Ensure: Present
+  - Name: Az.Accounts
+    Ensure: Present
+  - Name: Microsoft.Graph.Authentication
+    Ensure: Present
+  - Name: Pester
+    Ensure: Present
+  - Name: platyPS
+    Ensure: Present
+  - Name: posh-git
+    Ensure: Present
+  - Name: powershell-yaml
+    Ensure: Present
+  - Name: PowerShellBuild
+    Ensure: Present
+  - Name: psake
+    Ensure: Present
+  - Name: PSGraphQL
+    Ensure: Present
+  - Name: PSJsonWebToken
+    Ensure: Present
+  - Name: PSReadLine
+    Ensure: Present
+  - Name: PSScriptAnalyzer
+    Ensure: Present
+  - Name: PSTcpIp
+    Ensure: Present
+  - Name: Terminal-Icons
+    Ensure: Present
 
 # Git user configuration - uncomment and set these values as needed
 # GitUserEmail: your.email@example.com
