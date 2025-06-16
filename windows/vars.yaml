@@ -5,12 +5,13 @@
 WindowsFeatures:
   # Required for both WSL 1 and 2
   - Name: Microsoft-Windows-Subsystem-Linux
+    LogLevel: ErrorsOnly
   # Required for WSL 2
-  - Name: VirtualMachinePlatform
+  # - Name: VirtualMachinePlatform
   # Only enable if you need this
   # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
   # - Name: Microsoft-Hyper-V
-  - Name: Containers
+  # - Name: Containers
 
 # Chocolatey packages to install
 ChocolateyPackages:
@@ -26,8 +27,8 @@ ChocolateyPackages:
   - Name: citrix-workspace
   - Name: docker
   - Name: dotnet-sdk
-  # - Name: dotnetcore-sdk # versions 3 and lower
-  #   Ensure: Present
+  - Name: dotnetcore-sdk # versions 3 and lower
+    Ensure: Present
   - Name: dotnetfx
   - Name: drawio
   - Name: ffmpeg

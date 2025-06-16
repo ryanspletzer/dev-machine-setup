@@ -64,31 +64,6 @@ if (-not (Get-Command -Name pwsh -ErrorAction SilentlyContinue)) {
     Update-PathEnvironment
 }
 
-# Check if we're running in Windows PowerShell (5.1) instead of PowerShell Core (pwsh)
-if ($PSVersionTable.PSEdition -eq 'Desktop') {
-    Write-Output -InputObject "Detected Windows PowerShell. Switching to PowerShell Core (pwsh)..."
-
-    # Build the parameter string to pass to pwsh
-    $paramString = ""
-    if ($DscTraceLevel -ne 'trace') { $paramString += " -DscTraceLevel `"$DscTraceLevel`"" }
-    if ($PrereqsOnly) { $paramString += " -PrereqsOnly" }
-    if ($Force) { $paramString += " -Force" }
-    if ($GitUserEmail) { $paramString += " -GitUserEmail `"$GitUserEmail`"" }
-    if ($GitUserName) { $paramString += " -GitUserName `"$GitUserName`"" }
-    if ($VarsFile -ne "vars.yaml") { $paramString += " -VarsFile `"$VarsFile`"" }
-
-    # Re-run the script with the same parameters in pwsh
-    $scriptPath = $MyInvocation.MyCommand.Path
-    $command = "& pwsh -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"$paramString"
-
-    Write-Output -InputObject "Executing: $command"
-    Invoke-Expression -Command $command
-
-    # Exit the current Windows PowerShell session
-    Stop-Transcript
-    exit 0
-}
-
 # Install Microsoft.DSC and dsc CLI
 if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue)) {
     Write-Output -InputObject "Installing DSC CLI tool using Chocolatey..."
@@ -96,20 +71,29 @@ if (-not (Get-Command -Name dsc -ErrorAction SilentlyContinue)) {
     Update-PathEnvironment
 }
 
-# Set PSResourceRepository PSGallery as trusted
-Set-PSResourceRepository -Name PSGallery -Trusted
+# Install NuGet provider if not already installed
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+# Set PSRepository PSGallery as trusted
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
 # Check if we need to install or update required DSC resources
 $requiredModules = @(
-    @{ Name = 'cChoco'; Version = '2.6.0' },
-    @{ Name = 'PSDesiredStateConfiguration'; Version = '2.0.7' }
+    @{ Name = 'cChoco'; RequiredVersion = '2.6.0' },
+    @{ Name = 'xPSDesiredStateConfiguration'; RequiredVersion = '9.2.1' }
 )
 
 Write-Output -InputObject "Installing required DSC resources..."
 foreach ($module in $requiredModules) {
-    Write-Output -Message "Installing $($module.Name) (required version: $($module.Version))..."
+    Write-Output -Message "Installing $($module.Name) (required version: $($module.RequiredVersion))..."
     # Use pwsh to install the module
-    & pwsh -NoProfile -Command "Install-PSResource -Name $($module.Name) -Version $($module.Version) -TrustRepository -Scope CurrentUser" -ErrorAction SilentlyContinue
+    Install-Module -Name $($module.Name) -RequiredVersion $($module.RequiredVersion)
+}
+
+# Install powershell-yaml module if not already installed
+if (-not (Get-Module -Name powershell-yaml -ErrorAction SilentlyContinue)) {
+    Write-Output -InputObject "Installing powershell-yaml module..."
+    Install-Module -Name powershell-yaml -Force
 }
 
 Write-Output -InputObject "Prerequisites installation complete."
@@ -124,12 +108,6 @@ if ($PrereqsOnly) {
 #endregion Install Prerequisites
 
 #region Generate and Apply DSC Configuration
-
-# Install powershell-yaml module if not already installed
-if (-not (Get-PSResource -Name powershell-yaml -ErrorAction SilentlyContinue)) {
-    Write-Output -InputObject "Installing powershell-yaml module..."
-    Install-Module -Name powershell-yaml -Force -Scope CurrentUser
-}
 
 # Define paths
 $varsPath = Join-Path -Path $PSScriptRoot -ChildPath $VarsFile
@@ -160,13 +138,13 @@ $dscConfig = @{
 }
 
 # Add Windows Features
-foreach ($feature in $vars.WindowsFeatures) {
-    $dscConfig.resources[0].properties.resources += @{
-        name       = "WindowsFeature_$($feature.name)"
-        type       = "PSDesiredStateConfiguration/WindowsOptionalFeature"
-        properties = $feature
-    }
-}
+# foreach ($feature in $vars.WindowsFeatures) {
+#     $dscConfig.resources[0].properties.resources += @{
+#         name       = "WindowsFeature_$($feature.name)"
+#         type       = "xPSDesiredStateConfiguration/xWindowsOptionalFeature"
+#         properties = $feature
+#     }
+# }
 
 # Add Chocolatey Packages
 foreach ($package in $vars.ChocolateyPackages) {
