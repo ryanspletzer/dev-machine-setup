@@ -2,114 +2,118 @@
 # Externalized variables for DSC 3.0 setup
 
 # Windows Features to enable
-windows_features:
-  # Required for both WSL 1 and 2
-  - Name: Microsoft-Windows-Subsystem-Linux
-    LogLevel: ErrorsOnly
+windows_optional_features:
   # Required for WSL 2
-  # - Name: VirtualMachinePlatform
-  # Only enable if you need this
+  - VirtualMachinePlatform
+  # Required for both WSL 1 and 2
+  - Microsoft-Windows-Subsystem-Linux
+  # Only enable if you need these
   # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
-  # - Name: Microsoft-Hyper-V
-  # - Name: Containers
+  # - Microsoft-Hyper-V
+  # Provides support for working with Windows containers
+  # - Containers
 
 # Chocolatey packages to install
+# You may wonder why we have an explicit "package" key here instead of a simple array of package names...
+# package is the only required input, but _sometimes you_ may want to override install params -- ex. see Git below.
 chocolatey_packages:
-  - Name: 1password
-  - Name: adoptopenjdk
-  - Name: awscli
-  - Name: awssamcli
-  - Name: azure-cli
-  - Name: azure-data-studio
-  - Name: azure-functions-core-tools
-  - Name: bicep
-  - Name: cascadiacode
-  - Name: citrix-workspace
-  - Name: docker
-  - Name: dotnet-sdk
-  - Name: dotnetcore-sdk # versions 3 and lower
-    Ensure: Present
-  - Name: dotnetfx
-  - Name: drawio
-  - Name: ffmpeg
-  - Name: fiddler
-  - Name: firefox
-  - Name: gh
-  - Name: git
+  - package: 1password
+  - package: adoptopenjdk
+  - package: awscli
+  - package: awssamcli
+  - package: azure-cli
+  - package: azure-data-studio
+  - package: azure-functions-core-tools
+  - package: bicep
+  - package: cascadiacode
+  - package: citrix-workspace
+  - package: docker
+  - package: dotnet-sdk
+  # dotnetcore-sdk is deprecated, use dotnet-sdk instead
+  # This is only for .NET Core versions 3 and lower
+  # - package: dotnetcore-sdk
+  - package: dotnetfx
+  - package: drawio
+  - package: ffmpeg
+  - package: fiddler
+  - package: firefox
+  - package: gh
+  - package: git
     params: "/WindowsTerminal /NoShellIntegration"
-  - Name: gnupg
-  - Name: go
+  - package: gnupg
+  - package: go
   # May have a warning about not being signed...
   # The Chrome setup process is weird.
   # https://community.chocolatey.org/packages/GoogleChrome
-  - Name: googlechrome
-  - Name: ilspy
-  - Name: jq
-  - Name: maven
-  - Name: microsoftazurestorageexplorer
-  - Name: ngrok
-  - Name: nodejs
-  - Name: notepadplusplus
-  - Name: office365business
-  - Name: oh-my-posh
-  - Name: packer
-  - Name: python
-  - Name: pwsh
-  - Name: qemu
-  - Name: ruff
-  - Name: rsat
-  - Name: rustup.install
-  - Name: serverless
-  - Name: servicebusexplorer
-  - Name: slack
-  - Name: sql-server-management-studio
-  - Name: tailscale
-  - Name: terraform
-  - Name: uv
-  - Name: vault
-  - Name: visualstudio2022enterprise
-  - Name: visualstudiocode
-  - Name: windows-sdk-10-version-2004-all
-  - Name: zoom
-  - Name: zulu
+  - package: googlechrome
+  - package: ilspy
+  - package: jq
+  - package: maven
+  - package: microsoftazurestorageexplorer
+  - package: ngrok
+  - package: nodejs
+  - package: notepadplusplus
+  - package: office365business
+  - package: oh-my-posh
+  - package: packer
+  - package: python
+  - package: pwsh
+  - package: qemu
+  - package: ruff
+  - package: rsat
+  - package: rustup.install
+  - package: serverless
+  - package: servicebusexplorer
+  - package: slack
+  - package: sql-server-management-studio
+  - package: tailscale
+  - package: terraform
+  - package: uv
+  - package: vault
+  - package: visualstudio2022enterprise
+  - package: visualstudiocode
+  - package: windows-sdk-10-version-2004-all
+  - package: zoom
+  - package: zulu
 
-# PowerShell modules to install via PSResourceGet in PowerShell (pwsh)
+# PowerShell modules to install via PSResourceGet in PowerShell (pwsh.exe)
+# name is the only required key, but you can also specify version and prerelease (true|false) if desired.
 psresources:
-  - Name: AWS.Tools.Common
-  - Name: Az.Accounts
-  - Name: Microsoft.Graph.Authentication
-  - Name: Pester
-  - Name: platyPS
-  - Name: posh-git
-  - Name: powershell-yaml
-  - Name: PowerShellBuild
-  - Name: psake
-  - Name: PSGraphQL
-  - Name: PSJsonWebToken
-  - Name: PSReadLine
-  - Name: PSScriptAnalyzer
-  - Name: PSTcpIp
-  - Name: Terminal-Icons
+  - name: AWS.Tools.Common
+  - name: Az.Accounts
+  - name: Microsoft.Graph.Authentication
+  - name: Pester
+  - name: platyPS
+  - name: posh-git
+  - name: powershell-yaml
+  - name: PowerShellBuild
+  - name: psake
+  - name: PSGraphQL
+  - name: PSJsonWebToken
+  - name: PSReadLine
+  - name: PSScriptAnalyzer
+  - name: PSTcpIp
+  - name: Terminal-Icons
 
-# PowerShell modules to install via Install-Module in Windows PowerShell (powershell)
-# Note: Only use this if you need to install modules in old Windows PowerShell (powershell)
+# PowerShell modules to install via Install-Module in Windows PowerShell (powershell.exe)
+# Note: Only use this if you need to install modules in old Windows PowerShell (powershell.exe)
 # This is not recommended for new setups, prefer using pwsh and PSResourceGet
 psmodules:
-  # - Name: AWS.Tools.Common
-  # - Name: Az.Accounts
-  # - Name: Microsoft.Graph.Authentication
-  # - Name: Pester
-  # - Name: platyPS
-  # - Name: posh-git
-  # - Name: powershell-yaml
-  # - Name: PowerShellBuild
-  # - Name: psake
-  # - Name: PSGraphQL
-  # - Name: PSJsonWebToken
-  # - Name: PSReadLine
-  # - Name: PSScriptAnalyzer
-  # - Name: PSTcpIp
-  # - Name: Terminal-Icons
+  # - name: AWS.Tools.Common
+  # - name: Az.Accounts
+  # - name: Microsoft.Graph.Authentication
+  # - name: Pester
+  # - name: platyPS
+  # - name: posh-git
+  # - name: powershell-yaml
+  # - name: PowerShellBuild
+  # - name: psake
+  # - name: PSGraphQL
+  # - name: PSJsonWebToken
+  # - name: PSReadLine
+  # - name: PSScriptAnalyzer
+  # - name: PSTcpIp
+  # - name: Terminal-Icons
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
@@ -126,17 +130,21 @@ git_additional_configs:
   push.autoSetupRemote: true
   user.signingKey: 787AEF0BAE232359
 
-# Git user configuration - uncomment and set these values as needed
-# GitUserEmail: your.email@example.com
-# GitUserName: Your Name
-
 # Custom commands to execute after setup
 custom_commands:
   - python -m pip install --user pipx
   - python -m pipx ensurepath
-  # Install WSL without a distribution
-  - Write-Output "Installing WSL infrastructure..."
-  - wsl --install --no-distribution
+  # If you want more control over the WSL setup, you can use the following commands:
+  # Update WSL
+  # - wsl --update
+  # Set WSL default version to 2
+  # - wsl --set-default-version 2
+  # Install a specific WSL distribution
+  # - wsl --install -d Ubuntu-22.04
+  # If you are fine with the WSL defaults Ubuntu distribution, you can use the command below.
+  # Install WSL if not already installed with a default Ubuntu distribution
+  # This also enables the relevant Windows features automatically if they aren't enabled already.
+  - wsl --install
   # Additional custom commands can be added here
   # For example, to install a specific WSL distribution:
   # wsl --install -d Ubuntu-22.04
@@ -144,5 +152,5 @@ custom_commands:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-# custom_script: "/path/to/your/custom_script.ps1"
+# custom_script: "~/Downloads/custom_windows_script.ps1"
 # custom_script_args: "-Option1 value1 -Option2 value2"
