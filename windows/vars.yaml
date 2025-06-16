@@ -14,67 +14,69 @@ windows_optional_features:
   # - Containers
 
 # Chocolatey packages to install
-# You may wonder why we have an explicit "package" key here instead of a simple array of package names...
-# package is the only required input, but _sometimes you_ may want to override install params -- ex. see Git below.
-chocolatey_packages:
-  - package: 1password
-  - package: adoptopenjdk
-  - package: awscli
-  - package: awssamcli
-  - package: azure-cli
-  - package: azure-data-studio
-  - package: azure-functions-core-tools
-  - package: bicep
-  - package: cascadiacode
-  - package: citrix-workspace
-  - package: docker
-  - package: dotnet-sdk
-  # dotnetcore-sdk is deprecated, use dotnet-sdk instead
-  # This is only for .NET Core versions 3 and lower
-  # - package: dotnetcore-sdk
-  - package: dotnetfx
-  - package: drawio
-  - package: ffmpeg
-  - package: fiddler
-  - package: firefox
-  - package: gh
-  - package: git
-    params: "/WindowsTerminal /NoShellIntegration"
-  - package: gnupg
-  - package: go
-  # May have a warning about not being signed...
-  # The Chrome setup process is weird.
-  # https://community.chocolatey.org/packages/GoogleChrome
-  - package: googlechrome
-  - package: ilspy
-  - package: jq
-  - package: maven
-  - package: microsoftazurestorageexplorer
-  - package: ngrok
-  - package: nodejs
-  - package: notepadplusplus
-  - package: office365business
-  - package: oh-my-posh
-  - package: packer
-  - package: python
-  - package: pwsh
-  - package: qemu
-  - package: ruff
-  - package: rsat
-  - package: rustup.install
-  - package: serverless
-  - package: servicebusexplorer
-  - package: slack
-  - package: sql-server-management-studio
-  - package: tailscale
-  - package: terraform
-  - package: uv
-  - package: vault
-  - package: visualstudio2022enterprise
-  - package: visualstudiocode
-  - package: windows-sdk-10-version-2004-all
-  - package: zoom
-  - package: zulu
+# You may wonder why we have an explicit "name" key here instead of a simple array of package names...
+# name is required input.
+# But also _sometimes you_ want to override install parameters -- ex. see Git below.
+# You may want to allow for prerelease versions of packages, in which case you can set prerelease: true
+choco_packages:
+  - name: 1password
+  # - name: adoptopenjdk
+  # - name: awscli
+  # - name: awssamcli
+  # - name: azure-cli
+  # - name: azure-data-studio
+  # - name: azure-functions-core-tools
+  # - name: bicep
+  # - name: cascadiacode
+  # - name: citrix-workspace
+  # - name: docker
+  # - name: dotnet-sdk
+  # # dotnetcore-sdk is deprecated, use dotnet-sdk instead
+  # # This is only for .NET Core versions 3 and lower
+  # # - name: dotnetcore-sdk
+  # - name: dotnetfx
+  # - name: drawio
+  # - name: ffmpeg
+  # - name: fiddler
+  # - name: firefox
+  # - name: gh
+  # - name: git
+  #   parameters: /WindowsTerminal /NoShellIntegration
+  # - name: gnupg
+  # - name: go
+  # # May have a warning about not being signed...
+  # # The Chrome setup process is weird.
+  # # https://community.chocolatey.org/packages/GoogleChrome
+  # - name: googlechrome
+  # - name: ilspy
+  # - name: jq
+  # - name: maven
+  # - name: microsoftazurestorageexplorer
+  # - name: ngrok
+  # - name: nodejs
+  # - name: notepadplusplus
+  # - name: office365business
+  # - name: oh-my-posh
+  # - name: packer
+  # - name: python
+  # - name: pwsh
+  # - name: qemu
+  # - name: ruff
+  # - name: rsat
+  # - name: rustup.install
+  # - name: serverless
+  # - name: servicebusexplorer
+  # - name: slack
+  # - name: sql-server-management-studio
+  # - name: tailscale
+  # - name: terraform
+  # - name: uv
+  # - name: vault
+  # - name: visualstudio2022enterprise
+  # - name: visualstudiocode
+  # - name: windows-sdk-10-version-2004-all
+  # - name: zoom
+  # - name: zulu
 
 # PowerShell modules to install via PSResourceGet in PowerShell (pwsh.exe)
 # name is the only required key, but you can also specify version and prerelease (true|false) if desired.

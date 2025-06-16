@@ -118,7 +118,7 @@ Write-Verbose -Message '[Test] PowerShell (pwsh)...'
 if ($null -eq $pwsh) {
     # Set
     Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
-    choco install pwsh -yes --no-progress
+    choco install pwsh --yes --no-progress
     # Refresh Path
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
     Write-Verbose -Message '[Set] Refreshed PATH environment variable.'
@@ -236,6 +236,10 @@ $optionalFeatures = $vars.windows_optional_features
 Write-Verbose -Message '[Test] Windows Optional Features from Vars file import...'
 if ($optionalFeatures -and $optionalFeatures.Count -gt 0) {
     foreach ($featureName in $optionalFeatures) {
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $featureName -PercentComplete ($step / $totalSteps * 100)
+
         # Get
         Write-Verbose -Message "[Get] Windows Optional Feature: $featureName"
         $feature = Get-WindowsOptionalFeature -FeatureName $featureName -Online -ErrorAction SilentlyContinue
@@ -267,6 +271,49 @@ if ($optionalFeatures -and $optionalFeatures.Count -gt 0) {
 }
 
 #endregion Enable Windows Optional Features from Vars file
+
+#region Install Chocolatey Packages from Vars file
+
+$step++
+$stepText = 'Install Chocolatey Packages from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Chocolatey packages to install...'
+
+# Get
+Write-Verbose -Message '[Get] Chocolatey packages from Vars file import...'
+$chocoPackages = $vars.choco_packages
+
+# Test
+Write-Verbose -Message '[Test] Chocolatey packages from Vars file import...'
+if ($chocoPackages -and $chocoPackages.Count -gt 0) {
+    foreach ($package in $chocoPackages) {
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $package.name -PercentComplete ($step / $totalSteps * 100)
+
+        # Get / Test / Set
+        Write-Verbose -Message "[Get] / [Test] / [Set] Installing $($package.name) through Chocolatey..."
+        $chocoInstallCommandArgs = @()
+        $chocoInstallCommandArgs = "install", $package.name
+        if ($package.prerelease) {
+            $chocoInstallCommandArgs += "--prerelease"
+        }
+
+        if (-not [string]::IsNullOrWhiteSpace($package.parameters)) {
+            $chocoInstallCommandArgs += "--parameters", "'`"$($package.parameters)`"'"
+        }
+
+        $chocoInstallCommandArgs += "--yes", "--no-progress"
+        & choco @chocoInstallCommandArgs
+
+        Write-Verbose -Message "[Get] / [Test] / [Set] Installed $($package.name) through Chocolatey."
+        Write-Information -MessageData "Idempotently installed $($package.name)."
+    }
+} else {
+    Write-Information -MessageData 'No Chocolatey packages specified in vars.yaml file.'
+}
+
+#endregion Install Chocolatey Packages from Vars file
 
 Stop-Transcript
 
