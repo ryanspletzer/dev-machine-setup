@@ -29,7 +29,9 @@ param (
     [Parameter()]
     [ValidateScript({
         if ([string]::IsNullOrWhiteSpace($_) -and
-            [string]::IsNullOrWhiteSpace((git config --global user.name 2>$null))) {
+            [string]::IsNullOrWhiteSpace((git config --global user.name 2>$null)) -and
+            [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
+            # If no name is provided and no local user name is
             Write-Error -Message "Git user name is not set and no name was provided."
             $false
         } else {
@@ -205,9 +207,7 @@ if (-not (Test-Path -Path $VarsFilePath)) {
 Write-Verbose -Message '[Test] vars.yaml file...'
 try {
     Write-Verbose -Message '[Set] Importing vars.yaml file...'
-    $vars = pwsh -Command {
-        Import-Yaml -Path $using:VarsFilePath
-    }
+    $vars = pwsh -Command "ConvertFrom-Yaml -Yaml (Get-Content -Path $VarsFilePath -Raw) -ErrorAction Stop"
     Write-Verbose -Message '[Set] vars.yaml file imported successfully.'
     Write-Information -MessageData 'Imported vars.yaml file successfully.'
 } catch {
