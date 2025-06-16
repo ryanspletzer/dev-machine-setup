@@ -102,7 +102,9 @@ if ($null -eq $pwsh) {
     # Set
     Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
     choco install pwsh -yes --no-progress
-    # TODO: Refresh Path
+    # Refresh Path
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    Write-Verbose -Message '[Set] Refreshed PATH environment variable.'
     Write-Verbose -Message '[Set] PowerShell (pwsh) is now installed.'
     Write-Information -MessageData 'Installed PowerShell (pwsh).'
 } else {
