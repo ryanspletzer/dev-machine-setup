@@ -1,11 +1,11 @@
-# Windows Development Environment Setup with DSC 3.0
+# Windows Development Environment Setup with WinGet Configure
 
-This directory contains scripts and DSC 3.0 configuration to set up a Windows development environment. It uses modern technologies like PowerShell 7.4+, the new DSC CLI tool, and YAML-based configuration with a template + values approach.
+This directory contains scripts and WinGet configuration to set up a Windows development environment. It uses modern technologies like PowerShell, WinGet Configure, and Chocolatey for package management.
 
 ## Features
 
-- **Template + Values Approach**: Separates configuration template from values for flexibility
-- **Modern Configuration Management**: Uses DSC 3.0 with YAML configuration files
+- **Parameterized Approach**: Uses vars.yaml to dynamically generate the WinGet configuration
+- **Modern Configuration Management**: Uses WinGet Configure with YAML configuration files
 - **Idempotent Execution**: Can be run multiple times without causing issues
 - **Advanced State Management**: Properly manages Windows features, Chocolatey packages, PowerShell modules, and more
 - **Error Handling**: Robust error handling and detailed logging
@@ -15,9 +15,10 @@ This directory contains scripts and DSC 3.0 configuration to set up a Windows de
 
 All prerequisites are automatically installed by the setup script:
 
-- PowerShell 7.4+ (installed via Chocolatey if needed)
-- DSC 3.0 CLI tool (installed via Chocolatey)
-- Required DSC resources (installed via PSResource module)
+- WinGet (installed if not already present)
+- PowerShell YAML module (for processing the vars.yaml file)
+- Chocolatey (installed by the configuration)
+- PowerShell 7 (installed via WinGet)
 
 ## Usage
 
@@ -29,25 +30,17 @@ Open PowerShell as Administrator and run:
 .\setup.ps1
 ```
 
-### Install Prerequisites Only
+### Validate Configuration Only
 
-To only install prerequisites without applying the DSC configuration:
-
-```powershell
-.\setup.ps1 -PrereqsOnly
-```
-
-### Increase Verbosity
-
-For more detailed output:
+To only validate the configuration without applying it:
 
 ```powershell
-.\setup.ps1 -Verbosity 2
+.\setup.ps1 -ValidateOnly
 ```
 
-### Force Reinstallation of Prerequisites
+### Force Unattended Installation
 
-To force reinstallation of prerequisites:
+To run the installation in unattended mode:
 
 ```powershell
 .\setup.ps1 -Force
@@ -61,28 +54,27 @@ To set Git user information during setup:
 .\setup.ps1 -GitUserEmail "your.email@example.com" -GitUserName "Your Name"
 ```
 
-### Use Custom Template and Values Files
+### Use Custom Variables File
 
-To use different template or values files:
+To use a different variables file:
 
 ```powershell
-.\setup.ps1 -TemplateFile "examples\custom-template.yaml" -ValuesFile "examples\custom-values.yaml"
+.\setup.ps1 -VarsFile "examples\custom-vars.yaml"
 ```
 
 ## Configuration Details
 
 The configuration is defined in two files:
 
-1. `setup.yaml` - Template configuration with placeholders
-2. `vars.yaml` - Values to populate the template
+1. `vars.yaml` - Contains all the customizable values
+2. `config.yaml` - Dynamically generated from vars.yaml by the setup script
 
 The setup includes:
 
-- **Windows Features**: Enables WSL, Hyper-V, and other Windows features
-- **Chocolatey Packages**: Installs developer tools and applications
+- **Windows Features**: Enables WSL and other Windows features
+- **Chocolatey Packages**: Installs developer tools and applications via Chocolatey
 - **PowerShell Modules**: Installs PowerShell modules for development
 - **Git Configuration**: Sets up Git user settings and preferences
-- **Custom Commands**: Executes specific commands that don't fit into other categories
 
 ## Customization
 
@@ -92,12 +84,77 @@ You can customize the configuration by editing the `vars.yaml` file:
 - Add/remove Chocolatey packages
 - Modify PowerShell modules
 - Update Git configuration
-- Add custom commands
 
 Example `vars.yaml` structure:
 
 ```yaml
 # Windows Features to enable
+WindowsFeatures:
+  - Name: Microsoft-Windows-Subsystem-Linux
+  - Name: VirtualMachinePlatform
+
+# Chocolatey packages to install
+ChocolateyPackages:
+  - Name: git
+    params: "/WindowsTerminal /NoShellIntegration"
+  - Name: vscode
+  - Name: nodejs
+
+# PowerShell modules to install
+PowerShellModules:
+  - Name: PSReadLine
+  - Name: posh-git
+
+# Git configuration script
+GitConfigScript: |
+  # Set Git user email if provided
+  if ($env:GIT_USER_EMAIL) {
+    git config --global user.email $env:GIT_USER_EMAIL
+  }
+
+  # Set Git user name if provided
+  if ($env:GIT_USER_NAME) {
+    git config --global user.name $env:GIT_USER_NAME
+  }
+```
+
+## How It Works
+
+The `setup.ps1` script:
+
+1. Installs WinGet if not already present
+2. Installs the PowerShell YAML module if needed
+3. Reads `vars.yaml` to get the configuration values
+4. Dynamically generates `config.yaml` for WinGet Configure
+5. Applies the configuration using `winget configure`
+
+The generated `config.yaml` file follows the WinGet Configuration schema and includes:
+
+- Windows Features configuration
+- Chocolatey installation script
+- PowerShell modules installation
+- Git configuration
+
+## Troubleshooting
+
+### Common Issues
+
+- **WinGet Not Found**: Ensure Microsoft.DesktopAppInstaller is installed from the Microsoft Store
+- **Access Denied Errors**: Make sure you're running PowerShell as Administrator
+- **Chocolatey Installation Fails**: Check your internet connection or proxy settings
+- **Configuration Validation Fails**: Check the log file for details on the specific errors
+
+### Logs
+
+The script generates a log file (`setup_YYYYMMDD_HHMMSS.log`) in the current directory with detailed information about the setup process.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+See the LICENSE file in the root of this repository.
 WindowsFeatures:
   - name: Microsoft-Windows-Subsystem-Linux
     ensure: Present
