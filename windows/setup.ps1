@@ -207,7 +207,10 @@ if (-not (Test-Path -Path $VarsFilePath)) {
 Write-Verbose -Message '[Test] vars.yaml file...'
 try {
     Write-Verbose -Message '[Set] Importing vars.yaml file...'
-    $vars = pwsh -Command "ConvertFrom-Yaml -Yaml (Get-Content -Path $VarsFilePath -Raw) -ErrorAction Stop"
+    $vars = pwsh -Command {
+        param ($Path)
+        [pscustomobject](ConvertFrom-Yaml -Yaml (Get-Content -Path $Path -Raw) -ErrorAction Stop)
+    } -Args $VarsFilePath
     Write-Verbose -Message '[Set] vars.yaml file imported successfully.'
     Write-Information -MessageData 'Imported vars.yaml file successfully.'
 } catch {
