@@ -2,7 +2,7 @@
 # Externalized variables for DSC 3.0 setup
 
 # Windows Features to enable
-WindowsFeatures:
+windows_features:
   # Required for both WSL 1 and 2
   - Name: Microsoft-Windows-Subsystem-Linux
     LogLevel: ErrorsOnly
@@ -14,7 +14,7 @@ WindowsFeatures:
   # - Name: Containers
 
 # Chocolatey packages to install
-ChocolateyPackages:
+chocolatey_packages:
   - Name: 1password
   - Name: adoptopenjdk
   - Name: awscli
@@ -73,8 +73,8 @@ ChocolateyPackages:
   - Name: zoom
   - Name: zulu
 
-# PowerShell modules to install
-PowerShellModules:
+# PowerShell modules to install via PSResourceGet
+psresources:
   - Name: AWS.Tools.Common
   - Name: Az.Accounts
   - Name: Microsoft.Graph.Authentication
@@ -90,6 +90,21 @@ PowerShellModules:
   - Name: PSScriptAnalyzer
   - Name: PSTcpIp
   - Name: Terminal-Icons
+
+# Git configuration
+git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
+git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
+
+# Additional Git configurations (optional)
+# These will be set as git config --global key value
+git_additional_configs:
+  # Examples (uncomment to use):
+  commit.gpgsign: true
+  init.defaultBranch: main
+  gpg.program: /opt/homebrew/bin/gpg
+  push.default: current
+  push.autoSetupRemote: true
+  user.signingKey: 787AEF0BAE232359
 
 # Git user configuration - uncomment and set these values as needed
 # GitUserEmail: your.email@example.com
@@ -112,16 +127,18 @@ GitConfigScript: |
   git config --global core.autocrlf true
 
 # Custom commands to execute after setup
-CustomCommands: |
-  python -m pip install --user pipx
-  python -m pipx ensurepath
-
+custom_commands:
+  - python -m pip install --user pipx
+  - python -m pipx ensurepath
   # Install WSL without a distribution
-  Write-Output "Installing WSL infrastructure..."
-  wsl --install --no-distribution
-
+  - Write-Output "Installing WSL infrastructure..."
+  - wsl --install --no-distribution
   # Additional custom commands can be added here
   # For example, to install a specific WSL distribution:
   # wsl --install -d Ubuntu-22.04
   # Add more git config options as needed
 
+# Custom script path (optional)
+# Provide the path to a custom script that will be executed at the end of the setup
+# custom_script: "/path/to/your/custom_script.ps1"
+# custom_script_args: "-Option1 value1 -Option2 value2"

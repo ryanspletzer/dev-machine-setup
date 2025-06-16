@@ -1,351 +1,148 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
-# Modern Windows Developer Machine Setup with WinGet Configure
-# This script bootstraps a Windows development environment using:
-# - WinGet Configure for declarative configuration
-# - Chocolatey for package management
-# - PowerShell modules from PSGallery
+
+# Installs prerequisites and runs the configuration
 
 [CmdletBinding()]
 param (
     [Parameter()]
-    [switch]
-    $ValidateOnly,
-
-    [Parameter()]
-    [switch]
-    $Force,
-
-    [Parameter()]
+    [ValidateScript({
+        if ([string]::IsNullOrWhiteSpace($_) -and
+            [string]::IsNullOrWhiteSpace(git config --global user.email 2>$null)) {
+            Write-Error -Message "Git user email is not set and no email was provided."
+            $false
+        } else {
+            $true
+        }
+    })]
+    [Alias('e')]
     [string]
     $GitUserEmail,
 
     [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [Alias('n')]
     [string]
-    $GitUserName,
+    $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName,
 
     [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -Path $_ })]
+    [Alias('f')]
     [string]
-    $VarsFile = "vars.yaml",
-
-    [Parameter()]
-    [string]
-    $ConfigFile = "config.yaml"
+    $VarsFile = 'vars.yaml'
 )
 
-# Define the transcript file path
-$transcriptFile = "setup_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
-Start-Transcript -Path $transcriptFile
+Start-Transcript
+$script:VerbosePreference = 'Continue'
+$script:InformationPreference = 'Continue'
 
-# Set environment variables for Git configuration
-if ($GitUserEmail) {
-    [Environment]::SetEnvironmentVariable("GIT_USER_EMAIL", $GitUserEmail, "Process")
-    Write-Host "Git email set to: $GitUserEmail"
-}
+#region Progress Variables
 
-if ($GitUserName) {
-    [Environment]::SetEnvironmentVariable("GIT_USER_NAME", $GitUserName, "Process")
-    Write-Host "Git name set to: $GitUserName"
-}
+$activity = 'Setting Up Dev Machine'
+$step = 0 # Set this at the beginning of each step
+$stepText = 'Chocolatey Install' # Set this at the beginning of each step
 
-# Function to check if WinGet is installed and install it if needed
-function Test-WinGetInstalled {
-    try {
-        $wingetVersion = winget --version
-        Write-Host "WinGet is already installed. Version: $wingetVersion"
-    }
-    catch {
-        Write-Host "WinGet is not installed. Installing WinGet..."
+# Get content of current script file to count of the total steps by looking at Step++ lines
+$scriptPath = $MyInvocation.MyCommand.Path
+$totalSteps = (
+    Get-Content -Path $MyInvocation.MyCommand.Path |
+    Where-Object -FilterScript { $_ -eq '$Step++' }
+).Count
 
-        # Download the Microsoft.DesktopAppInstaller package from the GitHub releases
-        $wingetUrl = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-        $wingetInstallerPath = Join-Path $env:TEMP "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
+# Single quotes need to be on the outside
+$statusText = '"Step $($step.ToString().PadLeft($totalSteps.Count.ToString().Length)) of $totalSteps | $stepText"'
 
-        Invoke-WebRequest -Uri $wingetUrl -OutFile $wingetInstallerPath
+# This script block allows the string above to use the current values of embedded values each time it's run
+$statusBlock = [ScriptBlock]::Create($statusText)
 
-        # Install the package
-        Add-AppxPackage -Path $wingetInstallerPath
+#endregion Progress Variables
 
-        # Clean up
-        Remove-Item $wingetInstallerPath -Force
+#region Chocolatey Install
 
-        # Verify installation
-        try {
-            $wingetVersion = winget --version
-            Write-Host "WinGet installed successfully. Version: $wingetVersion"
-        }
-        catch {
-            Write-Error "Failed to install WinGet. Please install it manually from the Microsoft Store."
-            exit 1
-        }
-    }
-}
+$step++
+$stepText = 'Chocolatey Install'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Chocolatey install...'
 
-# Check for WinGet and install if needed
-Test-WinGetInstalled
+# Get
+Write-Verbose -Message '[Get] Chocolatey...'
+$choco = Get-Command -Name choco -ErrorAction SilentlyContinue
 
-# Ensure NetConnectionProfiles are set to Private or Domain, if not set Public ones to Private
-$netConnectionProfiles = Get-NetConnectionProfile
-if ($netConnectionProfiles) {
-    foreach ($profile in $netConnectionProfiles) {
-        if ($profile.NetworkCategory -eq 'Public') {
-            Write-Output -InputObject "Setting network profile '$($profile.Name)' to Private..."
-            Set-NetConnectionProfile -InterfaceIndex $profile.InterfaceIndex -NetworkCategory Private
-        }
-    }
+# Test
+Write-Verbose -Message '[Test] Chocolatey...'
+if ($null -eq $choco) {
+    # Set
+    Write-Verbose -Message '[Set] Chocolatey is not installed, installing...'
+    Invoke-Expression -Command (
+        (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
+    )
+    Write-Verbose -Message '[Set] Chocolatey is now installed.'
+    Write-Information -MessageData 'Installed Chocolatey.'
 } else {
-    Write-Warning -Message "No network connection profiles found."
+    Write-Information -MessageData 'Chocolatey is already installed.'
 }
 
-# Ensure WinRM is enabled
-Write-Host "Configuring WinRM..."
-winrm quickconfig -q
+#endregion Chocolatey Install
 
-# Check if PowerShell YAML module is installed
-if (-not (Get-Module -ListAvailable -Name powershell-yaml)) {
-    Write-Host "Installing PowerShell YAML module..."
-    Install-Module -Name powershell-yaml -Force -Scope CurrentUser
+#region Install PowerShell (pwsh)
+
+$step++
+$stepText = 'Install PowerShell (pwsh)'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for PowerShell (pwsh) install...'
+
+# Get
+Write-Verbose -Message '[Get] PowerShell (pwsh)...'
+$pwsh = Get-Command -Name pwsh -ErrorAction SilentlyContinue
+
+# Test
+Write-Verbose -Message '[Test] PowerShell (pwsh)...'
+if ($null -eq $pwsh) {
+    # Set
+    Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
+    choco install pwsh -yes --no-progress
+    Write-Verbose -Message '[Set] PowerShell (pwsh) is now installed.'
+    Write-Information -MessageData 'Installed PowerShell (pwsh).'
+} else {
+    Write-Information -MessageData 'PowerShell (pwsh) is already installed.'
 }
 
-# Import the PowerShell YAML module
-Import-Module powershell-yaml
+#endregion Install PowerShell (pwsh)
 
-# Define file paths
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$varsFilePath = Join-Path -Path $scriptDir -ChildPath $VarsFile
-$configFilePath = Join-Path -Path $scriptDir -ChildPath $ConfigFile
+#region Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)
+
+$step++
+$stepText = 'Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking if running in Windows PowerShell...'
+
+# Get
+Write-Verbose -Message '[Get] Current PowerShell version...'
+$currentPSVersion = $PSVersionTable.PSVersion
+
+# Test
+Write-Verbose -Message '[Test] Current PowerShell version...'
+if ($currentPSVersion.Major -lt 6) {
+    Write-Verbose -Message '[Set] Relaunching in PowerShell (pwsh)...'
+    $scriptPath = $MyInvocation.MyCommand.Path
+    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -e `"$GitUserEmail`" -n `"$GitUserName`" -f `"$VarsFile`""
+    Start-Process -FilePath 'pwsh.exe' -ArgumentList $args -Wait
+    exit 0
+} else {
+    Write-Information -MessageData 'Running in PowerShell (pwsh).'
+}
+
+#endregion Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)
 
 # Import vars.yaml
 if (Test-Path -Path $varsFilePath) {
     Write-Host "Importing vars from $varsFilePath..."
     $varsContent = Get-Content -Path $varsFilePath -Raw
-    $vars = ConvertFrom-Yaml -Yaml $varsContent
+    # $vars = ConvertFrom-Yaml -Yaml $varsContent
 } else {
     Write-Error "Variables file not found: $varsFilePath"
     exit 1
-}
-
-# Function to generate the WinGet configuration file
-function New-WinGetConfigFile {
-    param (
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Variables,
-
-        [Parameter(Mandatory = $true)]
-        [string]$OutputPath
-    )
-
-    # Initialize the configuration object
-    $config = @{
-        '$schema' = 'https://aka.ms/configuration-schema-v2'
-        properties = @{
-            scope = 'machine'
-            locale = 'en-US'
-        }
-        resources = @()
-    }
-
-    # Add Windows Features
-    foreach ($feature in $Variables.WindowsFeatures) {
-        $config.resources += @{
-            resource = 'Microsoft.Windows.Feature'
-            directives = @{
-                description = "Install Windows Feature: $($feature.Name)"
-                allowPrerelease = $true
-            }
-            settings = @{
-                featureName = $feature.Name
-                state = 'Enabled'
-            }
-        }
-    }
-
-    # Install Chocolatey Package Manager
-    $config.resources += @{
-        resource = 'Microsoft.Windows.PowerShell'
-        id = 'install_chocolatey'
-        directives = @{
-            description = 'Install Chocolatey'
-            allowPrerelease = $true
-        }
-        settings = @{
-            executeAsPowershell = $true
-            executionPolicy = 'Bypass'
-            source = @'
-if (-not (Get-Command -Name choco -ErrorAction SilentlyContinue)) {
-  Write-Host "Installing Chocolatey..."
-  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-  [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-  Invoke-Expression -Command ((New-Object -TypeName System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-  $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-  Write-Host "Chocolatey installed successfully."
-} else {
-  Write-Host "Chocolatey is already installed."
-}
-'@
-        }
-    }
-
-    # Install PowerShell 7 (pwsh)
-    $config.resources += @{
-        resource = 'Microsoft.WinGet.DSC/WinGetPackage'
-        id = 'install_pwsh'
-        directives = @{
-            description = 'Install PowerShell 7'
-            allowPrerelease = $true
-            dependsOn = @('install_chocolatey')
-        }
-        settings = @{
-            id = 'Microsoft.PowerShell'
-            source = 'winget'
-            ensure = 'Present'
-        }
-    }
-
-    # Generate Chocolatey packages installation script
-    $chocoPackagesScript = @'
-# Function to install Chocolatey package if not already installed
-function Install-ChocoPackageIfNotInstalled {
-    param(
-        [string]$PackageName,
-        [string]$Params = ""
-    )
-
-    if (-not (choco list --local-only --exact $PackageName | Select-String -Pattern "^$PackageName\s")) {
-        Write-Host "Installing $PackageName..."
-        if ($Params) {
-            choco install $PackageName -y --no-progress --params="$Params"
-        } else {
-            choco install $PackageName -y --no-progress
-        }
-    } else {
-        Write-Host "$PackageName is already installed."
-    }
-}
-
-# Install Chocolatey packages
-$packages = @(
-
-'@
-
-    # Add each Chocolatey package to the script
-    foreach ($package in $Variables.ChocolateyPackages) {
-        if ($package.params) {
-            $chocoPackagesScript += "    @{ Name = ""$($package.Name)""; Params = ""$($package.params)"" },`n"
-        } else {
-            $chocoPackagesScript += "    @{ Name = ""$($package.Name)"" },`n"
-        }
-    }
-
-    # Complete the Chocolatey packages script
-    $chocoPackagesScript += @'
-)
-
-# Install each package
-foreach ($package in $packages) {
-    if ($package.Params) {
-        Install-ChocoPackageIfNotInstalled -PackageName $package.Name -Params $package.Params
-    } else {
-        Install-ChocoPackageIfNotInstalled -PackageName $package.Name
-    }
-}
-'@
-
-    # Add Chocolatey packages installation to config
-    $config.resources += @{
-        resource = 'Microsoft.Windows.PowerShell'
-        id = 'install_choco_packages'
-        directives = @{
-            description = 'Install Developer Tools via Chocolatey'
-            allowPrerelease = $true
-            dependsOn = @('install_chocolatey')
-        }
-        settings = @{
-            executeAsPowershell = $true
-            executionPolicy = 'Bypass'
-            source = $chocoPackagesScript
-        }
-    }
-
-    # Generate PowerShell modules installation script
-    $psModulesScript = @'
-# Install PowerShell modules if not already installed
-$modules = @(
-
-'@
-
-    # Add each PowerShell module to the script
-    foreach ($module in $Variables.PowerShellModules) {
-        $psModulesScript += "    ""$($module.Name)"",`n"
-    }
-
-    # Complete the PowerShell modules script
-    $psModulesScript += @'
-)
-
-foreach ($module in $modules) {
-    if (-not (Get-Module -ListAvailable -Name $module)) {
-        Write-Host "Installing PowerShell module: $module..."
-        Install-Module -Name $module -Force -AllowClobber -Scope AllUsers
-    } else {
-        Write-Host "PowerShell module $module is already installed."
-    }
-}
-'@
-
-    # Add PowerShell modules installation to config
-    $config.resources += @{
-        resource = 'Microsoft.Windows.PowerShell'
-        id = 'install_powershell_modules'
-        directives = @{
-            description = 'Install PowerShell Modules'
-            allowPrerelease = $true
-            dependsOn = @('install_pwsh')
-        }
-        settings = @{
-            executeAsPowershell = $true
-            executionPolicy = 'Bypass'
-            source = $psModulesScript
-        }
-    }
-
-    # Add Git configuration if provided
-    if ($Variables.ContainsKey('GitConfigScript') -and -not [string]::IsNullOrWhiteSpace($Variables.GitConfigScript)) {
-        $config.resources += @{
-            resource = 'Microsoft.Windows.PowerShell'
-            id = 'configure_git'
-            directives = @{
-                description = 'Configure Git'
-                allowPrerelease = $true
-                dependsOn = @('install_choco_packages')
-            }
-            settings = @{
-                executeAsPowershell = $true
-                executionPolicy = 'Bypass'
-                source = $Variables.GitConfigScript
-            }
-        }
-    }
-
-    # Convert configuration to YAML and save to file
-    $configYaml = ConvertTo-Yaml -Data $config -OutFile $OutputPath -Force
-    Write-Host "WinGet configuration file generated: $OutputPath"
-}
-
-# Generate the WinGet configuration file
-New-WinGetConfigFile -Variables $vars -OutputPath $configFilePath
-
-# Apply the configuration
-if ($ValidateOnly) {
-    Write-Host "Validating configuration..."
-    winget configure validate -f $configFilePath
-} else {
-    Write-Host "Applying configuration..."
-    if ($Force) {
-        winget configure -f $configFilePath --accept-configuration-agreements --disable-interactivity
-    } else {
-        winget configure -f $configFilePath
-    }
 }
 
 Stop-Transcript
