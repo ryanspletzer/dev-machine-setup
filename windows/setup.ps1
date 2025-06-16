@@ -8,7 +8,7 @@ param (
     [Parameter()]
     [ValidateScript({
         if ([string]::IsNullOrWhiteSpace($_) -and
-            [string]::IsNullOrWhiteSpace(git config --global user.email 2>$null)) {
+            [string]::IsNullOrWhiteSpace((git config --global user.email 2>$null))) {
             Write-Error -Message "Git user email is not set and no email was provided."
             $false
         } else {
@@ -126,7 +126,8 @@ Write-Verbose -Message '[Test] Current PowerShell version...'
 if ($currentPSVersion.Major -lt 6) {
     Write-Verbose -Message '[Set] Relaunching in PowerShell (pwsh)...'
     $scriptPath = $MyInvocation.MyCommand.Path
-    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -e `"$GitUserEmail`" -n `"$GitUserName`" -f `"$VarsFile`""
+    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" +
+            " -e `"$GitUserEmail`" -n `"$GitUserName`" -f `"$VarsFile`""
     Start-Process -FilePath 'pwsh.exe' -ArgumentList $args -Wait
     exit 0
 } else {
