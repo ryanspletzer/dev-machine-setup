@@ -119,7 +119,7 @@ psmodules:
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
-git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
+git_user_name: ''  # Defaults to Windows local users full name (if set)
 
 # Additional Git configurations (optional)
 # These will be set as git config --global key value
