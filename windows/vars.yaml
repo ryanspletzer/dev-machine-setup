@@ -73,7 +73,7 @@ chocolatey_packages:
   - Name: zoom
   - Name: zulu
 
-# PowerShell modules to install via PSResourceGet
+# PowerShell modules to install via PSResourceGet in PowerShell (pwsh)
 psresources:
   - Name: AWS.Tools.Common
   - Name: Az.Accounts
@@ -90,6 +90,26 @@ psresources:
   - Name: PSScriptAnalyzer
   - Name: PSTcpIp
   - Name: Terminal-Icons
+
+# PowerShell modules to install via Install-Module in Windows PowerShell (powershell)
+# Note: Only use this if you need to install modules in old Windows PowerShell (powershell)
+# This is not recommended for new setups, prefer using pwsh and PSResourceGet
+psmodules:
+  # - Name: AWS.Tools.Common
+  # - Name: Az.Accounts
+  # - Name: Microsoft.Graph.Authentication
+  # - Name: Pester
+  # - Name: platyPS
+  # - Name: posh-git
+  # - Name: powershell-yaml
+  # - Name: PowerShellBuild
+  # - Name: psake
+  # - Name: PSGraphQL
+  # - Name: PSJsonWebToken
+  # - Name: PSReadLine
+  # - Name: PSScriptAnalyzer
+  # - Name: PSTcpIp
+  # - Name: Terminal-Icons
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
@@ -109,22 +129,6 @@ git_additional_configs:
 # Git user configuration - uncomment and set these values as needed
 # GitUserEmail: your.email@example.com
 # GitUserName: Your Name
-
-# Git configuration script
-GitConfigScript: |
-  # Git user configuration
-  if (-not [string]::IsNullOrEmpty('${GitUserEmail}')) {
-    git config --global user.email '${GitUserEmail}'
-  }
-  if (-not [string]::IsNullOrEmpty('${GitUserName}')) {
-    git config --global user.name '${GitUserName}'
-  }
-
-  # Additional Git configurations
-  git config --global init.defaultBranch main
-  git config --global push.default current
-  git config --global push.autoSetupRemote true
-  git config --global core.autocrlf true
 
 # Custom commands to execute after setup
 custom_commands:

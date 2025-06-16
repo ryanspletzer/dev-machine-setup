@@ -33,7 +33,7 @@ param (
     $VarsFile = 'vars.yaml'
 )
 
-Start-Transcript
+Start-Transcript -
 $script:VerbosePreference = 'Continue'
 $script:InformationPreference = 'Continue'
 
@@ -102,6 +102,7 @@ if ($null -eq $pwsh) {
     # Set
     Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
     choco install pwsh -yes --no-progress
+    # TODO: Refresh Path
     Write-Verbose -Message '[Set] PowerShell (pwsh) is now installed.'
     Write-Information -MessageData 'Installed PowerShell (pwsh).'
 } else {
@@ -110,31 +111,63 @@ if ($null -eq $pwsh) {
 
 #endregion Install PowerShell (pwsh)
 
-#region Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)
+#region Set PSGallery to Trusted in PSResourceGet in PowerShell (pwsh)
 
 $step++
-$stepText = 'Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)'
+$stepText = 'Set PSGallery to Trusted in PSResourceGet in PowerShell (pwsh)'
 Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
-Write-Information -MessageData 'Checking if running in Windows PowerShell...'
+Write-Information -MessageData 'Checking if PSGallery is set to trusted...'
 
 # Get
-Write-Verbose -Message '[Get] Current PowerShell version...'
-$currentPSVersion = $PSVersionTable.PSVersion
-
-# Test
-Write-Verbose -Message '[Test] Current PowerShell version...'
-if ($currentPSVersion.Major -lt 6) {
-    Write-Verbose -Message '[Set] Relaunching in PowerShell (pwsh)...'
-    $scriptPath = $MyInvocation.MyCommand.Path
-    $args = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" +
-            " -e `"$GitUserEmail`" -n `"$GitUserName`" -f `"$VarsFile`""
-    Start-Process -FilePath 'pwsh.exe' -ArgumentList $args -Wait
-    exit 0
-} else {
-    Write-Information -MessageData 'Running in PowerShell (pwsh).'
+Write-Verbose -Message '[Get] PSGallery resource repository is trusted...'
+$psResourceRepository = pwsh -Command {
+    Get-PSResourceRepository -Name 'PSGallery' -ErrorAction SilentlyContinue
 }
 
-#endregion Check if Running in Windows PowerShell, Relaunch in PowerShell (pwsh)
+# Test
+Write-Verbose -Message '[Test] PSGallery resource repository is trusted...'
+if (-not $psResourceRepository.Trusted) {
+    # Set
+    Write-Verbose -Message '[Set] PSGallery resource repository is not trusted, setting to trusted...'
+    pwsh -Command {
+        Set-PSResourceRepository -Name 'PSGallery' -Trusted
+    }
+    Write-Verbose -Message '[Set] PSGallery resource repository is now trusted.'
+    Write-Information -MessageData 'Set PSGallery to trusted in PSResourceGet.'
+} else {
+    Write-Information -MessageData 'PSGallery resource repository is already trusted.'
+}
+
+#endregion Set PSGallery to Trusted in PSResourceGet in PowerShell (pwsh)
+
+#region Install powershell-yaml in PowerShell (pwsh)
+
+$step++
+$stepText = 'Install powershell-yaml in PowerShell (pwsh)'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for powershell-yaml module install...'
+
+# Get
+Write-Verbose -Message '[Get] powershell-yaml module...'
+$yamlPSResource = pwsh -Command {
+    Get-PSResource -Name 'powershell-yaml' -ErrorAction SilentlyContinue
+}
+
+# Test
+Write-Verbose -Message '[Test] powershell-yaml module...'
+if ($null -eq $yamlPSResource) {
+    # Set
+    Write-Verbose -Message '[Set] powershell-yaml module is not installed, installing...'
+    pwsh -Command {
+        Install-PSResource -Name 'powershell-yaml'
+    }
+    Write-Verbose -Message '[Set] powershell-yaml module is now installed.'
+    Write-Information -MessageData 'Installed powershell-yaml module.'
+} else {
+    Write-Information -MessageData 'powershell-yaml module is already installed.'
+}
+
+#endregion Install powershell-yaml in PowerShell (pwsh)
 
 # Import vars.yaml
 if (Test-Path -Path $varsFilePath) {
