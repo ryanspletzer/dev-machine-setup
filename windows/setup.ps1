@@ -6,6 +6,13 @@
 [CmdletBinding()]
 param (
     [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({ Test-Path -Path $_ })]
+    [Alias('f')]
+    [string]
+    $VarsFilePath = 'vars.yaml',
+
+    [Parameter()]
     [ValidateScript({
         if ([string]::IsNullOrWhiteSpace($_) -and
             [string]::IsNullOrWhiteSpace((git config --global user.email 2>$null))) {
@@ -20,20 +27,28 @@ param (
     $GitUserEmail,
 
     [Parameter()]
-    [ValidateNotNullOrEmpty()]
+    [ValidateScript({
+        if ([string]::IsNullOrWhiteSpace($_) -and
+            [string]::IsNullOrWhiteSpace((git config --global user.name 2>$null))) {
+            Write-Error -Message "Git user name is not set and no name was provided."
+            $false
+        } else {
+            $true
+        }
+    })]
     [Alias('n')]
     [string]
-    $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName,
-
-    [Parameter()]
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Test-Path -Path $_ })]
-    [Alias('f')]
-    [string]
-    $VarsFile = 'vars.yaml'
+    $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
 )
 
-Start-Transcript -
+# Start Transcript at current path of script
+# Use default transcript file format with setup appended
+$randomString = -join ((65..90) + (97..122) | Get-Random -Count 8 | ForEach-Object { [char]$_ })
+$timestamp = Get-Date -Format "yyyyMMddHHmmss"
+$script:TranscriptFile = Join-Path -Path (
+    Split-Path -Path $MyInvocation.MyCommand.Path
+) -ChildPath "setup_PowerShell_transcript.$env:COMPUTERNAME.${randomString}.${timestamp}.txt"
+Start-Transcript -Path $script:TranscriptFile
 $script:VerbosePreference = 'Continue'
 $script:InformationPreference = 'Continue'
 
@@ -171,15 +186,37 @@ if ($null -eq $yamlPSResource) {
 
 #endregion Install powershell-yaml in PowerShell (pwsh)
 
-# Import vars.yaml
-if (Test-Path -Path $varsFilePath) {
-    Write-Host "Importing vars from $varsFilePath..."
-    $varsContent = Get-Content -Path $varsFilePath -Raw
-    # $vars = ConvertFrom-Yaml -Yaml $varsContent
-} else {
-    Write-Error "Variables file not found: $varsFilePath"
+#region Import Vars file using powershell-yaml in PowerShell (pwsh)
+
+$step++
+$stepText = 'Import Vars file using powershell-yaml in PowerShell (pwsh)'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for vars.yaml file...'
+
+# Get
+Write-Verbose -Message '[Get] vars.yaml file...'
+if (-not (Test-Path -Path $VarsFilePath)) {
+    Write-Error -Message "Vars file not found at path: $VarsFilePath"
+    Stop-Transcript
     exit 1
 }
+
+# Test
+Write-Verbose -Message '[Test] vars.yaml file...'
+try {
+    Write-Verbose -Message '[Set] Importing vars.yaml file...'
+    $vars = pwsh -Command {
+        Import-Yaml -Path $using:VarsFilePath
+    }
+    Write-Verbose -Message '[Set] vars.yaml file imported successfully.'
+    Write-Information -MessageData 'Imported vars.yaml file successfully.'
+} catch {
+    Write-Error -Message "Failed to import vars.yaml file: $_"
+    Stop-Transcript
+    exit 1
+}
+
+#endregion Import Vars file using powershell-yaml in PowerShell (pwsh)
 
 Stop-Transcript
 
