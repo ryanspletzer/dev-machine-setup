@@ -303,57 +303,6 @@ try {
 
 #endregion Import Vars file using powershell-yaml in PowerShell (pwsh)
 
-#region Enable Windows Optional Features from Vars file
-
-$step++
-$stepText = 'Enable Windows Optional Features from Vars file import'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
-Write-Information -MessageData 'Checking for Windows Optional Features...'
-
-# Get
-Write-Verbose -Message '[Get] Windows Optional Features from Vars file import...'
-$optionalFeatures = $vars.windows_optional_features
-
-# Test
-Write-Verbose -Message '[Test] Windows Optional Features from Vars file import...'
-if ($optionalFeatures -and $optionalFeatures.Count -gt 0) {
-    foreach ($featureName in $optionalFeatures) {
-        Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
-        ) -CurrentOperation $featureName -PercentComplete ($step / $totalSteps * 100)
-
-        # Get
-        Write-Verbose -Message "[Get] Windows Optional Feature: $featureName"
-        $feature = Get-WindowsOptionalFeature -FeatureName $featureName -Online -ErrorAction SilentlyContinue
-        if ($null -eq $feature) {
-            Write-Error -Message "Windows Optional Feature '$featureName' not found."
-            continue
-        }
-
-        # Test
-        Write-Verbose -Message "[Test] Windows Optional Feature: $featureName"
-        if ($feature.State -eq 'Enabled') {
-            Write-Information -MessageData "Windows Optional Feature '$featureName' is already enabled."
-            # Skip to next feature
-            continue
-        }
-
-        Write-Verbose -Message "[Set] Enabling feature: $featureName"
-        try {
-            # Set
-            Enable-WindowsOptionalFeature -FeatureName $featureName -Online -NoRestart -ErrorAction Stop
-            Write-Information -MessageData "Enabled Windows Optional Feature: $featureName."
-        } catch {
-            Write-Error -Message "Failed to enable Windows Optional Feature: $featureName. Error: $_"
-        }
-    }
-    Write-Verbose -Message '[Set] All specified Windows Optional Features have been processed.'
-} else {
-    Write-Information -MessageData 'No Windows Optional Features specified in vars.yaml file.'
-}
-
-#endregion Enable Windows Optional Features from Vars file
-
 #region Install Chocolatey Packages from Vars file
 
 $step++

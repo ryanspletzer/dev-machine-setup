@@ -1,18 +1,6 @@
 # vars.yml
 # Externalized variables for DSC 3.0 setup
 
-# Windows Features to enable
-windows_optional_features:
-  # Required for WSL 2
-  - VirtualMachinePlatform
-  # Required for both WSL 1 and 2
-  - Microsoft-Windows-Subsystem-Linux
-  # Only enable if you need these
-  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
-  # - Microsoft-Hyper-V
-  # Provides support for working with Windows containers
-  # - Containers
-
 # Chocolatey packages to install
 # You may wonder why we have an explicit "name" key here instead of a simple array of package names...
 # name is required input.
@@ -250,12 +238,16 @@ custom_commands:
   # - wsl --install -d Ubuntu-22.04
   # If you are fine with the WSL defaults Ubuntu distribution, you can use the command below.
   # Install WSL if not already installed with a default Ubuntu distribution
-  # This also enables the relevant Windows features automatically if they aren't enabled already.
+  # This also enables the relevant VirtualMachinePlatform and Microsoft-Windows-Subsystem-Linux Windows features
+  # automatically if they aren't enabled already.
   - wsl --install
   # Additional custom commands can be added here
   # For example, to install a specific WSL distribution:
   # wsl --install -d Ubuntu-22.04
-  # Add more git config options as needed
+  # Only enable if you need these
+  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
+  # - Enable-WindowsOptionalFeature -FeatureName Microsoft-Hyper-V -Online -NoRestart
+  # - Enable-WindowsOptionalFeature -FeatureName Containers -Online -NoRestart
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
