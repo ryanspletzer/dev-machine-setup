@@ -28,7 +28,7 @@ param (
 #region Additional Input Validation
 
 if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
-    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
+    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserEmail']) -and
     [string]::IsNullOrWhiteSpace(
         (
             Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
@@ -38,6 +38,18 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch 
     )) {
     Write-Error -Message "Git user email is not set and no email was provided."
     exit 1
+}
+
+# Check if git_user_email was supplied in the vars.yaml file and retrieve it if available
+if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
+    $gitUserEmailFromVars = (
+        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+            Where-Object -FilterScript { $_ -match 'git_user_email' } |
+            ForEach-Object -Process { $_.Split(':')[1].Trim() }
+    )
+    if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
+        $GitUserEmail = $gitUserEmailFromVars
+    }
 }
 
 # If there is no currently set git user.name, ensure that one was provided or that the local user FullName is set
@@ -54,6 +66,18 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
     # If no name is provided and no local user name is
     Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
     exit 1
+}
+
+# Check if git_user_name was supplied in the vars.yaml file and retrieve it if available
+if ([string]::IsNullOrWhiteSpace($GitUserName)) {
+    $gitUserNameFromVars = (
+        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+            Where-Object -FilterScript { $_ -match 'git_user_name' } |
+            ForEach-Object -Process { $_.Split(':')[1].Trim() }
+    )
+    if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
+        $GitUserName = $gitUserNameFromVars
+    }
 }
 
 #endregion Additional Input Validation
