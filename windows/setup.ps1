@@ -12,17 +12,8 @@ param (
     [string]
     $VarsFilePath = 'vars.yaml',
 
-    [Parameter(Mandatory)]
-    [ValidateScript({
-        if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
-            [string]::IsNullOrWhiteSpace($_)) {
-            Write-Error -Message "Git user email is not set and no email was provided."
-            $false
-        } else {
-            Write-Error -Message "Do we get output here?"
-            $true
-        }
-    })]
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
     [Alias('e')]
     [string]
     $GitUserEmail,
@@ -36,9 +27,29 @@ param (
 
 #region Additional Input Validation
 
+if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
+    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
+    [string]::IsNullOrWhiteSpace(
+        (
+            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+                Where-Object -FilterScript { $_ -match 'git_user_email' } |
+                ForEach-Object -Process { $_.Split(':')[1].Trim() }
+        )
+    )) {
+    Write-Error -Message "Git user email is not set and no email was provided."
+    exit 1
+}
+
 # If there is no currently set git user.name, ensure that one was provided or that the local user FullName is set
 if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {})) -and
     [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
+    [string]::IsNullOrWhiteSpace(
+        (
+            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+                Where-Object -FilterScript { $_ -match 'git_user_name' } |
+                ForEach-Object -Process { $_.Split(':')[1].Trim() }
+        )
+    ) -and
     [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
     # If no name is provided and no local user name is
     Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
@@ -319,6 +330,9 @@ if ($chocoPackages -and $chocoPackages.Count -gt 0) {
         Write-Verbose -Message "[Get] / [Test] / [Set] Installed $($package.name) through Chocolatey."
         Write-Information -MessageData "Idempotently installed $($package.name)."
     }
+
+    # Refresh the PATH environment variable to ensure any new Chocolatey packages are available
+    Update-SessionEnvironment
 } else {
     Write-Information -MessageData 'No Chocolatey packages specified in vars.yaml file.'
 }
@@ -503,10 +517,8 @@ Write-Verbose -Message '[Test] pipx...'
 if ($null -eq $pipx) {
     # Set
     Write-Verbose -Message '[Set] pipx is not installed, checking for Python installation...'
-
-    # Refresh Path in case Python was just installed by Chocolatey
-    Update-SessionEnvironment
     $python = Get-Command -Name python -ErrorAction SilentlyContinue
+
     if ($null -eq $python) {
         Write-Error -Message 'Python is not installed, pipx cannot be installed.'
     } else {
@@ -574,6 +586,66 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 }
 
 #endregion Ensure pipx Packages from Vars file are Installed
+
+#region Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
+
+$step++
+$stepText = 'Install Visual Studio Code Extensions from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Visual Studio Code extensions to install...'
+
+# Get
+Write-Verbose -Message '[Get] Visual Studio Code extensions from Vars file import...'
+$vscodeExtensions = $vars.vscode_extensions
+
+# Test
+Write-Verbose -Message '[Test] Visual Studio Code extensions from Vars file import...'
+if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
+    # Get
+    Write-Verbose -Message '[Get] Checking for Visual Studio Code installation...'
+    $code = Get-Command -Name code -ErrorAction SilentlyContinue
+
+    # Test
+    Write-Verbose -Message '[Test] Visual Studio Code installation...'
+    if ($null -eq $code) {
+        Write-Error -Message 'Visual Studio Code is not installed, cannot install extensions.'
+    } else {
+        $vscodeExtensionsInstalled = code --list-extensions
+        foreach ($extension in $vscodeExtensions) {
+            Write-Progress -Activity $Activity -Status (
+                & $StatusBlock
+            ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
+            Write-Information -MessageData "Checking for Visual Studio Code extension $extension..."
+
+            # Get
+            Write-Verbose -Message "[Get] Visual Studio Code extension: $extension"
+            $vscodeExtensionInstalled = $vscodeExtensionsInstalled |
+                Where-Object -FilterScript { $_ -eq $extension }
+
+            # Test
+            Write-Verbose -Message "[Test] Visual Studio Code extension: $extension"
+            if (-not $vscodeExtensionInstalled) {
+                # Set
+                Write-Verbose -Message (
+                    "[Set] Visual Studio Code extension $extension is not installed, installing..."
+                )
+                try {
+                    code --install-extension $extension
+                    Write-Verbose -Message "[Set] Visual Studio Code extension $extension is now installed."
+                    Write-Information -MessageData "Installed Visual Studio Code extension: $extension."
+                } catch {
+                    Write-Error -Message "Failed to install Visual Studio Code extension: $extension. Error: $_"
+                }
+            } else {
+                Write-Information -MessageData "Visual Studio Code extension $extension is already installed."
+            }
+        }
+    }
+} else {
+    Write-Information -MessageData 'No Visual Studio Code extensions specified in vars.yaml file.'
+}
+
+#endregion Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
 
 #region Git user.name and user.email Config
 

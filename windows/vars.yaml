@@ -40,6 +40,7 @@ choco_packages:
   # - name: fiddler
   # - name: firefox
   # - name: gh
+  # Required for git configs
   - name: git
   #   parameters: /WindowsTerminal /NoShellIntegration
   # - name: gnupg
@@ -58,6 +59,7 @@ choco_packages:
   # - name: office365business
   # - name: oh-my-posh
   # - name: packer
+  # Required to for pipx_modules
   - name: python
   # - name: pwsh
   # - name: qemu
@@ -73,7 +75,8 @@ choco_packages:
   # - name: uv
   # - name: vault
   # - name: visualstudio2022enterprise
-  # - name: visualstudiocode
+  # Required for vscode_extensions
+  - name: visualstudiocode
   # - name: windows-sdk-10-version-2004-all
   # - name: zoom
   # - name: zulu
@@ -87,7 +90,7 @@ powershell_modules:
   # - Pester
   # - platyPS
   # - posh-git
-  # - powershell-yaml
+  # - powershell-yaml # This is pre-installed by the script to import this yaml file
   # - PowerShellBuild
   # - psake
   # - PSGraphQL
@@ -124,9 +127,116 @@ pipx_packages:
   # - taskcat
   # Add more pipx modules as needed
 
+# Visual Studio Code extensions
+# You can list your Visual Studio Code extensions with the command:
+# code --list-extensions
+# and then format them as shown below.
+# Alternatively if you're a long-time Visual Studio Code user, you can use Visual Studio Code's extension sync
+# feature tied to a GitHub or Microsoft account to sync your extensions across devices and onto new machines.
+vscode_extensions:
+  - 4ops.packer
+  # - alefragnani.project-manager
+  # - arjun.swagger-viewer
+  # - aws-scripting-guy.cform
+  # - charliermarsh.ruff
+  # - codezombiech.gitignore
+  # - davidanson.vscode-markdownlint
+  # - dbaeumer.vscode-eslint
+  # - docker.docker
+  # - donjayamanne.git-extension-pack
+  # - donjayamanne.githistory
+  # - eamodio.gitlens
+  # - esbenp.prettier-vscode
+  # - fernandoescolar.vscode-solution-explorer
+  # - github.copilot
+  # - github.copilot-chat
+  # - github.vscode-github-actions
+  # - github.vscode-pull-request-github
+  # - golang.go
+  # - grapecity.gc-excelviewer
+  # - hbenl.vscode-test-explorer
+  # - josin.kusto-syntax-highlighting
+  # - k--kato.docomment
+  # - medo64.render-crlf
+  # - mhutchie.git-graph
+  # - mimarec.swagger-doc-viewer
+  # - mohsen1.prettify-json
+  # - ms-azuretools.vscode-azurefunctions
+  # - ms-azuretools.vscode-azureresourcegroups
+  # - ms-azuretools.vscode-bicep
+  # - ms-azuretools.vscode-containers
+  # - ms-azuretools.vscode-docker
+  # - ms-dotnettools.csdevkit
+  # - ms-dotnettools.csharp
+  # - ms-dotnettools.vscode-dotnet-runtime
+  # - ms-kubernetes-tools.vscode-kubernetes-tools
+  # - ms-mssql.data-workspace-vscode
+  # - ms-mssql.mssql
+  # - ms-mssql.sql-bindings-vscode
+  # - ms-mssql.sql-database-projects-vscode
+  # - ms-python.debugpy
+  # - ms-python.isort
+  # - ms-python.python
+  # - ms-python.vscode-pylance
+  # - ms-toolsai.jupyter
+  # - ms-toolsai.jupyter-keymap
+  # - ms-toolsai.jupyter-renderers
+  # - ms-toolsai.vscode-jupyter-cell-tags
+  # - ms-toolsai.vscode-jupyter-slideshow
+  # - ms-vscode-remote.remote-containers
+  # - ms-vscode-remote.remote-ssh
+  # - ms-vscode-remote.remote-ssh-edit
+  # - ms-vscode-remote.remote-wsl
+  # - ms-vscode-remote.vscode-remote-extensionpack
+  # - ms-vscode.cmake-tools
+  # - ms-vscode.cpptools
+  # - ms-vscode.cpptools-extension-pack
+  # - ms-vscode.cpptools-themes
+  # - ms-vscode.hexeditor
+  # - ms-vscode.makefile-tools
+  # - ms-vscode.powershell
+  # - ms-vscode.remote-explorer
+  # - ms-vscode.remote-server
+  # - ms-vscode.test-adapter-converter
+  # - ms-vsliveshare.vsliveshare
+  # - msazurermtools.azurerm-vscode-tools
+  # - octref.vetur
+  # - oderwat.indent-rainbow
+  # - parallelsdesktop.parallels-desktop
+  # - pspester.pester-test
+  # - rangav.vscode-thunder-client
+  # - redhat.java
+  # - redhat.vscode-commons
+  # - redhat.vscode-yaml
+  # - samirat.csharp-test-adapter
+  # - sibiraj-s.vscode-scss-formatter
+  # - streetsidesoftware.code-spell-checker
+  # - takumii.markdowntable
+  # - teamsdevapp.ms-teams-vscode-extension
+  # - teamsdevapp.vscode-adaptive-cards
+  # - twxs.cmake
+  # - tylerleonhardt.vscode-inline-values-powershell
+  # - tyriar.sort-lines
+  # - usernamehw.errorlens
+  # - visualstudioexptteam.intellicode-api-usage-examples
+  # - visualstudioexptteam.vscodeintellicode
+  # - vscjava.vscode-gradle
+  # - vscjava.vscode-java-debug
+  # - vscjava.vscode-java-dependency
+  # - vscjava.vscode-java-pack
+  # - vscjava.vscode-java-test
+  # - vscjava.vscode-maven
+  # - vscode-icons-team.vscode-icons
+  # - vsls-contrib.codetour
+  # - vue.volar
+  # - waderyan.gitblame
+  # - yzhang.markdown-all-in-one
+  # - ziyasal.vscode-open-in-github
+  # Add more Visual Studio Code extensions as needed
+
 # Git configuration
-git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
-git_user_name: ''  # Defaults to Windows local users full name (if set)
+git_user_email: 'ryanspletzer@gmail.com'  # REQUIRED: Set your email here _or_ pass via command line with -e flag
+git_user_name: 'ryanspletzer'  # Defaults to Windows local users full name (if set)
 
 # Additional Git configurations (optional)
 # These will be set as git config --global key value
