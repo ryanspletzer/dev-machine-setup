@@ -43,6 +43,8 @@ param (
     $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
 )
 
+#region Transcript Setup
+
 # Start Transcript at current path of script
 # Use default transcript file format with setup appended
 $randomString = -join ((65..90) + (97..122) | Get-Random -Count 8 | ForEach-Object { [char]$_ })
@@ -53,6 +55,8 @@ $script:TranscriptFile = Join-Path -Path (
 Start-Transcript -Path $script:TranscriptFile
 $script:VerbosePreference = 'Continue'
 $script:InformationPreference = 'Continue'
+
+#endregion Transcript Setup
 
 #region Progress Variables
 
@@ -315,7 +319,66 @@ if ($chocoPackages -and $chocoPackages.Count -gt 0) {
 
 #endregion Install Chocolatey Packages from Vars file
 
+#region Install PowerShell (pwsh) Modules from Vars file via PSResourceGet
+
+$step++
+$stepText = 'Install PowerShell (pwsh) Modules from Vars file via PSResourceGet'
+Write-Information -MessageData 'Checking for PowerShell (pwsh) modules to install via PSResourceGet...'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+
+# Get
+Write-Verbose -Message '[Get] PowerShell (pwsh) modules from Vars file import...'
+$powershellModules = $vars.powershell_modules
+
+# Test
+Write-Verbose -Message '[Test] PowerShell (pwsh) modules from Vars file import...'
+if ($powershellModules -and $powershellModules.Count -gt 0) {
+    foreach ($module in $powershellModules) {
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
+
+        Write-Information -MessageData "Checking for PowerShell (pwsh) module $module..."
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
+
+        # Get
+        Write-Verbose -Message "[Get] PowerShell (pwsh) module: $module"
+        $psModule = pwsh -Command {
+            param ($module)
+            Get-InstalledPSResource -Name $module -ErrorAction SilentlyContinue
+        } -Args $module
+
+        # Test
+        Write-Verbose -Message "[Test] PowerShell (pwsh) module: $module"
+        if ($null -eq $psModule) {
+            Write-Verbose -Message "[Set] PowerShell (pwsh) module $module is not installed, installing..."
+            try {
+                pwsh -Command {
+                    param ($module)
+                    Install-PSResource -Name $module -Scope CurrentUser -ErrorAction Stop
+                } -Args $module
+                Write-Verbose -Message "[Set] PowerShell (pwsh) module $module is now installed."
+                Write-Information -MessageData "Installed PowerShell (pwsh) module: $module."
+            } catch {
+                Write-Error -Message "Failed to install PowerShell (pwsh) module: $module. Error: $_"
+            }
+        } else {
+            Write-Information -MessageData "PowerShell (pwsh) module $module is already installed."
+        }
+    }
+} else {
+    Write-Information -MessageData 'No PowerShell (pwsh) modules specified in vars.yaml file.'
+}
+
+#endregion Install PowerShell (pwsh) Modules from Vars file via PSResourceGet
+
+#region Transcript Teardown
+
 Stop-Transcript
 
 Write-Host "`nSetup completed successfully!"
 Write-Host "Full log available at: $transcriptFile"
+
+#endregion Transcript Teardown
