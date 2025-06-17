@@ -41,7 +41,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
     [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
     [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
     # If no name is provided and no local user name is
-    Write-Error -Message "Git user name is not set and no name was provided."
+    Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
     exit 1
 }
 
@@ -72,7 +72,7 @@ $stepText = 'Chocolatey Install' # Set this at the beginning of each step
 $scriptPath = $MyInvocation.MyCommand.Path
 $totalSteps = (
     Get-Content -Path $MyInvocation.MyCommand.Path |
-    Where-Object -FilterScript { $_ -eq '$Step++' }
+    Where-Object -FilterScript { $_ -eq '$step++' }
 ).Count
 
 # Single quotes need to be on the outside
@@ -102,7 +102,7 @@ if ($null -eq $choco) {
     Invoke-Expression -Command (
         (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
     )
-    Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+    Import-Module -Name $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
     Write-Verbose -Message '[Set] Chocolatey is now installed.'
     Write-Information -MessageData 'Installed Chocolatey.'
 } else {
@@ -129,7 +129,7 @@ if ($null -eq $pwsh) {
     Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
     choco install pwsh --yes --no-progress
     # Refresh Path
-    refreshenv
+    Update-SessionEnvironment
     Write-Verbose -Message '[Set] Refreshed PATH environment variable.'
     Write-Verbose -Message '[Set] PowerShell (pwsh) is now installed.'
     Write-Information -MessageData 'Installed PowerShell (pwsh).'
@@ -505,7 +505,7 @@ if ($null -eq $pipx) {
     Write-Verbose -Message '[Set] pipx is not installed, checking for Python installation...'
 
     # Refresh Path in case Python was just installed by Chocolatey
-    refreshenv
+    Update-SessionEnvironment
     $python = Get-Command -Name python -ErrorAction SilentlyContinue
     if ($null -eq $python) {
         Write-Error -Message 'Python is not installed, pipx cannot be installed.'
@@ -516,7 +516,7 @@ if ($null -eq $pipx) {
         python -m pipx ensurepath
 
         # Refresh Path to ensure pipx is in the PATH in the current session
-        refreshenv
+        Update-SessionEnvironment
         Write-Verbose -Message '[Set] pipx is now installed.'
         Write-Information -MessageData 'Installed pipx.'
     }
