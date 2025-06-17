@@ -1,244 +1,181 @@
-# Windows Development Environment Setup with WinGet Configure
+# Windows Development Machine Setup
 
-This directory contains scripts and WinGet configuration to set up a Windows development environment. It uses modern technologies like PowerShell, WinGet Configure, and Chocolatey for package management.
+This directory contains scripts and configuration files to automate the setup of a Windows development environment using PowerShell and various package managers.
 
-## Features
+## Overview
 
-- **Parameterized Approach**: Uses vars.yaml to dynamically generate the WinGet configuration
-- **Modern Configuration Management**: Uses WinGet Configure with YAML configuration files
-- **Idempotent Execution**: Can be run multiple times without causing issues
-- **Advanced State Management**: Properly manages Windows features, Chocolatey packages, PowerShell modules, and more
-- **Error Handling**: Robust error handling and detailed logging
-- **Extensible**: Easy to customize and extend
+The setup script (`setup.ps1`) automates the installation and configuration of:
+
+- [Chocolatey](https://chocolatey.org/) packages (applications and tools)
+- [PowerShell](https://github.com/PowerShell/PowerShell) modules (via PSResourceGet)
+- Windows PowerShell modules (via PowerShellGet)
+- [pipx](https://pypa.github.io/pipx/) packages (Python tools)
+- [Visual Studio Code](https://code.visualstudio.com/) extensions
+- Git configuration
+- System preferences and Windows features
 
 ## Prerequisites
 
-All prerequisites are automatically installed by the setup script:
+- Windows 11
+- Administrative privileges
+- PowerShell 5.1 or higher (comes with Windows 11)
+- Internet connection
 
-- WinGet (installed if not already present)
-- PowerShell YAML module (for processing the vars.yaml file)
-- Chocolatey (installed by the configuration)
-- PowerShell 7 (installed via WinGet)
+## Quick Start
 
-## Usage
-
-### Quick Start
-
-Open PowerShell as Administrator and run:
+1. Clone this repository or download the files
+2. Open Windows PowerShell as Administrator
+3. Navigate to the `windows` directory
+4. Run the setup script:
 
 ```powershell
 .\setup.ps1
 ```
 
-### Validate Configuration Only
+## Configuration
 
-To only validate the configuration without applying it:
+The setup is driven by the `vars.yaml` file, which contains configurable options for:
 
-```powershell
-.\setup.ps1 -ValidateOnly
+### Chocolatey Packages
+
+Applications and tools installed via Chocolatey. Each entry has:
+
+- `name`: Package name (required)
+- `parameters`: Optional installation parameters (e.g., `/WindowsTerminal`)
+- `prerelease`: Optional boolean to allow prerelease versions
+
+```yaml
+choco_packages:
+  - name: git
+    parameters: /WindowsTerminal /NoShellIntegration
+  - name: vscode
+  # etc.
 ```
 
-### Force Unattended Installation
+### PowerShell Modules
 
-To run the installation in unattended mode:
+PowerShell modules installed via PSResourceGet in PowerShell 7+ (pwsh):
 
-```powershell
-.\setup.ps1 -Force
+```yaml
+powershell_modules:
+  - AWS.Tools.Common
+  - Terminal-Icons
+  # etc.
 ```
 
-### Specify Git User Information
+> **Note**: Some modules like `Pester` are pre-installed with Windows PowerShell. If you need to install a newer version, you might need to use `-SkipPublisherCheck` when installing manually.
+>
+### Windows PowerShell Modules
 
-To set Git user information during setup:
+Legacy modules to install in Windows PowerShell 5.1 (if needed):
 
-```powershell
-.\setup.ps1 -GitUserEmail "your.email@example.com" -GitUserName "Your Name"
+```yaml
+windows_powershell_modules:
+  # - AWS.Tools.Common
+  # etc.
 ```
 
-### Use Custom Variables File
+### pipx Packages
 
-To use a different variables file:
+Python tools installed in isolated environments:
 
-```powershell
-.\setup.ps1 -VarsFile "examples\custom-vars.yaml"
+```yaml
+pipx_packages:
+  - cfn-lint
+  - poetry
+  # etc.
 ```
 
-## Configuration Details
+### Visual Studio Code Extensions
 
-The configuration is defined in two files:
+Extensions to install in VS Code:
 
-1. `vars.yaml` - Contains all the customizable values
-2. `config.yaml` - Dynamically generated from vars.yaml by the setup script
+```yaml
+vscode_extensions:
+  - ms-vscode.powershell
+  - github.copilot
+  # etc.
+```
 
-The setup includes:
+### Git Configuration
 
-- **Windows Features**: Enables WSL and other Windows features
-- **Chocolatey Packages**: Installs developer tools and applications via Chocolatey
-- **PowerShell Modules**: Installs PowerShell modules for development
-- **Git Configuration**: Sets up Git user settings and preferences
+Git user settings:
+
+```yaml
+git_user_email: 'your.email@example.com'
+git_user_name: 'Your Name'
+```
+
+### Custom Commands
+
+PowerShell commands to execute after setup:
+
+```yaml
+custom_commands:
+  - Write-Output "Enabling dark mode..."
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0
+  # etc.
+```
+
+### Custom Script
+
+An optional script to run at the end of setup:
+
+```yaml
+custom_script: "./examples/custom_script.ps1"
+```
+
+## Advanced Usage
+
+### Running with Specific Options
+
+```powershell
+.\setup.ps1
+```
+
+### Passing Git Configuration Values
+
+If you don't want to store your Git credentials in the vars.yaml file, you can set them via environment variables:
+
+```powershell
+$env:GIT_USER_EMAIL = "your.email@example.com"
+$env:GIT_USER_NAME = "Your Name"
+.\setup.ps1
+```
 
 ## Customization
 
-You can customize the configuration by editing the `vars.yaml` file:
+### Adding Packages
 
-- Add/remove Windows features
-- Add/remove Chocolatey packages
-- Modify PowerShell modules
-- Update Git configuration
+To add more packages, edit the `vars.yaml` file and add entries to the appropriate sections.
 
-Example `vars.yaml` structure:
+### Custom Scripts
 
-```yaml
-# Windows Features to enable
-WindowsFeatures:
-  - Name: Microsoft-Windows-Subsystem-Linux
-  - Name: VirtualMachinePlatform
+For more complex customizations, create a script in the `examples` directory and reference it in the `custom_script` section of `vars.yaml`.
 
-# Chocolatey packages to install
-ChocolateyPackages:
-  - Name: git
-    params: "/WindowsTerminal /NoShellIntegration"
-  - Name: vscode
-  - Name: nodejs
+### Path Environment Variable Warning
 
-# PowerShell modules to install
-PowerShellModules:
-  - Name: PSReadLine
-  - Name: posh-git
+When installing PowerShell modules, you might see a warning like:
 
-# Git configuration script
-GitConfigScript: |
-  # Set Git user email if provided
-  if ($env:GIT_USER_EMAIL) {
-    git config --global user.email $env:GIT_USER_EMAIL
-  }
-
-  # Set Git user name if provided
-  if ($env:GIT_USER_NAME) {
-    git config --global user.name $env:GIT_USER_NAME
-  }
+```text
+WARNING: The installation path for the script does not currently appear in the CurrentUser path environment variable.
+To make the script discoverable, add the script installation path, C:\Users\username\Documents\PowerShell\Modules, to the environment PATH variable.
 ```
 
-## How It Works
-
-The `setup.ps1` script:
-
-1. Installs WinGet if not already present
-2. Installs the PowerShell YAML module if needed
-3. Reads `vars.yaml` to get the configuration values
-4. Dynamically generates `config.yaml` for WinGet Configure
-5. Applies the configuration using `winget configure`
-
-The generated `config.yaml` file follows the WinGet Configuration schema and includes:
-
-- Windows Features configuration
-- Chocolatey installation script
-- PowerShell modules installation
-- Git configuration
+This warning is informational and doesn't prevent the modules from being used within PowerShell. It only means that executable scripts within the modules won't be directly callable from the command line without specifying their full path. Add the suggested path to your environment variables if you need this functionality.
 
 ## Troubleshooting
 
-### Common Issues
+### Windows Features
 
-- **WinGet Not Found**: Ensure Microsoft.DesktopAppInstaller is installed from the Microsoft Store
-- **Access Denied Errors**: Make sure you're running PowerShell as Administrator
-- **Chocolatey Installation Fails**: Check your internet connection or proxy settings
-- **Configuration Validation Fails**: Check the log file for details on the specific errors
+Some Windows features require a system restart to take effect:
 
-### Logs
+```powershell
+Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart
+```
 
-The script generates a log file (`setup_YYYYMMDD_HHMMSS.log`) in the current directory with detailed information about the setup process.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+After running the script, consider restarting your system to ensure all changes take effect.
 
 ## License
 
-See the LICENSE file in the root of this repository.
-WindowsFeatures:
-  - name: Microsoft-Windows-Subsystem-Linux
-    ensure: Present
-    includeAllSubFeature: true
-
-# Chocolatey packages to install
-ChocolateyPackages:
-  - name: git
-    ensure: Present
-  - name: visualstudiocode
-    ensure: Present
-
-# PowerShell modules to install
-PowerShellModules:
-  - name: PSReadLine
-    ensure: Present
-  - name: posh-git
-    ensure: Present
-
-# Git configuration script
-GitConfigScript: |
-  # Git user configuration
-  if (-not [string]::IsNullOrEmpty('${GitUserEmail}')) {
-    git config --global user.email '${GitUserEmail}'
-  }
-  # ...more configuration...
-```
-
-You can also create custom template and values files in the examples directory for different scenarios.
-
-## Troubleshooting
-
-The setup script creates a detailed log file in the current directory with timestamps. Check this file for information about any errors.
-
-If you encounter issues:
-
-1. Run with `-Verbosity 3` for maximum detail
-2. Check the log file for specific error messages
-3. Ensure your user account has administrative privileges
-4. Try running with `-Force` to reinstall prerequisites
-
-# Windows Developer Machine Setup
-
-This directory contains DSC 3.0 configuration files for setting up a Windows developer machine.
-
-## How to Use
-
-1. Customize the `vars.yaml` file with your desired configuration:
-   - Windows Features
-   - Chocolatey packages
-   - PowerShell modules
-   - Git configuration
-   - Custom commands
-
-2. Generate the DSC configuration file by running:
-   ```powershell
-   Import-Module powershell-yaml
-   ./Generate-DscConfig.ps1
-   ```
-
-3. Apply the configuration using DSC:
-   ```powershell
-   # Install DSC v3 if you don't have it yet
-   Install-Module Microsoft.DSC -AllowPrerelease
-
-   # Apply the configuration
-   Start-DscConfiguration -Path ./setup.yaml
-   ```
-
-## Configuration Components
-
-- **Windows Features**: Enable Windows components like WSL, Hyper-V, etc.
-- **Chocolatey Packages**: Install development tools and applications
-- **PowerShell Modules**: Install PowerShell modules for development
-- **Git Configuration**: Set up Git with your preferred settings
-- **Custom Commands**: Run additional setup steps
-
-## Customization
-
-To customize Git settings, uncomment and set the `GitUserEmail` and `GitUserName` variables in `vars.yaml`.
-
-## Requirements
-
-- Windows 10/11
-- PowerShell 7+
-- [DSC v3](https://learn.microsoft.com/en-us/powershell/dsc/concepts/dsc3-overview)
-- PowerShell-YAML module (`Install-Module powershell-yaml -Scope CurrentUser`)
+See the [LICENSE](../LICENSE) file in the root directory for details.
