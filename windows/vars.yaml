@@ -101,21 +101,21 @@ powershell_modules:
 # Note: Only use this if you need to install modules in old Windows PowerShell (powershell.exe)
 # This is not recommended for new setups, prefer using pwsh and PSResourceGet
 windows_powershell_modules:
-  # - name: AWS.Tools.Common
-  # - name: Az.Accounts
-  # - name: Microsoft.Graph.Authentication
-  # - name: Pester
-  # - name: platyPS
-  # - name: posh-git
-  # - name: powershell-yaml
-  # - name: PowerShellBuild
-  # - name: psake
-  # - name: PSGraphQL
-  # - name: PSJsonWebToken
-  # - name: PSReadLine
-  # - name: PSScriptAnalyzer
-  # - name: PSTcpIp
-  # - name: Terminal-Icons
+  # - AWS.Tools.Common
+  - Az.Accounts
+  # - Microsoft.Graph.Authentication
+  # - Pester
+  # - platyPS
+  # - posh-git
+  # - powershell-yaml
+  # - PowerShellBuild
+  # - psake
+  # - PSGraphQL
+  # - PSJsonWebToken
+  # - PSReadLine
+  # - PSScriptAnalyzer
+  # - PSTcpIp
+  # - Terminal-Icons
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag

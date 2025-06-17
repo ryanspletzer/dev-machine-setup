@@ -337,11 +337,7 @@ if ($powershellModules -and $powershellModules.Count -gt 0) {
         Write-Progress -Activity $Activity -Status (
             & $StatusBlock
         ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
-
         Write-Information -MessageData "Checking for PowerShell (pwsh) module $module..."
-        Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
-        ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
 
         # Get
         Write-Verbose -Message "[Get] PowerShell (pwsh) module: $module"
@@ -431,6 +427,57 @@ if (-not $packageSource.IsTrusted) {
 }
 
 #endregion Ensure Windows PowerShell PSGallery Package Source is Trusted
+
+#region Install Windows PowerShell Modules from Vars file
+
+$step++
+$stepText = 'Install Windows PowerShell Modules from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Windows PowerShell modules to install...'
+
+# Get
+Write-Verbose -Message '[Get] Windows PowerShell modules from Vars file import...'
+$windowsPowerShellModules = $vars.windows_powershell_modules
+
+# Test
+Write-Verbose -Message '[Test] Windows PowerShell modules from Vars file import...'
+if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
+    foreach ($module in $windowsPowerShellModules) {
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
+        Write-Information -MessageData "Checking for Windows PowerShell module $module..."
+
+        # Get
+        Write-Verbose -Message "[Get] Windows PowerShell module: $module"
+        $psModule = powershell -Command {
+            param ($module)
+            Get-Module -Name $module -ListAvailable -ErrorAction SilentlyContinue
+        } -Args $module
+
+        # Test
+        Write-Verbose -Message "[Test] Windows PowerShell module: $module"
+        if ($null -eq $psModule) {
+            Write-Verbose -Message "[Set] Windows PowerShell module $module is not installed, installing..."
+            try {
+                powershell -Command {
+                    param ($module)
+                    Install-Module -Name $module -Scope CurrentUser -Force -ErrorAction Stop
+                } -Args $module
+                Write-Verbose -Message "[Set] Windows PowerShell module $module is now installed."
+                Write-Information -MessageData "Installed Windows PowerShell module: $module."
+            } catch {
+                Write-Error -Message "Failed to install Windows PowerShell module: $module. Error: $_"
+            }
+        } else {
+            Write-Information -MessageData "Windows PowerShell module $module is already installed."
+        }
+    }
+} else {
+    Write-Information -MessageData 'No Windows PowerShell modules specified in vars.yaml file.'
+}
+
+#endregion Install Windows PowerShell Modules from Vars file
 
 #region Transcript Teardown
 
