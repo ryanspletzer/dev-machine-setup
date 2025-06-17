@@ -272,5 +272,4 @@ custom_commands:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-# custom_script: "~/Downloads/custom_windows_script.ps1"
-# custom_script_args: "-Option1 value1 -Option2 value2"
+custom_script: "./examples/custom_script.ps1"

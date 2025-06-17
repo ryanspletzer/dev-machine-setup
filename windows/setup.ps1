@@ -753,6 +753,36 @@ if ($customCommands -and $customCommands.Count -gt 0) {
 
 #endregion Execute Custom Commands from Vars file
 
+#region Execute Custom Script from Vars file
+
+$step++
+$stepText = 'Execute Custom Script from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for custom script to execute from vars.yaml file...'
+
+# Get
+Write-Verbose -Message '[Get] Custom script from Vars file import...'
+$customScript = $vars.custom_script
+
+# Test
+Write-Verbose -Message '[Test] Custom script from Vars file import...'
+if (-not [string]::IsNullOrWhiteSpace($customScript)) {
+    # Set
+    Write-Verbose -Message '[Set] Executing custom script from vars.yaml file...'
+    try {
+        . $customScript
+    } catch {
+        Write-Error -Message "Failed to execute custom script: $customScript. Error: $_"
+    }
+
+    Write-Verbose -Message '[Set] Successfully executed custom script from vars.yaml file.'
+    Write-Information -MessageData "Executed custom script from vars.yaml file: $customScript."
+} else {
+    Write-Information -MessageData 'No custom script specified in vars.yaml file.'
+}
+
+#endregion Execute Custom Commands from Vars file
+
 #region Transcript Teardown
 
 Stop-Transcript
