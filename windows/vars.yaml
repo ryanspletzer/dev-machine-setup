@@ -223,17 +223,34 @@ vscode_extensions:
   # Add more Visual Studio Code extensions as needed
 
 # Git configuration
-git_user_email: "ryanspletzer@gmail.com"  # REQUIRED: Set your email here _or_ pass via command line with -e flag
-git_user_name: ryanspletzer  # Defaults to Windows local users full name (if set)
+# REQUIRED: Set your email here _or_ pass via command line with -e flag
+git_user_email: ryanspletzer@gmail.com
+ # Defaults to Windows local users full name (if set)
+git_user_name: ryanspletzer
 
 # Custom commands to execute after setup
 custom_commands:
-  # Enable Dark Mode
+  # Enable Dark Mode for System and Apps
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
   - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
-  - git lfs install
-  # Enable these features if you want to use WSL 2
+  # Enable sudo
+  - sudo config --enable normal
+  -  # Restart Explorer to apply the theme changes
+  - Stop-Process -Name explorer
+  - git lfs install --skip-repo
+  # Enable these features if you want to use WSL 1 or 2
   - Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -NoRestart
   - Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart
+  # Set Windows Terminal as the default terminal application
+  - New-Item -Path 'HKCU:\Console\%%Startup' -Force | Out-Null
+  - Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name DelegationConsole  -Value '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+  - Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name DelegationTerminal -Value '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+  # Show File Extensions in File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name HideFileExt -Value 0
+  # Show Hidden Files in File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name Hidden -Value 1
+  # Show Full Path in Title Bar of File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name FullPathAddress -Value 1
   # Only run the WSL commands below AFTER a reboot.
   # If you want more control over the WSL setup, you can use the following commands:
   # Update WSL
