@@ -374,6 +374,35 @@ if ($powershellModules -and $powershellModules.Count -gt 0) {
 
 #endregion Install PowerShell (pwsh) Modules from Vars file via PSResourceGet
 
+#region Ensure Windows PowerShell NuGet Package Provider is Installed
+
+$step++
+$stepText = 'Ensure Windows PowerShell NuGet Package Provider is Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Windows PowerShell NuGet Package Provider...'
+
+# Get
+Write-Verbose -Message '[Get] Windows PowerShell NuGet Package Provider...'
+$nuGetPackageProvider = powershell -Command {
+    Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue
+}
+
+# Test
+Write-Verbose -Message '[Test] Windows PowerShell NuGet Package Provider...'
+if (($null -eq $nuGetPackageProvider) -or ($nuGetPackageProvider.Version -lt 2.8.5.201)) {
+    # Set
+    Write-Verbose -Message '[Set] Windows PowerShell NuGet Package Provider is not installed, installing...'
+    powershell -Command {
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    }
+    Write-Verbose -Message ('[Set] Windows PowerShell NuGet Package Provider is now installed.')
+    Write-Information -MessageData 'Installed Windows PowerShell NuGet package provider.'
+} else {
+    Write-Information -MessageData 'Windows PowerShell NuGet package provider is already installed.'
+}
+
+#endregion Ensure Windows PowerShell NuGet Package Provider is Installed
+
 #region Transcript Teardown
 
 Stop-Transcript
