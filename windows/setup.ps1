@@ -14,11 +14,12 @@ param (
 
     [Parameter(Mandatory)]
     [ValidateScript({
-        if ([string]::IsNullOrWhiteSpace($_) -and
-            [string]::IsNullOrWhiteSpace((git config --global user.email 2>$null))) {
+        if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
+            [string]::IsNullOrWhiteSpace($_)) {
             Write-Error -Message "Git user email is not set and no email was provided."
             $false
         } else {
+            Write-Error -Message "Do we get output here?"
             $true
         }
     })]
@@ -27,21 +28,24 @@ param (
     $GitUserEmail,
 
     [Parameter()]
-    [ValidateScript({
-        if ([string]::IsNullOrWhiteSpace($_) -and
-            [string]::IsNullOrWhiteSpace((git config --global user.name 2>$null)) -and
-            [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
-            # If no name is provided and no local user name is
-            Write-Error -Message "Git user name is not set and no name was provided."
-            $false
-        } else {
-            $true
-        }
-    })]
+    [ValidateNotNullOrEmpty()]
     [Alias('n')]
     [string]
     $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
 )
+
+#region Additional Input Validation
+
+# If there is no currently set git user.name, ensure that one was provided or that the local user FullName is set
+if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {})) -and
+    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
+    [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
+    # If no name is provided and no local user name is
+    Write-Error -Message "Git user name is not set and no name was provided."
+    exit 1
+}
+
+#endregion Additional Input Validation
 
 #region Transcript Setup
 
