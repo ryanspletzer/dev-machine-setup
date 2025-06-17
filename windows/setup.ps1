@@ -259,7 +259,7 @@ if ($null -eq $yamlPSResource) {
     # Set
     Write-Verbose -Message '[Set] powershell-yaml module is not installed, installing...'
     pwsh -Command {
-        Install-PSResource -Name 'powershell-yaml'
+        Install-PSResource -Name 'powershell-yaml' -Scope CurrentUser
     }
     Write-Verbose -Message '[Set] powershell-yaml module is now installed.'
     Write-Information -MessageData 'Installed powershell-yaml module.'
@@ -494,7 +494,7 @@ if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
             try {
                 powershell -Command {
                     param ($module)
-                    Install-Module -Name $module -Scope CurrentUser -Force -ErrorAction Stop
+                    Install-Module -Name $module -Scope CurrentUser -AllowClobber -Force
                 } -Args $module
                 Write-Verbose -Message "[Set] Windows PowerShell module $module is now installed."
                 Write-Information -MessageData "Installed Windows PowerShell module: $module."

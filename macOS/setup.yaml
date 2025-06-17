@@ -163,19 +163,6 @@
         - git
         - config
 
-    # Additional Git configurations
-    - name: Configure additional Git settings
-      ansible.builtin.command:
-        cmd: git config --global {{ item.key }} "{{ item.value }}"
-      loop: "{{ git_additional_configs | default({}) | dict2items }}"
-      register: git_config_result
-      changed_when: git_config_result.rc == 0
-      loop_control:
-        label: "Setting git config: {{ item.key }}={{ item.value }}"
-      tags:
-        - git
-        - config
-
     # Custom macOS commands and preferences - Non-elevated (user) commands
     - name: Execute custom macOS commands (non-elevated)
       ansible.builtin.shell:
@@ -256,7 +243,7 @@
 
     - name: Execute custom script
       ansible.builtin.command:
-        cmd: "{{ custom_script }} {{ custom_script_args | default('') }}"
+        cmd: "{{ custom_script }}"
       register: custom_script_result
       changed_when: custom_script_result.rc == 0
       when:

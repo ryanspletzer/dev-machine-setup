@@ -105,6 +105,7 @@ powershell_modules:
   - Microsoft.Graph.Authentication
   - Pester
   - platyPS
+  - poetry
   - posh-git
   - powershell-yaml
   - PowerShellBuild
@@ -119,7 +120,6 @@ powershell_modules:
 
 # pipx modules
 pipx_modules:
-  - poetry
   - taskcat
   # Add more pipx modules as needed
 
@@ -232,26 +232,6 @@ vscode_extensions:
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
 git_user_name: "{{ lookup('pipe', 'id -F') }}"  # Defaults to macOS user's full name
 
-# Additional Git configurations (optional)
-# These will be set as git config --global key value
-git_additional_configs:
-  # Examples (uncomment to use):
-  commit.gpgsign: true
-  init.defaultBranch: main
-  gpg.program: /opt/homebrew/bin/gpg
-  push.default: current
-  push.autoSetupRemote: true
-  user.signingKey: 787AEF0BAE232359
-  # core.editor: "code --wait"
-  # pull.rebase: "true"
-  # init.defaultBranch: "main"
-  # color.ui: "auto"
-  # alias.co: "checkout"
-  # alias.br: "branch"
-  # alias.ci: "commit"
-  # alias.st: "status"
-  # Add more git config options as needed
-
 # Custom commands and scripts (optional)
 # These commands will be executed as the current user (non-elevated)
 custom_commands_user:
@@ -304,6 +284,15 @@ custom_commands_user:
   # Keep folders on top when sorting by name in Finder
   - echo "Setting Finder to keep folders on top when sorting by name..."
   - defaults write com.apple.finder _FXSortFoldersFirst -bool true
+  # Disable natural scrolling
+  - echo "Disabling natural scrolling..."
+  - defaults write -g com.apple.swipescrolldirection -bool false
+  # Disable swipe between pages
+  - echo "Disabling swipe between pages..."
+  - defaults write -g AppleEnableSwipeNavigateWithScrolls -bool false
+  # Set app expose to swipe down with three fingers
+  - echo "Setting App Expose to swipe down with three fingers..."
+  - defaults write com.apple.dock showAppExposeGestureEnabled -bool true
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
@@ -313,6 +302,17 @@ custom_commands_user:
   # Update PowerShell help
   - echo "Updating PowerShell help documentation..."
   - pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+  # Install Git LFS
+  - echo "Installing Git LFS..."
+  - git lfs install
+  # Set git configs
+  - echo "Setting global git configurations..."
+  - git config --global commit.gpgsign true
+  - git config --global init.defaultBranch main
+  - git config --global gpg.program /opt/homebrew/bin/gpg
+  - git config --global push.default current
+  - git config --global push.autoSetupRemote true
+  - git config --global user.signingKey 787AEF0BAE232359
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
@@ -332,5 +332,4 @@ custom_commands_elevated:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-# custom_script: "/path/to/your/custom_script.sh"
-# custom_script_args: "--option1 value1 --option2 value2"
+custom_script: "./examples/custom_script.sh"
