@@ -1,0 +1,275 @@
+# vars.yml
+# Externalized variables for DSC 3.0 setup
+
+# Chocolatey packages to install
+# You may wonder why we have an explicit "name" key here instead of a simple array of package names...
+# name is required input.
+# But also _sometimes you_ want to override install parameters -- ex. see Git below.
+# You may want to allow for prerelease versions of packages, in which case you can set prerelease: true
+choco_packages:
+  # - name: 1password
+  # - name: adoptopenjdk
+  # - name: awscli
+  # - name: awssamcli
+  # - name: azure-cli
+  # - name: azure-data-studio
+  # - name: azure-functions-core-tools
+  # - name: bicep
+  # - name: cascadiacode
+  # - name: citrix-workspace
+  # - name: docker
+  # - name: dotnet-sdk
+  # # dotnetcore-sdk is deprecated, use dotnet-sdk instead
+  # # This is only for .NET Core versions 3 and lower
+  # # - name: dotnetcore-sdk
+  # - name: dotnetfx
+  # - name: drawio
+  # - name: ffmpeg
+  # - name: fiddler
+  # - name: firefox
+  # - name: gh
+  # Required for git configs
+  - name: git
+  #   parameters: /WindowsTerminal /NoShellIntegration
+  # - name: gnupg
+  # - name: go
+  # # May have a warning about not being signed...
+  # # The Chrome setup process is weird.
+  # # https://community.chocolatey.org/packages/GoogleChrome
+  # - name: googlechrome
+  # - name: ilspy
+  # - name: jq
+  # - name: maven
+  # - name: microsoftazurestorageexplorer
+  # - name: ngrok
+  # - name: nodejs
+  # - name: notepadplusplus
+  # - name: office365business
+  # - name: oh-my-posh
+  # - name: packer
+  # Required to for pipx_modules
+  - name: python
+  # - name: pwsh
+  # - name: qemu
+  # - name: ruff
+  # - name: rsat
+  # - name: rustup.install
+  # - name: serverless
+  # - name: servicebusexplorer
+  # - name: slack
+  # - name: sql-server-management-studio
+  # - name: tailscale
+  # - name: terraform
+  # - name: uv
+  # - name: vault
+  # - name: visualstudio2022enterprise
+  # Required for vscode_extensions
+  - name: visualstudiocode
+  # - name: windows-sdk-10-version-2004-all
+  # - name: zoom
+  # - name: zulu
+
+# PowerShell modules to install via PSResourceGet in PowerShell (pwsh.exe)
+# name is the only required key, but you can also specify version and prerelease (true|false) if desired.
+powershell_modules:
+  - AWS.Tools.Common
+  # - Az.Accounts
+  # - Microsoft.Graph.Authentication
+  # - Pester
+  # - platyPS
+  # - posh-git
+  # - powershell-yaml # This is pre-installed by the script to import this yaml file
+  # - PowerShellBuild
+  # - psake
+  # - PSGraphQL
+  # - PSJsonWebToken
+  # - PSReadLine
+  # - PSScriptAnalyzer
+  # - PSTcpIp
+  # - Terminal-Icons
+
+# PowerShell modules to install via Install-Module in Windows PowerShell (powershell.exe)
+# Note: Only use this if you need to install modules in old Windows PowerShell (powershell.exe)
+# This is not recommended for new setups, prefer using pwsh and PSResourceGet
+windows_powershell_modules:
+  # - AWS.Tools.Common
+  - Az.Accounts
+  # - Microsoft.Graph.Authentication
+  # - Pester
+  # - platyPS
+  # - posh-git
+  # - powershell-yaml
+  # - PowerShellBuild
+  # - psake
+  # - PSGraphQL
+  # - PSJsonWebToken
+  # - PSReadLine
+  # - PSScriptAnalyzer
+  # - PSTcpIp
+  # - Terminal-Icons
+
+# pipx modules
+pipx_packages:
+  - cfn-lint
+  # - poetry
+  # - taskcat
+  # Add more pipx modules as needed
+
+# Visual Studio Code extensions
+# You can list your Visual Studio Code extensions with the command:
+# code --list-extensions
+# and then format them as shown below.
+# Alternatively if you're a long-time Visual Studio Code user, you can use Visual Studio Code's extension sync
+# feature tied to a GitHub or Microsoft account to sync your extensions across devices and onto new machines.
+vscode_extensions:
+  - 4ops.packer
+  # - alefragnani.project-manager
+  # - arjun.swagger-viewer
+  # - aws-scripting-guy.cform
+  # - charliermarsh.ruff
+  # - codezombiech.gitignore
+  # - davidanson.vscode-markdownlint
+  # - dbaeumer.vscode-eslint
+  # - docker.docker
+  # - donjayamanne.git-extension-pack
+  # - donjayamanne.githistory
+  # - eamodio.gitlens
+  # - esbenp.prettier-vscode
+  # - fernandoescolar.vscode-solution-explorer
+  # - github.copilot
+  # - github.copilot-chat
+  # - github.vscode-github-actions
+  # - github.vscode-pull-request-github
+  # - golang.go
+  # - grapecity.gc-excelviewer
+  # - hbenl.vscode-test-explorer
+  # - josin.kusto-syntax-highlighting
+  # - k--kato.docomment
+  # - medo64.render-crlf
+  # - mhutchie.git-graph
+  # - mimarec.swagger-doc-viewer
+  # - mohsen1.prettify-json
+  # - ms-azuretools.vscode-azurefunctions
+  # - ms-azuretools.vscode-azureresourcegroups
+  # - ms-azuretools.vscode-bicep
+  # - ms-azuretools.vscode-containers
+  # - ms-azuretools.vscode-docker
+  # - ms-dotnettools.csdevkit
+  # - ms-dotnettools.csharp
+  # - ms-dotnettools.vscode-dotnet-runtime
+  # - ms-kubernetes-tools.vscode-kubernetes-tools
+  # - ms-mssql.data-workspace-vscode
+  # - ms-mssql.mssql
+  # - ms-mssql.sql-bindings-vscode
+  # - ms-mssql.sql-database-projects-vscode
+  # - ms-python.debugpy
+  # - ms-python.isort
+  # - ms-python.python
+  # - ms-python.vscode-pylance
+  # - ms-toolsai.jupyter
+  # - ms-toolsai.jupyter-keymap
+  # - ms-toolsai.jupyter-renderers
+  # - ms-toolsai.vscode-jupyter-cell-tags
+  # - ms-toolsai.vscode-jupyter-slideshow
+  # - ms-vscode-remote.remote-containers
+  # - ms-vscode-remote.remote-ssh
+  # - ms-vscode-remote.remote-ssh-edit
+  # - ms-vscode-remote.remote-wsl
+  # - ms-vscode-remote.vscode-remote-extensionpack
+  # - ms-vscode.cmake-tools
+  # - ms-vscode.cpptools
+  # - ms-vscode.cpptools-extension-pack
+  # - ms-vscode.cpptools-themes
+  # - ms-vscode.hexeditor
+  # - ms-vscode.makefile-tools
+  # - ms-vscode.powershell
+  # - ms-vscode.remote-explorer
+  # - ms-vscode.remote-server
+  # - ms-vscode.test-adapter-converter
+  # - ms-vsliveshare.vsliveshare
+  # - msazurermtools.azurerm-vscode-tools
+  # - octref.vetur
+  # - oderwat.indent-rainbow
+  # - parallelsdesktop.parallels-desktop
+  # - pspester.pester-test
+  # - rangav.vscode-thunder-client
+  # - redhat.java
+  # - redhat.vscode-commons
+  # - redhat.vscode-yaml
+  # - samirat.csharp-test-adapter
+  # - sibiraj-s.vscode-scss-formatter
+  # - streetsidesoftware.code-spell-checker
+  # - takumii.markdowntable
+  # - teamsdevapp.ms-teams-vscode-extension
+  # - teamsdevapp.vscode-adaptive-cards
+  # - twxs.cmake
+  # - tylerleonhardt.vscode-inline-values-powershell
+  # - tyriar.sort-lines
+  # - usernamehw.errorlens
+  # - visualstudioexptteam.intellicode-api-usage-examples
+  # - visualstudioexptteam.vscodeintellicode
+  # - vscjava.vscode-gradle
+  # - vscjava.vscode-java-debug
+  # - vscjava.vscode-java-dependency
+  # - vscjava.vscode-java-pack
+  # - vscjava.vscode-java-test
+  # - vscjava.vscode-maven
+  # - vscode-icons-team.vscode-icons
+  # - vsls-contrib.codetour
+  # - vue.volar
+  # - waderyan.gitblame
+  # - yzhang.markdown-all-in-one
+  # - ziyasal.vscode-open-in-github
+  # Add more Visual Studio Code extensions as needed
+
+# Git configuration
+# REQUIRED: Set your email here _or_ pass via command line with -e flag
+git_user_email: ryanspletzer@gmail.com
+ # Defaults to Windows local users full name (if set)
+git_user_name: ryanspletzer
+
+# Custom commands to execute after setup
+custom_commands:
+  # Enable Dark Mode for System and Apps
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
+  # Enable sudo
+  - sudo config --enable normal
+  -  # Restart Explorer to apply the theme changes
+  - Stop-Process -Name explorer
+  - git lfs install --skip-repo
+  # Enable these features if you want to use WSL 1 or 2
+  - Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -NoRestart
+  - Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart
+  # Set Windows Terminal as the default terminal application
+  - New-Item -Path 'HKCU:\Console\%%Startup' -Force | Out-Null
+  - Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name DelegationConsole  -Value '{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}'
+  - Set-ItemProperty -Path 'HKCU:\Console\%%Startup' -Name DelegationTerminal -Value '{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}'
+  # Show File Extensions in File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name HideFileExt -Value 0
+  # Show Hidden Files in File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name Hidden -Value 1
+  # Show Full Path in Title Bar of File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name FullPathAddress -Value 1
+  # Only run the WSL commands below AFTER a reboot.
+  # If you want more control over the WSL setup, you can use the following commands:
+  # Update WSL
+  # - wsl --update
+  # Set WSL default version to 2 -- skip if you are on a platform that does not support nested virtualization.
+  # - wsl --set-default-version 2
+  # Install a specific WSL distribution
+  # - wsl --install -d Ubuntu-22.04
+  # If you are fine with the WSL defaults Ubuntu distribution, you can use the command below.
+  # Install WSL if not already installed with a default Ubuntu distribution
+  # This also enables the relevant VirtualMachinePlatform and Microsoft-Windows-Subsystem-Linux Windows features
+  # automatically if they aren't enabled already.
+  # THIS COMMAND CAN BE FLAKY -- the above approaches provide more control.
+  # - wsl --install
+  # Only enable if you need these
+  # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
+  # - Enable-WindowsOptionalFeature -FeatureName Microsoft-Hyper-V -Online -NoRestart
+  # - Enable-WindowsOptionalFeature -FeatureName Containers -Online -NoRestart
+
+# Custom script path (optional)
+# Provide the path to a custom script that will be executed at the end of the setup
+custom_script: "./examples/custom_script.ps1"
