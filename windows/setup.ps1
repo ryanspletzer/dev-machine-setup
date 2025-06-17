@@ -717,6 +717,42 @@ if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and
 
 #endregion Git user.email and user.name Config
 
+#region Execute Custom Commands from Vars file
+
+$step++
+$stepText = 'Execute Custom Commands from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for custom commands to execute from vars.yaml file...'
+
+# Get
+Write-Verbose -Message '[Get] Custom commands from Vars file import...'
+$customCommands = $vars.custom_commands
+
+# Test
+Write-Verbose -Message '[Test] Custom commands from Vars file import...'
+if ($customCommands -and $customCommands.Count -gt 0) {
+    foreach ($command in $customCommands) {
+        Write-Progress -Activity $Activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $command -PercentComplete ($step / $totalSteps * 100)
+        Write-Information -MessageData "Executing custom command: $command..."
+
+        # Get / Test / Set
+        Write-Verbose -Message "[Get] / [Test] / [Set] Executing custom command: $command"
+        try {
+            Invoke-Command -ScriptBlock ([ScriptBlock]::Create($command))
+            Write-Verbose -Message "[Get] / [Test] / [Set] Successfully executed custom command: $command"
+            Write-Information -MessageData "Executed custom command: $command."
+        } catch {
+            Write-Error -Message "Failed to execute custom command: $command. Error: $_"
+        }
+    }
+} else {
+    Write-Information -MessageData 'No custom commands specified in vars.yaml file.'
+}
+
+#endregion Execute Custom Commands from Vars file
+
 #region Transcript Teardown
 
 Stop-Transcript
