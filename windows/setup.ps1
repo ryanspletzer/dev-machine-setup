@@ -98,6 +98,7 @@ if ($null -eq $choco) {
     Invoke-Expression -Command (
         (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
     )
+    Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
     Write-Verbose -Message '[Set] Chocolatey is now installed.'
     Write-Information -MessageData 'Installed Chocolatey.'
 } else {
@@ -124,7 +125,7 @@ if ($null -eq $pwsh) {
     Write-Verbose -Message '[Set] PowerShell (pwsh) is not installed, installing...'
     choco install pwsh --yes --no-progress
     # Refresh Path
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    refreshenv
     Write-Verbose -Message '[Set] Refreshed PATH environment variable.'
     Write-Verbose -Message '[Set] PowerShell (pwsh) is now installed.'
     Write-Information -MessageData 'Installed PowerShell (pwsh).'
@@ -478,6 +479,92 @@ if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
 }
 
 #endregion Install Windows PowerShell Modules from Vars file
+
+#region Ensure pipx is Installed if Python is Installed
+
+$step++
+$stepText = 'Ensure pipx is Installed if Python is Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for pipx installation...'
+
+# Get
+Write-Verbose -Message '[Get] pipx...'
+$pipx = Get-Command -Name pipx -ErrorAction SilentlyContinue
+
+# Test
+Write-Verbose -Message '[Test] pipx...'
+if ($null -eq $pipx) {
+    # Set
+    Write-Verbose -Message '[Set] pipx is not installed, checking for Python installation...'
+    # Refresh Path in case Python was just installed by Chocolatey
+    refreshenv
+    $python = Get-Command -Name python -ErrorAction SilentlyContinue
+    if ($null -eq $python) {
+        Write-Error -Message 'Python is not installed, pipx cannot be installed.'
+    } else {
+        Write-Verbose -Message '[Set] Python is installed, installing pipx...'
+        # Install pipx using Python's pip
+        python -m pip install --user pipx
+        python -m pipx ensurepath
+
+        # Refresh Path to ensure pipx is in the PATH in the current session
+        refreshenv
+        Write-Verbose -Message '[Set] pipx is now installed.'
+        Write-Information -MessageData 'Installed pipx.'
+    }
+} else {
+    Write-Information -MessageData 'pipx is already installed.'
+}
+
+#endregion Ensure pipx is Installed if Python is Installed
+
+#region Ensure pipx Packages from Vars file are Installed
+
+$step++
+$stepText = 'Ensure pipx Packages from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for pipx packages to install...'
+
+# Get
+Write-Verbose -Message '[Get] pipx packages from Vars file import...'
+$pipxPackages = $vars.pipx_packages
+
+# Test
+Write-Verbose -Message '[Test] pipx packages from Vars file import...'
+if ($pipxPackages -and $pipxPackages.Count -gt 0) {
+    # Get the list of currently installed pipx packages
+    Write-Verbose -Message '[Get] Currently installed pipx packages...'
+    $pipxPackagesInstalled = pipx list --json | ConvertFrom-Json
+    foreach ($package in $pipxPackages) {
+        Write-Progress -Activity $activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
+        Write-Information -MessageData "Checking for pipx package $package..."
+
+        # Get
+        Write-Verbose -Message "[Get] pipx package: $package"
+        $pipxPackageInstalled = $pipxPackagesInstalled | Where-Object { $_.name -eq $package }
+
+        # Test
+        Write-Verbose -Message "[Test] pipx package: $package"
+        if ($null -eq $pipxPackageInstalled) {
+            Write-Verbose -Message "[Set] pipx package $package is not installed, installing..."
+            try {
+                pipx install $package
+                Write-Verbose -Message "[Set] pipx package $package is now installed."
+                Write-Information -MessageData "Installed pipx package: $package."
+            } catch {
+                Write-Error -Message "Failed to install pipx package: $package. Error: $_"
+            }
+        } else {
+            Write-Information -MessageData "pipx package $package is already installed."
+        }
+    }
+} else {
+    Write-Information -MessageData 'No pipx packages specified in vars.yaml file.'
+}
+
+#endregion Ensure pipx Packages from Vars file are Installed
 
 #region Transcript Teardown
 

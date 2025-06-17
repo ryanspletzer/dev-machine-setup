@@ -19,7 +19,7 @@ windows_optional_features:
 # But also _sometimes you_ want to override install parameters -- ex. see Git below.
 # You may want to allow for prerelease versions of packages, in which case you can set prerelease: true
 choco_packages:
-  - name: 1password
+  # - name: 1password
   # - name: adoptopenjdk
   # - name: awscli
   # - name: awssamcli
@@ -58,7 +58,7 @@ choco_packages:
   # - name: office365business
   # - name: oh-my-posh
   # - name: packer
-  # - name: python
+  - name: python
   # - name: pwsh
   # - name: qemu
   # - name: ruff
@@ -116,6 +116,13 @@ windows_powershell_modules:
   # - PSScriptAnalyzer
   # - PSTcpIp
   # - Terminal-Icons
+
+# pipx modules
+pipx_packages:
+  - cfn-lint
+  # - poetry
+  # - taskcat
+  # Add more pipx modules as needed
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
