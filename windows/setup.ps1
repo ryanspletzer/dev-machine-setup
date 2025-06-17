@@ -25,7 +25,6 @@ param (
     $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
 )
 
-
 #region Transcript Setup
 
 # Start Transcript at current path of script
@@ -42,6 +41,20 @@ $script:InformationPreference = 'Continue'
 #endregion Transcript Setup
 
 #region Additional Input Validation
+
+# Strip everything outside the choco_packages block
+$gitPackageInYaml = (
+        (Get-Content -Path $VarsFilePath -Raw) -replace '(?ms)^.*?^choco_packages:\s*|^\S.*', ''
+    ) -split "`r?\n" |                  # break into lines
+    Where-Object {
+        # keep  - name: …  lines
+        $_ -match '^\s*-\s*name:'
+    } |
+    ForEach-Object {
+        # strip YAML syntax + quotes, leave only the raw name
+        ($_ -replace '^\s*-\s*name:\s*["'']?(?<pkg>[^"'']+)["'']?\s*$', '$1')
+    } |
+    Where-Object -FilterScript { $_ -eq 'git' }
 
 # | Piece        | What it matches                                                | Purpose                              |
 # | ------------ | -------------------------------------------------------------- | ------------------------------------ |
@@ -66,7 +79,9 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch 
                 Where-Object -FilterScript { $_ -match 'git_user_email' } |
                 ForEach-Object -Process { $_ -replace $pattern, '$2' }
         )
-    )) {
+    ) -and
+    $gitPackageInYaml) {
+
     Write-Error -Message "Git user email is not set and no email was provided."
     Stop-Transcript
     exit 1
@@ -96,8 +111,9 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
                 Where-Object -FilterScript { $_ -match 'git_user_name' } |
                 ForEach-Object -Process { $_ -replace $pattern, '$2' }
         )
-    )) {
-    # If no name is provided and no local user name is
+    ) -and
+    $gitPackageInYaml) {
+
     Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
     Stop-Transcript
     exit 1
@@ -706,7 +722,9 @@ $currentGitUserName = try { git config --global user.name } catch {}
 
 # Test
 Write-Verbose -Message '[Test] Git user.email...'
-if (-not [string]::IsNullOrWhiteSpace($GitUserEmail) -and $currentGitUserEmail -ne $GitUserEmail) {
+if (-not [string]::IsNullOrWhiteSpace($GitUserEmail) -and
+    $currentGitUserEmail -ne $GitUserEmail -and
+    (Get-Command -Name git -ErrorAction SilentlyContinue)) {
     # Set
     Write-Verbose -Message "[Set] Setting Git user.email to '$GitUserEmail'..."
     try {
@@ -717,13 +735,19 @@ if (-not [string]::IsNullOrWhiteSpace($GitUserEmail) -and $currentGitUserEmail -
 
     Write-Verbose -Message "[Set] Git user.email is now set to '$GitUserEmail'."
     Write-Information -MessageData "Set Git user.email to '$GitUserEmail'."
+} elseif (-not (Get-Command -Name git -ErrorAction SilentlyContinue)) {
+    Write-Warning -Message 'Git is not installed, cannot set user.email.'
+} elseif ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
+    Write-Warning -Message 'Git user.email is not set and no email was provided.'
 } else {
     Write-Information -MessageData "Git user.email is already set to '$currentGitUserEmail'."
 }
 
 # Test
 Write-Verbose -Message '[Test] Git user.name...'
-if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and $currentGitUserName -ne $GitUserName) {
+if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and
+    $currentGitUserName -ne $GitUserName -and
+    (Get-Command -Name git -ErrorAction SilentlyContinue)) {
     # Set
     Write-Verbose -Message "[Set] Setting Git user.name to '$GitUserName'..."
     try {
@@ -734,7 +758,9 @@ if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and $currentGitUserName -ne
 
     Write-Verbose -Message "[Set] Git user.name is now set to '$GitUserName'."
     Write-Information -MessageData "Set Git user.name to '$GitUserName'."
-} elseif ([string]::IsNullOrWhiteSpace($GitUserName)) {
+} elseif (-not (Get-Command -Name git -ErrorAction SilentlyContinue)) {
+    Write-Warning -Message 'Git is not installed, cannot set user.email.'
+}  elseif ([string]::IsNullOrWhiteSpace($GitUserName)) {
     Write-Error -Message 'Git user.name is not set and no name was provided.'
 } else {
     Write-Information -MessageData "Git user.name is already set to '$currentGitUserName'."

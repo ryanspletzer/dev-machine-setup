@@ -235,22 +235,12 @@ vscode_extensions:
   # Add more Visual Studio Code extensions as needed
 
 # Git configuration
-git_user_email: 'ryanspletzer@gmail.com'  # REQUIRED: Set your email here _or_ pass via command line with -e flag
-git_user_name: 'ryanspletzer'  # Defaults to Windows local users full name (if set)
-
-# Additional Git configurations (optional)
-# These will be set as git config --global key value
-git_config:
-  # Examples (uncomment to use):
-  commit.gpgsign: true
-  init.defaultBranch: main
-  gpg.program: /opt/homebrew/bin/gpg
-  push.default: current
-  push.autoSetupRemote: true
-  user.signingKey: 787AEF0BAE232359
+git_user_email: "ryanspletzer@gmail.com"  # REQUIRED: Set your email here _or_ pass via command line with -e flag
+git_user_name: ryanspletzer  # Defaults to Windows local users full name (if set)
 
 # Custom commands to execute after setup
 custom_commands:
+  - git lfs install
   # If you want more control over the WSL setup, you can use the following commands:
   # Update WSL
   # - wsl --update
