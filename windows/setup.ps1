@@ -12,7 +12,7 @@ param (
     [string]
     $VarsFilePath = 'vars.yaml',
 
-    [Parameter()]
+    [Parameter(Mandatory)]
     [ValidateScript({
         if ([string]::IsNullOrWhiteSpace($_) -and
             [string]::IsNullOrWhiteSpace((git config --global user.email 2>$null))) {
@@ -211,6 +211,7 @@ if (-not (Test-Path -Path $VarsFilePath)) {
 # Test
 Write-Verbose -Message '[Test] vars.yaml file...'
 try {
+    # Set
     Write-Verbose -Message '[Set] Importing vars.yaml file...'
     $vars = pwsh -Command {
         param ($Path)
@@ -263,7 +264,7 @@ if ($optionalFeatures -and $optionalFeatures.Count -gt 0) {
 
         Write-Verbose -Message "[Set] Enabling feature: $featureName"
         try {
-            # Splat feature name and state and any additional parameters
+            # Set
             Enable-WindowsOptionalFeature -FeatureName $featureName -Online -NoRestart -ErrorAction Stop
             Write-Information -MessageData "Enabled Windows Optional Feature: $featureName."
         } catch {
@@ -350,6 +351,7 @@ if ($powershellModules -and $powershellModules.Count -gt 0) {
         # Test
         Write-Verbose -Message "[Test] PowerShell (pwsh) module: $module"
         if ($null -eq $psModule) {
+            # Set
             Write-Verbose -Message "[Set] PowerShell (pwsh) module $module is not installed, installing..."
             try {
                 pwsh -Command {
@@ -459,6 +461,7 @@ if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
         # Test
         Write-Verbose -Message "[Test] Windows PowerShell module: $module"
         if ($null -eq $psModule) {
+            # Set
             Write-Verbose -Message "[Set] Windows PowerShell module $module is not installed, installing..."
             try {
                 powershell -Command {
@@ -496,6 +499,7 @@ Write-Verbose -Message '[Test] pipx...'
 if ($null -eq $pipx) {
     # Set
     Write-Verbose -Message '[Set] pipx is not installed, checking for Python installation...'
+
     # Refresh Path in case Python was just installed by Chocolatey
     refreshenv
     $python = Get-Command -Name python -ErrorAction SilentlyContinue
@@ -548,6 +552,7 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
         # Test
         Write-Verbose -Message "[Test] pipx package: $package"
         if ($null -eq $pipxPackageInstalled) {
+            # Set
             Write-Verbose -Message "[Set] pipx package $package is not installed, installing..."
             try {
                 pipx install $package
@@ -565,6 +570,42 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 }
 
 #endregion Ensure pipx Packages from Vars file are Installed
+
+#region Git user.name and user.email Config
+
+$step++
+$stepText = 'Git user.name and user.email Config'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Configuring Git user.name and user.email...'
+
+# Get
+Write-Verbose -Message '[Get] Git user.name and user.email...'
+$currentGitUserName = git config --global user.name
+$currentGitUserEmail = git config --global user.email
+
+# Test
+Write-Verbose -Message '[Test] Git user.name...'
+if ($currentGitUserName -ne $GitUserName) {
+    # Set
+    Write-Verbose -Message "[Set] Setting Git user.name to '$GitUserName'..."
+    git config --global user.name $GitUserName
+    Write-Information -MessageData "Set Git user.name to '$GitUserName'."
+} else {
+    Write-Information -MessageData "Git user.name is already set to '$currentGitUserName'."
+}
+
+# Test
+Write-Verbose -Message '[Test] Git user.email...'
+if ($currentGitUserEmail -ne $GitUserEmail) {
+    # Set
+    Write-Verbose -Message "[Set] Setting Git user.email to '$GitUserEmail'..."
+    git config --global user.email $GitUserEmail
+    Write-Information -MessageData "Set Git user.email to '$GitUserEmail'."
+} else {
+    Write-Information -MessageData "Git user.email is already set to '$currentGitUserEmail'."
+}
+
+#endregion Git user.name and user.email Config
 
 #region Transcript Teardown
 

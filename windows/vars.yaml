@@ -40,7 +40,7 @@ choco_packages:
   # - name: fiddler
   # - name: firefox
   # - name: gh
-  # - name: git
+  - name: git
   #   parameters: /WindowsTerminal /NoShellIntegration
   # - name: gnupg
   # - name: go
