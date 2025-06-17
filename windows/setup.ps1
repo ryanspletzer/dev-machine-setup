@@ -403,6 +403,35 @@ if (($null -eq $nuGetPackageProvider) -or ($nuGetPackageProvider.Version -lt 2.8
 
 #endregion Ensure Windows PowerShell NuGet Package Provider is Installed
 
+#region Ensure Windows PowerShell PSGallery Package Source is Trusted
+
+$step++
+$stepText = 'Ensure Windows PowerShell PSGallery Package Source is Trusted'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking Ensure Windows PowerShell PSGallery Package Source is Trusted...'
+
+# Get
+Write-Verbose -Message '[Get] Windows PowerShell PSGallery Package Source...'
+$packageSource = powershell -Command {
+    Get-PackageSource -Name PSGallery
+}
+
+# Test
+Write-Verbose -Message '[Test] Windows PowerShell PSGallery Package Source...'
+if (-not $packageSource.IsTrusted) {
+    # Set
+    Write-Verbose -Message '[Set] Windows PowerShell PSGallery Package Source is not Trusted, setting...'
+    powershell -Command {
+        Set-PackageSource -Name PSGallery -Trusted
+    }
+    Write-Verbose -Message '[Set] Windows PowerShell PSGallery Package Source is now Trusted.'
+    Write-Information -MessageData 'Set Windows PowerShell PSGallery Package Source to Trusted.'
+} else {
+    Write-Information -MessageData 'Windows PowerShell PSGallery Package Source is already set to Trusted.'
+}
+
+#endregion Ensure Windows PowerShell PSGallery Package Source is Trusted
+
 #region Transcript Teardown
 
 Stop-Transcript
