@@ -25,62 +25,6 @@ param (
     $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
 )
 
-#region Additional Input Validation
-
-if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
-    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserEmail']) -and
-    [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match 'git_user_email' } |
-                ForEach-Object -Process { $_.Split(':')[1].Trim() }
-        )
-    )) {
-    Write-Error -Message "Git user email is not set and no email was provided."
-    exit 1
-}
-
-# Check if git_user_email was supplied in the vars.yaml file and retrieve it if available
-if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
-    $gitUserEmailFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match 'git_user_email' } |
-            ForEach-Object -Process { $_.Split(':')[1].Trim() }
-    )
-    if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
-        $GitUserEmail = $gitUserEmailFromVars
-    }
-}
-
-# If there is no currently set git user.name, ensure that one was provided or that the local user FullName is set
-if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {})) -and
-    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
-    [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match 'git_user_name' } |
-                ForEach-Object -Process { $_.Split(':')[1].Trim() }
-        )
-    ) -and
-    [string]::IsNullOrWhiteSpace((Get-LocalUser -Name $env:USERNAME).FullName)) {
-    # If no name is provided and no local user name is
-    Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
-    exit 1
-}
-
-# Check if git_user_name was supplied in the vars.yaml file and retrieve it if available
-if ([string]::IsNullOrWhiteSpace($GitUserName)) {
-    $gitUserNameFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match 'git_user_name' } |
-            ForEach-Object -Process { $_.Split(':')[1].Trim() }
-    )
-    if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
-        $GitUserName = $gitUserNameFromVars
-    }
-}
-
-#endregion Additional Input Validation
 
 #region Transcript Setup
 
@@ -96,6 +40,83 @@ $script:VerbosePreference = 'Continue'
 $script:InformationPreference = 'Continue'
 
 #endregion Transcript Setup
+
+#region Additional Input Validation
+
+# | Piece        | What it matches                                                | Purpose                              |
+# | ------------ | -------------------------------------------------------------- | ------------------------------------ |
+# | `^\s*`       | optional leading spaces at line start                          | anchor at the beginning              |
+# | `[^:]+:`     | everything up to (and including) the first colon               | skips the key name                   |
+# | `\s*`        | optional spaces                                                | ignore padding                       |
+# | `(["'']?)`   | **group 1** – an optional `'` or `"`                           | remembers opening quote if present   |
+# | `([^#'"]+?)` | **group 2** – one or more chars that are **not** `#`, `'`, `"` | captures the value itself            |
+# | `\1`         | the same quote captured in group 1                             | ensures we close the quote we opened |
+# | `\s*`        | optional spaces                                                | ignore padding                       |
+# | `(?:#.*)?`   | an optional comment starting with `#` to EOL                   | discards right-hand comments         |
+# | `$`          | end of line                                                    | anchor                               |
+$pattern = '^\s*[^:]+:\s*(["'']?)([^#''"]+?)\1\s*(?:#.*)?$'
+
+# If git.config --global user.email is not set, ensure that one was provided or that the vars.yaml file has a
+# git_user_email entry
+if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
+    [string]::IsNullOrWhiteSpace($GitUserEmail) -and
+    [string]::IsNullOrWhiteSpace(
+        (
+            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+                Where-Object -FilterScript { $_ -match 'git_user_email' } |
+                ForEach-Object -Process { $_ -replace $pattern, '$2' }
+        )
+    )) {
+    Write-Error -Message "Git user email is not set and no email was provided."
+    Stop-Transcript
+    exit 1
+}
+
+# If GitUserEmail is empty, check if it was supplied in the vars.yaml file
+if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
+    $gitUserEmailFromVars = (
+        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+            Where-Object -FilterScript { $_ -match 'git_user_email' } |
+            ForEach-Object -Process { $_ -replace $pattern, '$2' }
+    )
+    if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
+        Write-Verbose -Message "Using git_user_email from vars.yaml: $gitUserEmailFromVars"
+        $GitUserEmail = $gitUserEmailFromVars
+    }
+}
+
+# If git.config --global user.name is not set, ensure that one was provided or that the default value is not empty
+# or the vars.yaml file has a git_user_name entry
+if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {})) -and
+    [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
+    [string]::IsNullOrWhiteSpace($GitUserName) -and
+    [string]::IsNullOrWhiteSpace(
+        (
+            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+                Where-Object -FilterScript { $_ -match 'git_user_name' } |
+                ForEach-Object -Process { $_ -replace $pattern, '$2' }
+        )
+    )) {
+    # If no name is provided and no local user name is
+    Write-Error -Message "Git user.name is not set and no name was provided nor available from local user FullName."
+    Stop-Transcript
+    exit 1
+}
+
+# If GitUserName is empty, check if it was supplied in the vars.yaml file
+if ([string]::IsNullOrWhiteSpace($GitUserName)) {
+    $gitUserNameFromVars = (
+        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
+            Where-Object -FilterScript { $_ -match 'git_user_name' } |
+            ForEach-Object -Process { $_ -replace $pattern, '$2' }
+    )
+    if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
+        Write-Verbose -Message "Using git_user_name from vars.yaml: $gitUserNameFromVars"
+        $GitUserName = $gitUserNameFromVars
+    }
+}
+
+#endregion Additional Input Validation
 
 #region Progress Variables
 
@@ -671,41 +692,55 @@ if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
 
 #endregion Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
 
-#region Git user.name and user.email Config
+#region Git user.email and user.name Config
 
 $step++
-$stepText = 'Git user.name and user.email Config'
+$stepText = 'Git user.email and user.name Config'
 Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
-Write-Information -MessageData 'Configuring Git user.name and user.email...'
+Write-Information -MessageData 'Configuring Git user.email and user.name...'
 
 # Get
-Write-Verbose -Message '[Get] Git user.name and user.email...'
-$currentGitUserName = git config --global user.name
-$currentGitUserEmail = git config --global user.email
-
-# Test
-Write-Verbose -Message '[Test] Git user.name...'
-if ($currentGitUserName -ne $GitUserName) {
-    # Set
-    Write-Verbose -Message "[Set] Setting Git user.name to '$GitUserName'..."
-    git config --global user.name $GitUserName
-    Write-Information -MessageData "Set Git user.name to '$GitUserName'."
-} else {
-    Write-Information -MessageData "Git user.name is already set to '$currentGitUserName'."
-}
+Write-Verbose -Message '[Get] Git user.email and user.name...'
+$currentGitUserEmail = try { git config --global user.email } catch {}
+$currentGitUserName = try { git config --global user.name } catch {}
 
 # Test
 Write-Verbose -Message '[Test] Git user.email...'
-if ($currentGitUserEmail -ne $GitUserEmail) {
+if (-not [string]::IsNullOrWhiteSpace($GitUserEmail) -and $currentGitUserEmail -ne $GitUserEmail) {
     # Set
     Write-Verbose -Message "[Set] Setting Git user.email to '$GitUserEmail'..."
-    git config --global user.email $GitUserEmail
+    try {
+        git config --global user.email $GitUserEmail
+    } catch {
+        Write-Error -Message "Failed to set Git user.email: $_"
+    }
+
+    Write-Verbose -Message "[Set] Git user.email is now set to '$GitUserEmail'."
     Write-Information -MessageData "Set Git user.email to '$GitUserEmail'."
 } else {
     Write-Information -MessageData "Git user.email is already set to '$currentGitUserEmail'."
 }
 
-#endregion Git user.name and user.email Config
+# Test
+Write-Verbose -Message '[Test] Git user.name...'
+if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and $currentGitUserName -ne $GitUserName) {
+    # Set
+    Write-Verbose -Message "[Set] Setting Git user.name to '$GitUserName'..."
+    try {
+        git config --global user.name $GitUserName
+    } catch {
+        Write-Error -Message "Failed to set Git user.name: $_"
+    }
+
+    Write-Verbose -Message "[Set] Git user.name is now set to '$GitUserName'."
+    Write-Information -MessageData "Set Git user.name to '$GitUserName'."
+} elseif ([string]::IsNullOrWhiteSpace($GitUserName)) {
+    Write-Error -Message 'Git user.name is not set and no name was provided.'
+} else {
+    Write-Information -MessageData "Git user.name is already set to '$currentGitUserName'."
+}
+
+#endregion Git user.email and user.name Config
 
 #region Transcript Teardown
 

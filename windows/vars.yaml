@@ -240,7 +240,7 @@ git_user_name: 'ryanspletzer'  # Defaults to Windows local users full name (if s
 
 # Additional Git configurations (optional)
 # These will be set as git config --global key value
-git_additional_configs:
+git_config:
   # Examples (uncomment to use):
   commit.gpgsign: true
   init.defaultBranch: main
@@ -251,8 +251,6 @@ git_additional_configs:
 
 # Custom commands to execute after setup
 custom_commands:
-  - python -m pip install --user pipx
-  - python -m pipx ensurepath
   # If you want more control over the WSL setup, you can use the following commands:
   # Update WSL
   # - wsl --update
