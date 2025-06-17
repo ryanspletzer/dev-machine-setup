@@ -228,11 +228,17 @@ git_user_name: ryanspletzer  # Defaults to Windows local users full name (if set
 
 # Custom commands to execute after setup
 custom_commands:
+  # Enable Dark Mode
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
   - git lfs install
+  # Enable these features if you want to use WSL 2
+  - Enable-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online -NoRestart
+  - Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart
+  # Only run the WSL commands below AFTER a reboot.
   # If you want more control over the WSL setup, you can use the following commands:
   # Update WSL
   # - wsl --update
-  # Set WSL default version to 2
+  # Set WSL default version to 2 -- skip if you are on a platform that does not support nested virtualization.
   # - wsl --set-default-version 2
   # Install a specific WSL distribution
   # - wsl --install -d Ubuntu-22.04
@@ -240,10 +246,8 @@ custom_commands:
   # Install WSL if not already installed with a default Ubuntu distribution
   # This also enables the relevant VirtualMachinePlatform and Microsoft-Windows-Subsystem-Linux Windows features
   # automatically if they aren't enabled already.
-  - wsl --install
-  # Additional custom commands can be added here
-  # For example, to install a specific WSL distribution:
-  # wsl --install -d Ubuntu-22.04
+  # THIS COMMAND CAN BE FLAKY -- the above approaches provide more control.
+  # - wsl --install
   # Only enable if you need these
   # Only works with the proper virtualization support in the processor, enabled in BIOS/UEFI
   # - Enable-WindowsOptionalFeature -FeatureName Microsoft-Hyper-V -Online -NoRestart
