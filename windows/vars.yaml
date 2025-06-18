@@ -43,6 +43,7 @@ choco_packages:
   - name: ngrok
   - name: nodejs
   - name: notepadplusplus
+  - name: nvm
   - name: office365business
   - name: oh-my-posh
   - name: packer
