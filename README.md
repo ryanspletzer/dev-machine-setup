@@ -41,11 +41,24 @@ The setup is platform-specific but provides a similar set of tools across both m
 ### macOS
 
 1. Clone this repository
-2. Navigate to the `macOS` directory
-3. Run the setup script:
+   (or grab a zip download of the repo and copy the contents of the `macOS` directory to somewhere like `~/Downloads` if
+   you don't have git installed yet)
+2. Open macOS Terminal app
+3. Navigate to the directory with the `macOS` script contents
+4. Run the setup script:
 
 ```bash
-./setup.sh -e "your.email@example.com"
+# Copy the contents of the macOS directory to somewhere like Downloads if you don't have git installed yet to clone the
+# repo
+
+# Change to that directory
+cd ~/Downloads
+
+# Allow the setup.sh script to run
+chmod 700 ./setup.sh
+
+# Run the script
+./setup.sh -e your.email@example.com
 ```
 
 [Detailed macOS Setup Instructions](./macOS/README.md)
@@ -53,11 +66,26 @@ The setup is platform-specific but provides a similar set of tools across both m
 ### Windows
 
 1. Clone this repository
+   (or grab a zip download of the repo and copy the contents of the `windows` directory to somewhere like `~/Downloads`
+   if you don't have git installed yet)
 2. Open PowerShell as Administrator
-3. Navigate to the `windows` directory
-4. Run the setup script:
+3. Navigate to the directory with the `windows` script contents
+4. Run the setup script
 
 ```powershell
+# Copy the contents of the macOS directory to somewhere like ~/Downloads if you don't have git installed yet to clone
+# the repo
+
+# Change to that directory
+cd ~/Downloads
+
+# Change the PowerShell Execution Policy
+# Note this is _not_ a security boundary, so don't worry...
+# See this for more info:
+# https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+
+# Run the script
 .\setup.ps1 -e your.email@example.com
 ```
 

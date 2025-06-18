@@ -24,25 +24,40 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 
 ## Quick Start
 
-1. Clone this repository or download the files
+1. Clone this repository
+   (Or grab a zip download of the repo and copy the contents of the `macOS` directory to somewhere like `~/Downloads` if
+   you don't have git installed yet)
 2. Open Windows PowerShell as Administrator
 3. Navigate to the `windows` directory
 4. Run the setup script:
 
 ```powershell
+# Copy the contents of the macOS directory to somewhere like ~/Downloads if you don't have git installed yet to clone
+# the repo
+
+# Change to that directory
+cd ~/Downloads
+
+# Change the PowerShell Execution Policy
+# Note this is _not_ a security boundary, so don't worry...
+# See this for more info:
+# https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+
+# Run the script
 .\setup.ps1 -e your.email@example.com
 ```
 
 Email is for the git user.email config.
 
-The script also sets git user.name and it can be provided like so:
+The script also sets git user.name and it can be provided as shown below -- - if no name is provided, the script will
+try to use the output of `(Get-LocalUser -Name $env:USERNAME).FullName` to pull the user's full name from the local
+Windows user information (as long as it is not empty -- if it is the script will stop).
 
 ```powershell
+# Provide your name for git user.name config if you know your proper full name isn't set for your local windows user
 .\setup.ps1 -e your.email@example.com -n 'Your Name'
 ```
-
-However if no name is provided, the script will try to use the output of `(Get-LocalUser -Name $env:USERNAME).FullName`
-to pull the user's full name from the local Windows user information.
 
 ## Configuration
 

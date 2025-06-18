@@ -31,24 +31,31 @@ Some applications may require Rosetta 2, which can be installed automatically by
 
 ## Quick Start
 
-1. Clone this repository:
+1. Get the script:
 
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/ansible-devmachinesetup.git
-   cd ansible-devmachinesetup/macOS
-   ```
+    ```zsh
+    # Copy the contents of the macOS directory to somewhere like Downloads if you don't have git installed yet to clone
+    # the repo
+
+    # Change to that directory
+    cd ~/Downloads
+
+    # Allow the setup.sh script to run
+    chmod 700 ./setup.sh
+    ```
 
 2. Run the setup script:
 
-   ```bash
-   ./setup.sh -e "your.email@example.com"
-   ```
+    ```zsh
+    # Run the script
+    ./setup.sh -e "your.email@example.com"
+    ```
 
 ## Setup Options
 
 The `setup.sh` script accepts several options:
 
-```bash
+```zsh
 Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
   -v              Enable verbose output (can be repeated for more verbosity, e.g. -vv or -vvv)
   -e git_email    Specify Git user email
@@ -61,25 +68,25 @@ Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
 
 - Basic installation with Git email:
 
-  ```bash
+  ```zsh
   ./setup.sh -e "your.email@example.com"
   ```
 
 - Install with verbose output and custom Git name:
 
-  ```bash
+  ```zsh
   ./setup.sh -v -e "your.email@example.com" -n "Your Name"
   ```
 
 - Install prerequisites only (Homebrew and Ansible):
 
-  ```bash
+  ```zsh
   ./setup.sh -p
   ```
 
 - Use a custom playbook file:
 
-  ```bash
+  ```zsh
   ./setup.sh -e "your.email@example.com" custom_playbook.yaml
   ```
 
