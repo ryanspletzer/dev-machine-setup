@@ -1,0 +1,266 @@
+# vars.yaml
+# Externalized variables for Ansible setup
+
+# System configuration
+# Enable WSL-specific configurations if running in WSL
+is_wsl: false  # Set to true if running in WSL
+
+# APT packages
+apt_packages:
+  # Development tools
+  - build-essential
+  - cmake
+  - make
+  - pkg-config
+  - autoconf
+  - automake
+  - libtool
+  - curl
+  - wget
+  - unzip
+  - software-properties-common
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  # Python dependencies
+  - libssl-dev
+  - zlib1g-dev
+  - libbz2-dev
+  - libreadline-dev
+  - libsqlite3-dev
+  - llvm
+  - libncurses5-dev
+  - libncursesw5-dev
+  - tk-dev
+  - libffi-dev
+  - liblzma-dev
+  - python3-openssl
+  - python3-pip
+  - python3-venv
+  # Git and version control
+  - git
+  - git-lfs
+  # Shell tools
+  - zsh
+  - fish
+  - bash-completion
+  # Other tools
+  - jq
+  - maven
+  - direnv
+  # Add more packages as needed
+
+# External package repositories
+apt_repositories:
+  - ppa:git-core/ppa  # Git PPA for latest Git version
+  # Add more repositories as needed
+
+# External package keys
+apt_keys:
+  - name: Microsoft
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    keyring: /etc/apt/keyrings/microsoft.gpg
+  # Add more keys as needed
+
+# External package repositories that need more complex setup
+external_repositories:
+  - name: Microsoft
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main"
+  - name: Docker
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  # Add more repositories as needed
+
+# Snap packages
+snap_packages:
+  - name: code
+    classic: true
+  - name: azure-cli
+    classic: true
+  - name: spotify
+  - name: slack
+    classic: true
+  # Add more snap packages as needed
+
+# Docker configuration
+install_docker: true
+docker_users:
+  - "{{ ansible_user_id }}"
+
+# PowerShell configuration
+install_powershell: true
+
+# PowerShell modules
+powershell_modules:
+  - AWS.Tools.Common
+  - Az.Accounts
+  - Microsoft.Graph.Authentication
+  - Pester
+  - platyPS
+  - poetry
+  - posh-git
+  - powershell-yaml
+  - PowerShellBuild
+  - psake
+  - PSGraphQL
+  - PSJsonWebToken
+  - PSReadLine
+  - PSScriptAnalyzer
+  - PSTcpIp
+  - Terminal-Icons
+  # Add more PowerShell modules as needed
+
+# pipx modules
+pipx_modules:
+  - taskcat
+  - azure-cli
+  - awscli
+  # Add more pipx modules as needed
+
+# VS Code extensions (same as macOS for consistency)
+# You can list your VS Code extensions with the command:
+# code --list-extensions
+vscode_extensions:
+  - 4ops.packer
+  - alefragnani.project-manager
+  - arjun.swagger-viewer
+  - aws-scripting-guy.cform
+  - charliermarsh.ruff
+  - codezombiech.gitignore
+  - davidanson.vscode-markdownlint
+  - dbaeumer.vscode-eslint
+  - docker.docker
+  - donjayamanne.git-extension-pack
+  - donjayamanne.githistory
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+  - fernandoescolar.vscode-solution-explorer
+  - github.copilot
+  - github.copilot-chat
+  - github.vscode-github-actions
+  - github.vscode-pull-request-github
+  - golang.go
+  - grapecity.gc-excelviewer
+  - hbenl.vscode-test-explorer
+  - josin.kusto-syntax-highlighting
+  - k--kato.docomment
+  - medo64.render-crlf
+  - mhutchie.git-graph
+  - mimarec.swagger-doc-viewer
+  - mohsen1.prettify-json
+  - ms-azuretools.vscode-azurefunctions
+  - ms-azuretools.vscode-azureresourcegroups
+  - ms-azuretools.vscode-bicep
+  - ms-azuretools.vscode-containers
+  - ms-azuretools.vscode-docker
+  - ms-dotnettools.csdevkit
+  - ms-dotnettools.csharp
+  - ms-dotnettools.vscode-dotnet-runtime
+  - ms-kubernetes-tools.vscode-kubernetes-tools
+  - ms-mssql.data-workspace-vscode
+  - ms-mssql.mssql
+  - ms-mssql.sql-bindings-vscode
+  - ms-mssql.sql-database-projects-vscode
+  - ms-python.debugpy
+  - ms-python.isort
+  - ms-python.python
+  - ms-python.vscode-pylance
+  - ms-toolsai.jupyter
+  - ms-toolsai.jupyter-keymap
+  - ms-toolsai.jupyter-renderers
+  - ms-toolsai.vscode-jupyter-cell-tags
+  - ms-toolsai.vscode-jupyter-slideshow
+  - ms-vscode-remote.remote-containers
+  - ms-vscode-remote.remote-ssh
+  - ms-vscode-remote.remote-ssh-edit
+  - ms-vscode-remote.remote-wsl
+  - ms-vscode-remote.vscode-remote-extensionpack
+  - ms-vscode.cmake-tools
+  - ms-vscode.cpptools
+  - ms-vscode.cpptools-extension-pack
+  - ms-vscode.cpptools-themes
+  - ms-vscode.hexeditor
+  - ms-vscode.makefile-tools
+  - ms-vscode.powershell
+  - ms-vscode.remote-explorer
+  - ms-vscode.remote-server
+  - ms-vscode.test-adapter-converter
+  - ms-vsliveshare.vsliveshare
+  - msazurermtools.azurerm-vscode-tools
+  - octref.vetur
+  - oderwat.indent-rainbow
+  - parallelsdesktop.parallels-desktop
+  - pspester.pester-test
+  - rangav.vscode-thunder-client
+  - redhat.java
+  - redhat.vscode-commons
+  - redhat.vscode-yaml
+  - samirat.csharp-test-adapter
+  - sibiraj-s.vscode-scss-formatter
+  - streetsidesoftware.code-spell-checker
+  - takumii.markdowntable
+  - teamsdevapp.ms-teams-vscode-extension
+  - teamsdevapp.vscode-adaptive-cards
+  - twxs.cmake
+  - tylerleonhardt.vscode-inline-values-powershell
+  - tyriar.sort-lines
+  - usernamehw.errorlens
+  - visualstudioexptteam.intellicode-api-usage-examples
+  - visualstudioexptteam.vscodeintellicode
+  - vscjava.vscode-gradle
+  - vscjava.vscode-java-debug
+  # Add more VS Code extensions as needed
+
+# Node Version Manager (nvm) configuration
+install_nvm: true
+nvm_version: "0.39.7"  # Check for the latest version
+node_version: "lts/*"  # Install latest LTS version
+
+# Python version manager (pyenv) configuration
+install_pyenv: true
+pyenv_version: "2.4.0"  # Check for the latest version
+python_versions:
+  - "3.12.2"  # Check for the latest version
+default_python_version: "3.12.2"
+
+# Ruby version manager (rbenv) configuration
+install_rbenv: true
+ruby_version: "3.3.0"  # Check for the latest version
+
+# Go installation
+install_go: true
+go_version: "1.22.2"  # Check for the latest version
+
+# Rust installation
+install_rust: true
+
+# .NET SDK installation
+install_dotnet: true
+dotnet_version: "8.0"  # Check for the latest version
+
+# Git configuration
+git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
+git_user_name: "{{ ansible_user_id }}"  # Defaults to the current user's username
+
+# Git Credential Manager configuration
+install_git_credential_manager: true
+
+# bash-git-prompt configuration
+install_bash_git_prompt: true
+
+# Custom commands and scripts (optional)
+# These commands will be executed as the current user (non-elevated)
+custom_commands_user:
+  # Add commands to execute as the current user
+  - command: "mkdir -p ~/Projects"
+    description: "Create Projects directory"
+
+# These commands will be executed with elevated privileges (sudo)
+custom_commands_elevated:
+  # Add commands requiring sudo
+  - command: "update-alternatives --set editor /usr/bin/vim.basic"
+    description: "Set vim as the default editor"
+
+# Custom script path (optional)
+# Provide the path to a custom script that will be executed at the end of the setup
+custom_script: "./examples/custom_script.sh"
