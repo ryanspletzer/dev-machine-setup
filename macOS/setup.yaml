@@ -223,7 +223,7 @@
     # Execute custom script if defined
     - name: Check if custom script exists
       ansible.builtin.stat:
-        path: "{{ custom_script | default('') }}"
+        path: "{{ playbook_dir }}/{{ custom_script | default('') }}"
       register: script_stat
       when: custom_script is defined and custom_script != ""
       tags:
@@ -232,7 +232,7 @@
 
     - name: Make custom script executable
       ansible.builtin.file:
-        path: "{{ custom_script }}"
+        path: "{{ playbook_dir }}/{{ custom_script }}"
         mode: '0755'
       when:
         - custom_script is defined and custom_script != ""
@@ -243,7 +243,7 @@
 
     - name: Execute custom script
       ansible.builtin.command:
-        cmd: "{{ custom_script }}"
+        cmd: "{{ playbook_dir }}/{{ custom_script }}"
       register: custom_script_result
       changed_when: custom_script_result.rc == 0
       when:
