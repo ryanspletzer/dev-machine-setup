@@ -81,6 +81,7 @@ homebrew_formulae:
   - jq
   - maven
   - node
+  - nvm
   - oh-my-posh
   - pipx
   - pyenv-virtualenv
