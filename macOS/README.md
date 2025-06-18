@@ -1,433 +1,191 @@
-# macOS Developer Machine Setup with Ansible
+# macOS Development Machine Setup
 
-This repository contains an Ansible playbook for automating the setup of a macOS development environment. It streamlines the installation and configuration of developer tools, applications, and settings - perfect for setting up a fresh macOS machine from scratch.
+This directory contains Ansible automation scripts to set up a consistent development environment on macOS.
+The automation installs and configures common development tools, applications, and settings to create a ready-to-use
+development environment.
 
 ## Features
 
-The playbook automates the installation and configuration of:
+- 🍺 **Homebrew Package Management**: Installs Homebrew taps, casks, and formulae
+- 🔧 **PowerShell Module Installation**: Sets up PowerShell modules for development
+- 📦 **Python Package Management**: Installs pipx modules
+- 💻 **VS Code Extensions**: Configures VS Code with essential development extensions
+- 🔄 **Git Setup**: Configures Git with user information and LFS support
+- ⚙️ **macOS System Preferences**: Applies recommended macOS system preferences
+- 🚀 **Custom Script Support**: Allows for additional customization via custom scripts
 
-- **Homebrew packages**
-  - Taps, formulae, and casks (installed in this specific order to ensure dependencies are available)
-- **PowerShell modules**
-  - PowerShell modules installation
-- **pipx modules**
-  - Python tools installation
-- **Visual Studio Code extensions**
-  - Developer productivity extensions
-- **Git configuration**
-  - User settings (name, email)
-  - Additional Git configurations (editor, aliases, default branch, etc.)
-  - Git LFS setup
+## Prerequisites
 
-## Prerequisites (Optional)
+- macOS (works on both Intel and Apple Silicon)
+- Internet connection
+- Administrator (sudo) privileges
 
-The setup.sh script will install pre-requisites _and_ run Ansible.
+## System Compatibility
 
-You can install prerequisites only using the setup script with the `-p` flag, if you want more control over running Ansible directly:
+This setup has been tested and confirmed to work on:
 
-### Quick Install (Recommended)
+- macOS Sequoia (15.x)
 
-```zsh
-./setup.sh -p
-```
+Some applications may require Rosetta 2, which can be installed automatically by setting `install_rosetta: true` in
+`vars.yaml`.
 
-This will install Homebrew (if not already installed) and Ansible using Homebrew without running the Ansible playbook.
-
----
-
-Manual steps for reference:
-
-1. **macOS** - This playbook is designed for macOS
-2. **Homebrew** - Install using:
-
-   ```zsh
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-3. **Ansible** - Install using Homebrew:
-
-   ```zsh
-   brew install ansible
-   ```
-
-## Installation
-
-### Option 1: If you already have Git installed
+## Quick Start
 
 1. Clone this repository:
 
-   ```zsh
-   git clone https://github.com/yourusername/ansible-devmachinesetup.git
-   cd ansible-devmachinesetup
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/ansible-devmachinesetup.git
+   cd ansible-devmachinesetup/macOS
    ```
 
-2. Review and customize the `setup.yaml` file to match your needs:
-   - Add/remove packages in the `vars` section
-   - Configure Git settings
+2. Run the setup script:
 
-### Option 2: If you don't have Git installed (fresh macOS)
-
-1. Download the repository as a ZIP file from GitHub:
-   - Go to `https://github.com/yourusername/ansible-devmachinesetup`
-   - Click the green "Code" button
-   - Select "Download ZIP"
-
-2. Extract the ZIP file and navigate to the directory:
-
-   ```zsh
-   cd ~/Downloads
-   unzip ansible-devmachinesetup-main.zip
-   cd ansible-devmachinesetup-main
-   ```
-
-3. Review and customize the `setup.yaml` file using a text editor
-
-## Usage
-
-### Run the Complete Setup
-
-To run the entire playbook:
-
-```bash
-ansible-playbook setup.yaml
-```
-
-Or use the setup script (which also installs prerequisites if needed):
-
-```bash
-./setup.sh
-```
-
-### Setup Script Options
-
-The `setup.sh` script supports several options:
-
-```bash
-./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
-```
-
-- `-v`: Enable verbose output (can be repeated for more verbosity)
-- `-e git_email`: Specify Git user email
-- `-n git_name`: Specify Git user name
-- `-p`: Install prerequisites only (Homebrew and Ansible), don't run Ansible playbook
-- `playbook_file`: Optional playbook file name (defaults to setup.yaml)
-
-Examples:
-
-```bash
-# Install prerequisites only
-./setup.sh -p
-
-# Run with specific Git configuration
-./setup.sh -e "your.email@example.com" -n "Your Name"
-
-# Verbose output with a custom playbook
-./setup.sh -v custom_playbook.yaml
-```
-
-For increased verbosity during the setup:
-
-```bash
-./setup.sh -v       # Verbosity level 1
-./setup.sh -vv      # Verbosity level 2
-./setup.sh -vvv     # Verbosity level 3
-```
-
-### Run Specific Components
-
-You can use tags to run specific parts of the setup:
-
-```bash
-# Install only Rosetta 2 (if enabled)
-ansible-playbook setup.yaml --tags "rosetta"
-
-# Install only Homebrew packages
-ansible-playbook setup.yaml --tags "homebrew"
-
-# Setup PowerShell modules
-ansible-playbook setup.yaml --tags "powershell"
-
-# Install pipx modules
-ansible-playbook setup.yaml --tags "pipx"
-
-# Install VS Code extensions
-ansible-playbook setup.yaml --tags "vscode"
-
-# Configure Git
-ansible-playbook setup.yaml --tags "git"
-```
-
-You can also combine tags:
-
-```bash
-ansible-playbook setup.yaml --tags "homebrew,vscode"
-```
-
-### Configuration
-
-#### System Configuration
-
-The playbook can optionally install Rosetta 2, which is required for running Intel-based applications on Apple Silicon Macs:
-
-- `install_rosetta`: Set to `true` to install Rosetta 2, defaults to `false`
-
-To enable Rosetta 2 installation when running the playbook:
-
-```bash
-ansible-playbook setup.yaml --extra-vars "install_rosetta=true"
-```
-
-Or update the `vars.yaml` file to set `install_rosetta: true`.
-
-#### Git Configuration
-
-The playbook sets Git user information and additional configurations:
-
-- `user.name`: OPTIONAL - Defaults to your macOS full name (from `id -F`)
-- `user.email`: REQUIRED - Must be set either in vars.yaml or via command line
-- Additional Git configurations: OPTIONAL - Configure any Git settings through the `git_additional_configs` dictionary
-
-To provide your Git email (REQUIRED):
-
-```bash
-# Via ansible-playbook directly
-ansible-playbook setup.yaml --extra-vars "git_user_email=your.email@example.com"
-
-# Or more easily via the setup.sh script
-./setup.sh -e "your.email@example.com"
-```
-
-To override the default Git name:
-
-```bash
-# Via ansible-playbook directly
-ansible-playbook setup.yaml --extra-vars "git_user_name=Your Name"
-
-# Or more easily via the setup.sh script
-./setup.sh -n "Your Name"
-```
-
-You can combine both parameters:
-
-```bash
-./setup.sh -e "your.email@example.com" -n "Your Name"
-```
-
-If you don't provide a Git email via command line or in vars.yaml, the setup will fail with a clear error message.
-
-You can set additional Git configurations in the `vars.yaml` file under the `git_additional_configs` section:
-
-```yaml
-git_additional_configs:
-  core.editor: "code --wait"
-  pull.rebase: "true"
-  init.defaultBranch: "main"
-  color.ui: "auto"
-  alias.co: "checkout"
-  alias.br: "branch"
-  alias.ci: "commit"
-  alias.st: "status"
-  # Add more configurations as needed
-```
-
-Or via command line:
-
-```bash
-ansible-playbook setup.yaml --extra-vars '{"git_additional_configs": {"core.editor": "code --wait", "pull.rebase": "true"}}'
-```
-
-This allows you to configure any Git setting that you would normally set with `git config --global` commands.
-
-#### Custom Commands and Scripts
-
-The setup supports running custom commands and scripts for any additional configurations you might need:
-
-- `custom_commands`: A list of shell commands to run at the end of the setup
-- `custom_script`: Path to a custom script file to execute
-- `custom_script_args`: Arguments to pass to the custom script
-
-Example configuration in `vars.yaml`:
-
-```yaml
-# Custom commands and scripts (optional)
-custom_commands:
-  # Show hidden files in Finder
-  - defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
-  # Dark mode
-  - defaults write -g AppleInterfaceStyle Dark
-  # Key repeat settings
-  - defaults write -g InitialKeyRepeat -int 15
-  - defaults write -g KeyRepeat -int 2
-
-# Custom script path (optional)
-custom_script: "/Users/username/custom_setup.sh"
-custom_script_args: "--option1 value1 --option2 value2"
-```
-
-This feature is perfect for setting macOS system preferences or any other custom configurations that aren't covered by the main setup components.
-
-> **Note**: An example script is provided in the `examples/custom_macos_settings.sh` file that demonstrates how to configure common macOS settings like showing hidden files, disabling .DS_Store file creation on network volumes, and more.
-
-#### Customizing Installed Packages
-
-Edit the `vars.yaml` file to customize:
-
-- `install_rosetta`: Set to `true` to install Rosetta 2 for Apple Silicon Macs
-- `homebrew_taps`: Homebrew tap repositories
-- `homebrew_formulae`: CLI tools and libraries
-- `homebrew_casks`: macOS applications
-- `powershell_modules`: PowerShell modules to install
-- `pipx_modules`: Python applications to install via pipx
-- `vscode_extensions`: VS Code extensions to install
-- `git_user_name`: Git user name (defaults to macOS full name)
-- `git_user_email`: Git user email
-- `git_additional_configs`: Additional Git configurations
-- `custom_commands`: Custom shell commands to execute at the end of setup
-- `custom_script`: Path to a custom script to execute
-- `custom_script_args`: Arguments for the custom script
-
-## Running the Scripts
-
-### Using `install_prerequisites.sh`
-
-This script installs Homebrew (if not already installed) and Ansible. To use it:
-
-1. Make the script executable:
-
-   ```zsh
-   # Make the script executable with restricted permissions (owner only)
-   chmod 700 ./install_prerequisites.sh
-   ```
-
-2. Run the script:
-
-   ```zsh
-   ./install_prerequisites.sh
-   ```
-
-### Using `setup.sh`
-
-The `setup.sh` script installs prerequisites and runs the Ansible playbook. It supports the following parameters:
-
-- **Verbosity**: `-v` flag which can be repeated (e.g., `-vv`, `-vvv`) to increase the verbosity level
-- **Git Email**: `-e` flag followed by your email to set the Git user email (e.g., `-e "your.email@example.com"`)
-- **Git Name**: `-n` flag followed by your name to set the Git user name (e.g., `-n "Your Name"`)
-- **Custom YAML file**: Optional parameter to specify a custom YAML file. If no parameter is provided, it defaults to `setup.yaml`
-
-1. Make the script executable:
-
-   ```zsh
-   # Make the script executable with restricted permissions (owner only)
-   chmod 700 ./setup.sh
-   ```
-
-2. Run the default setup:
-
-   ```zsh
-   ./setup.sh
-   ```
-
-3. Run with increased verbosity:
-
-   ```zsh
-   ./setup.sh -v       # Verbosity level 1
-   ./setup.sh -vv      # Verbosity level 2
-   ./setup.sh -vvv     # Verbosity level 3
-   ```
-
-4. Run with a specific Git email:
-
-   ```zsh
+   ```bash
    ./setup.sh -e "your.email@example.com"
    ```
 
-5. Run with a specific Git name:
+## Setup Options
 
-   ```zsh
-   ./setup.sh -n "Your Name"
-   ```
+The `setup.sh` script accepts several options:
 
-6. Run a custom setup with a specific YAML file:
-
-   ```zsh
-   ./setup.sh custom_setup.yaml
-   ```
-
-7. Combine options:
-
-   ```zsh
-   ./setup.sh -v -e "your.email@example.com" -n "Your Name" custom_setup.yaml
-   ```
-
-These scripts simplify the process of setting up your macOS development environment. Ensure you have the necessary permissions to execute them.
-
-## Maintenance
-
-### Updating the Playbook
-
-1. Edit `setup.yaml` to add new software or configurations
-2. Run the playbook again - Ansible will only make the necessary changes
-
-### Running on a New Machine
-
-For convenience, you can use the included shell script to install prerequisites:
-
-```zsh
-# For highest security, use chmod 700 to limit access to only the owner
-chmod 700 install_prerequisites.sh
-./install_prerequisites.sh
+```bash
+Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+  -v              Enable verbose output (can be repeated for more verbosity, e.g. -vv or -vvv)
+  -e git_email    Specify Git user email
+  -n git_name     Specify Git user name
+  -p              Install prerequisites only (Homebrew and Ansible), don't run Ansible playbook
+  playbook_file   Optional playbook file name (defaults to setup.yaml)
 ```
 
-Or follow these manual steps:
+### Examples
 
-1. Install Homebrew:
+- Basic installation with Git email:
 
-   ```zsh
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
+  ```bash
+  ./setup.sh -e "your.email@example.com"
+  ```
 
-2. Install Ansible using Homebrew:
+- Install with verbose output and custom Git name:
 
-   ```zsh
-   brew install ansible
-   ```
+  ```bash
+  ./setup.sh -v -e "your.email@example.com" -n "Your Name"
+  ```
 
-3. Download or clone this repository (see Installation section above)
+- Install prerequisites only (Homebrew and Ansible):
 
-4. Run the playbook:
+  ```bash
+  ./setup.sh -p
+  ```
 
-   ```zsh
-   ansible-playbook setup.yaml
-   ```
+- Use a custom playbook file:
+
+  ```bash
+  ./setup.sh -e "your.email@example.com" custom_playbook.yaml
+  ```
+
+## Customization
+
+### Modifying Installed Packages
+
+Edit `vars.yaml` to customize which packages get installed:
+
+- `homebrew_taps`: List of Homebrew taps to add
+- `homebrew_casks`: GUI applications to install
+- `homebrew_formulae`: Command-line tools to install
+- `powershell_modules`: PowerShell modules to install
+- `pipx_modules`: Python packages to install via pipx
+- `vscode_extensions`: VS Code extensions to install
+
+### macOS System Preferences
+
+The setup automatically configures macOS with developer-friendly preferences:
+
+- Show hidden files in Finder
+- Enable path bar and status bar in Finder
+- Disable warnings when changing file extensions
+- Prevent .DS_Store file creation on network/USB volumes
+- Set Finder to list view by default
+- Configure Dock behavior (auto-hide, animation speed)
+- Configure TextEdit to use plain text by default
+- Configure trackpad settings
+
+You can customize these settings by editing the `custom_commands_user` and `custom_commands_elevated` sections in
+`vars.yaml`.
+
+### Adding Custom Scripts
+
+To add additional setup steps:
+
+1. Create a custom script in the `examples/` directory or elsewhere
+2. Set the `custom_script` variable in `vars.yaml` to point to your script
+3. Make sure the script is executable (`chmod +x your_script.sh`)
+
+## Components
+
+- `setup.sh`: Main setup script that installs prerequisites and runs the Ansible playbook
+- `setup.yaml`: Ansible playbook that performs the installation and configuration
+- `vars.yaml`: Configuration variables defining what gets installed
+- `examples/`: Directory containing example custom scripts
+
+## Notable Default Packages
+
+The default setup includes a curated selection of popular development tools and applications:
+
+### Developer Tools
+
+- Docker
+- Git and Git LFS
+- Visual Studio Code
+- .NET SDK
+- Python, Node.js, Ruby, Go, Rust
+- AWS CLI, Azure CLI, Terraform, Packer
+- PowerShell
+
+### Applications
+
+- iTerm2
+- Microsoft Office
+- Microsoft Edge
+- Microsoft Teams
+- Rectangle Pro (window management)
+- 1Password
+- Docker Desktop
+
+See `vars.yaml` for the complete list of installed packages.
+
+## Ansible Tags
+
+The playbook uses tags to allow selective execution of tasks:
+
+- `homebrew`: All Homebrew-related tasks
+  - `taps`: Only Homebrew taps
+  - `casks`: Only Homebrew casks (applications)
+  - `formulae`: Only Homebrew formulae (CLI tools)
+- `powershell`: PowerShell module installation
+- `pipx`: Python package installation via pipx
+- `vscode`: VS Code extension installation
+- `git`: Git configuration tasks
+- `macos`: macOS system preferences
+  - `preferences`: macOS preference settings
+  - `user-commands`: User-level commands
+  - `elevated-commands`: Commands requiring sudo
+- `custom`: Custom script execution
 
 ## Troubleshooting
 
-### Common Issues
+- **Logs**: All installation logs are saved to a timestamped log file in the current directory.
+- **Verbosity**: Use the `-v` flag (can be repeated for more detail) to see more information during setup.
+- **Failed Tasks**: You can safely rerun the setup script - it will skip already completed tasks.
 
-- **Permission errors**: Some commands may require sudo access
-- **Network issues**: Ensure you have a stable internet connection
-- **Homebrew errors**: Run `brew doctor` to diagnose Homebrew problems
-- **Application compatibility on Apple Silicon**: Some applications may require Rosetta 2. Set `install_rosetta: true` in `vars.yaml` or use `--extra-vars "install_rosetta=true"` when running the playbook
-- **Ansible warnings about inventory**: These are normal when running locally and are automatically suppressed in the setup script
+## Security Notes
 
-If you encounter errors with specific tasks, you can run with verbose output:
+- The setup script securely handles your sudo password via storing it securely in macOS Keychain and removes it after
+  completion.
+  This is to prevent additional prompts throughout the running of the script.
+- All credentials are temporary and cleaned up when the script exits.
+- The script only runs commands defined in the Ansible playbook or in your custom commands / custom script.
 
-```bash
-# Using ansible-playbook directly
-ansible-playbook setup.yaml -vvv
+## Notes for Apple Silicon Macs
 
-# Or using the setup script with verbosity flags
-./setup.sh -v       # Verbosity level 1
-./setup.sh -vv      # Verbosity level 2
-./setup.sh -vvv     # Verbosity level 3
-```
-
-The setup script automatically creates a timestamped log file (e.g., `setup_20250609_123456.txt`) that captures all output, making it easier to diagnose issues.
-
-## License
-
-[MIT License](LICENSE)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- Some applications require Rosetta 2. To install it, set `install_rosetta: true` in `vars.yaml`.
+- Some Homebrew packages may have compatibility issues with Apple Silicon.

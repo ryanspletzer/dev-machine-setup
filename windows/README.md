@@ -30,14 +30,25 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 4. Run the setup script:
 
 ```powershell
-.\setup.ps1
+.\setup.ps1 -e your.email@example.com
 ```
+
+Email is for the git user.email config.
+
+The script also sets git user.name and it can be provided like so:
+
+```powershell
+.\setup.ps1 -e your.email@example.com -n 'Your Name'
+```
+
+However if no name is provided, the script will try to use the output of `(Get-LocalUser -Name $env:USERNAME).FullName`
+to pull the user's full name from the local Windows user information.
 
 ## Configuration
 
 The setup is driven by the `vars.yaml` file, which contains configurable options for the following items below.
 
-### Make It Your Own!
+### Make It Your Own
 
 _**It is encourage to take the vars.yaml file and customize it to your needs!**_
 
@@ -186,7 +197,3 @@ Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -On
 ```
 
 After running the script, consider restarting your system to ensure all changes take effect.
-
-## License
-
-See the [LICENSE](../LICENSE) file in the root directory for details.
