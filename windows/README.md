@@ -25,7 +25,7 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 ## Quick Start
 
 1. Clone this repository
-   (Or grab a zip download of the repo and copy the contents of the `macOS` directory to somewhere like `~/Downloads` if
+   (or grab a zip download of the repo and copy the contents of the `macOS` directory to somewhere like `~/Downloads` if
    you don't have git installed yet)
 2. Open Windows PowerShell as Administrator
 3. Navigate to the `windows` directory
