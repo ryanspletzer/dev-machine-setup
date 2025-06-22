@@ -122,7 +122,7 @@
     # npm global package setup
     - name: Check if npm packages are already installed
       ansible.builtin.command:
-        cmd: npm list -g {{ item }}
+        cmd: /opt/homebrew/bin/npm list -g {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -135,13 +135,13 @@
 
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
-        cmd: npm install -g {{ item }}
-      loop: "{{ npm_global_packages | default([]) }}"
-      when: "npm_check_result.results[ansible_loop.index0].rc != 0"
+        cmd: /opt/homebrew/bin/npm install -g {{ item.0 }}
+      loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
+      when: "item.1.rc != 0"
       register: npm_install_result
-      changed_when: npm_install_result.rc == 0
+      changed_when: "npm_install_result.rc == 0"
       loop_control:
-        label: "Installing npm package: {{ item }}"
+        label: "Installing npm package: {{ item.0 }}"
       tags:
         - npm
         - packages
