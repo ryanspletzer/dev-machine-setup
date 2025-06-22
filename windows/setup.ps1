@@ -597,6 +597,55 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
 #endregion Ensure pipx Packages from Vars file are Installed
 
+#region Ensure npm global Packages from Vars file are Installed
+
+$step++
+$stepText = 'Ensure npm global Packages from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for npm global packages to install...'
+
+# Get
+Write-Verbose -Message '[Get] npm global packages from Vars file import...'
+$npmGlobalPackages = $vars.npm_global_packages
+
+# Test
+Write-Verbose -Message '[Test] npm global packages from Vars file import...'
+if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
+    # Get the list of currently installed npm global packages
+    Write-Verbose -Message '[Get] Currently installed npm global packages...'
+    $npmGlobalPackagesInstalled = npm list -g --depth=0 --json | ConvertFrom-Json
+    foreach ($package in $npmGlobalPackages) {
+        Write-Progress -Activity $activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
+        Write-Information -MessageData "Checking for npm global package $package..."
+
+        # Get
+        Write-Verbose -Message "[Get] npm global package: $package"
+        $npmPackageInstalled = $npmGlobalPackagesInstalled.dependencies.$package
+
+        # Test
+        Write-Verbose -Message "[Test] npm global package: $package"
+        if (-not $npmPackageInstalled) {
+            # Set
+            Write-Verbose -Message "[Set] npm global package $package is not installed, installing..."
+            try {
+                npm install -g $package
+                Write-Verbose -Message "[Set] npm global package $package is now installed."
+                Write-Information -MessageData "Installed npm global package: $package."
+            } catch {
+                Write-Error -Message "Failed to install npm global package: $package. Error: $_"
+            }
+        } else {
+            Write-Information -MessageData "npm global package $package is already installed."
+        }
+    }
+} else {
+    Write-Information -MessageData 'No npm global packages specified in vars.yaml file.'
+}
+
+#endregion Ensure npm global Packages from Vars file are Installed
+
 #region Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
 
 $step++
