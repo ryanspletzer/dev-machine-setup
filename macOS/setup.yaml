@@ -28,7 +28,7 @@
 
     - name: Check if Rosetta 2 is already installed
       ansible.builtin.command:
-        cmd: /usr/bin/pgrep -q oahd
+        cmd: pgrep -q oahd
       register: rosetta_check
       ignore_errors: yes
       changed_when: false
@@ -41,7 +41,7 @@
 
     - name: Install Rosetta 2 (with become_method=sudo)
       ansible.builtin.command:
-        cmd: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+        cmd: softwareupdate --install-rosetta --agree-to-license
       become: yes
       become_method: sudo
       when:
@@ -68,7 +68,7 @@
 
     - name: Ensure Homebrew casks are installed
       ansible.builtin.shell:
-        cmd: "/opt/homebrew/bin/brew install --cask {{ item }}"
+        cmd: "brew install --cask {{ item }}"
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
         HOMEBREW_SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
@@ -93,6 +93,10 @@
         - homebrew
         - formulae
 
+    # Refresh Ansible inventory
+    # This ensures that the inventory is up-to-date after Homebrew installations which add to the PATH
+    - meta: refresh_inventory
+
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
@@ -109,7 +113,7 @@
     # pipx module setup
     - name: Ensure pipx modules are installed
       ansible.builtin.command:
-        cmd: /opt/homebrew/bin/pipx install {{ item }}
+        cmd: pipx install {{ item }}
       loop: "{{ pipx_modules }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
@@ -122,7 +126,7 @@
     # npm global package setup
     - name: Check if npm packages are already installed
       ansible.builtin.command:
-        cmd: /opt/homebrew/bin/npm list -g {{ item }}
+        cmd: npm list -g {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -135,7 +139,7 @@
 
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
-        cmd: /opt/homebrew/bin/npm install -g {{ item.0 }}
+        cmd: npm install -g {{ item.0 }}
       loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
@@ -149,7 +153,7 @@
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
-        cmd: /opt/homebrew/bin/code --install-extension {{ item }}
+        cmd: code --install-extension {{ item }}
       loop: "{{ vscode_extensions }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"

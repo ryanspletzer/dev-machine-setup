@@ -127,7 +127,7 @@ pipx_modules:
 npm_global_packages:
   - aws-cdk
   - npmrc
-  - '@vue.cli'
+  - '@vue/cli'
 
 # VS Code extensions
 # You can list your VS Code extensions with the command:
