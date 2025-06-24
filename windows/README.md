@@ -121,6 +121,17 @@ pipx_packages:
   # etc.
 ```
 
+### npm Global Packages
+
+Node.js packages installed globally:
+
+```yaml
+npm_global_packages:
+  - aws-cdk
+  - npmrc
+  # etc.
+```
+
 ### Visual Studio Code Extensions
 
 Extensions to install in VS Code:

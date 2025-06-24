@@ -114,12 +114,14 @@ else
     -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "$LOG_FILE"
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
-  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
+
+# Ensure Homebrew is on the PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Install Ansible using Homebrew
 echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
-run_and_log /opt/homebrew/bin/brew install ansible
+run_and_log brew install ansible
 
 # Check if we're in "prereqs only" mode
 if [ "$PREREQS_ONLY" = true ]; then

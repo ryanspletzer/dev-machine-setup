@@ -101,6 +101,7 @@ Edit `vars.yaml` to customize which packages get installed:
 - `homebrew_formulae`: Command-line tools to install
 - `powershell_modules`: PowerShell modules to install
 - `pipx_modules`: Python packages to install via pipx
+- `npm_global_packages`: Node.js packages to install globally via npm
 - `vscode_extensions`: VS Code extensions to install
 
 ### macOS System Preferences
@@ -147,6 +148,7 @@ The default setup includes a curated selection of popular development tools and 
 - Python, Node.js, Ruby, Go, Rust
 - AWS CLI, Azure CLI, Terraform, Packer
 - PowerShell
+- Global npm packages (AWS CDK, npmrc)
 
 ### Applications
 
@@ -170,6 +172,7 @@ The playbook uses tags to allow selective execution of tasks:
   - `formulae`: Only Homebrew formulae (CLI tools)
 - `powershell`: PowerShell module installation
 - `pipx`: Python package installation via pipx
+- `npm`: Node.js package installation via npm
 - `vscode`: VS Code extension installation
 - `git`: Git configuration tasks
 - `macos`: macOS system preferences
