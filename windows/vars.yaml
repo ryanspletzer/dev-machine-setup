@@ -11,7 +11,6 @@ choco_packages:
   - name: awscli
   - name: awssamcli
   - name: azure-cli
-  - name: azure-data-studio
   - name: azure-functions-core-tools
   - name: bicep
   - name: cascadiacode
