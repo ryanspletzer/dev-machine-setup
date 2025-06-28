@@ -20,7 +20,7 @@ homebrew_casks:
   - azure-data-studio
   - chatgpt
   - citrix-workspace
-  - docker
+  - docker-desktop
   - dotnet-sdk
   - drawio
   - elgato-camera-hub
@@ -43,7 +43,7 @@ homebrew_casks:
   - spotify
   - steam
   - synologyassistant
-  - tailscale
+  - tailscale-app
   - utm
   - virtualbox
   - visual-studio-code
