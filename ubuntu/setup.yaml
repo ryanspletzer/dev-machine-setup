@@ -32,6 +32,25 @@
         - system
         - wsl
 
+    # Set Debian architecture mapping
+    - name: Set Debian architecture fact
+      ansible.builtin.set_fact:
+        deb_architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+        go_architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+      tags:
+        - system
+        - architecture
+
+    - name: Display detected architecture
+      ansible.builtin.debug:
+        msg:
+          - "Detected system architecture: {{ ansible_architecture }}"
+          - "Using Debian architecture: {{ deb_architecture }}"
+          - "Using Go architecture: {{ go_architecture }}"
+      tags:
+        - system
+        - architecture
+
     # APT setup
     - name: Update APT cache
       ansible.builtin.apt:
@@ -176,7 +195,7 @@
 
         - name: Add Docker repository
           ansible.builtin.apt_repository:
-            repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+            repo: "deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
             state: present
           become: yes
 
@@ -401,8 +420,8 @@
       block:
         - name: Download Go
           ansible.builtin.get_url:
-            url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
-            dest: "/tmp/go{{ go_version }}.linux-amd64.tar.gz"
+            url: "https://go.dev/dl/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
+            dest: "/tmp/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
           register: go_download
 
         - name: Remove existing Go installation if present
@@ -414,7 +433,7 @@
 
         - name: Extract Go
           ansible.builtin.unarchive:
-            src: "/tmp/go{{ go_version }}.linux-amd64.tar.gz"
+            src: "/tmp/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
             dest: /usr/local
             remote_src: yes
           become: yes
@@ -508,7 +527,7 @@
       block:
         - name: Download and install Git Credential Manager
           ansible.builtin.apt:
-            deb: https://github.com/git-ecosystem/git-credential-manager/releases/latest/download/gcm-linux_amd64.deb
+            deb: "https://github.com/git-ecosystem/git-credential-manager/releases/latest/download/gcm-linux_{{ deb_architecture }}.deb"
           become: yes
 
         - name: Configure Git to use Git Credential Manager
