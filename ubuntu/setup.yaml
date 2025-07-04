@@ -50,24 +50,22 @@
         - apt
         - upgrade
 
+    # Install prerequisite packages first
+    - name: Install prerequisite APT packages
+      ansible.builtin.apt:
+        name: "{{ apt_packages_prereqs }}"
+        state: present
+      become: yes
+      tags:
+        - apt
+        - prereqs
+        - packages
+
     - name: Create keyrings directory
       ansible.builtin.file:
         path: /etc/apt/keyrings
         state: directory
         mode: '0755'
-      become: yes
-      tags:
-        - apt
-        - repositories
-
-    # APT repositories
-    - name: Add APT repositories
-      ansible.builtin.apt_repository:
-        repo: "{{ item }}"
-        state: present
-      loop: "{{ apt_repositories }}"
-      loop_control:
-        label: "Adding repository: {{ item }}"
       become: yes
       tags:
         - apt
@@ -98,6 +96,19 @@
       tags:
         - apt
         - keys
+
+    # APT repositories
+    - name: Add APT repositories
+      ansible.builtin.apt_repository:
+        repo: "{{ item }}"
+        state: present
+      loop: "{{ apt_repositories }}"
+      loop_control:
+        label: "Adding repository: {{ item }}"
+      become: yes
+      tags:
+        - apt
+        - repositories
 
     # External repositories
     - name: Add external APT repositories
