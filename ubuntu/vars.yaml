@@ -23,6 +23,14 @@ apt_packages_prereqs:
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module
 external_apt_repositories:
+  # Add more repositories as needed
+  # 1password only works on amd64 through apt, so we install it via tarball for ARM64 in custom_commands_elevated
+  - name: 1password
+    signed_by: https://downloads.1password.com/linux/keys/1password.asc
+    uris: https://downloads.1password.com/linux/debian
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: docker
     signed_by: https://download.docker.com/linux/ubuntu/gpg
     uris: https://download.docker.com/linux/ubuntu
@@ -35,12 +43,12 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
-  # Add more repositories as needed
 
 # External package repositories
 ppa_apt_repositories:
-  - ppa:git-core/ppa  # Git PPA for latest Git version
-  # Add more repositories as needed
+  # Add more PPA APT repositories as needed
+  # Git PPA for latest Git version
+  - ppa:git-core/ppa
 
 # APT packages
 apt_packages:
@@ -85,8 +93,6 @@ apt_packages:
 
 # Snap packages
 snap_packages:
-  - name: 1password
-    classic: true
   - name: code
     classic: true
   - name: drawio
@@ -281,14 +287,24 @@ install_bash_git_prompt: true
 # These commands will be executed as the current user (non-elevated)
 custom_commands_user:
   # Add commands to execute as the current user
-  - command: "mkdir -p ~/Projects"
-    description: "Create Projects directory"
+  - command: "curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz"
+    description: "Download 1Password tarball"
 
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
-  # Add commands requiring sudo
-  - command: "update-alternatives --set editor /usr/bin/vim.basic"
-    description: "Set vim as the default editor"
+  # Add commands to execute with elevated privileges
+  # Steps to install 1Password on ARM64 Ubuntu (doesn't receive updates via apt yet)
+  # https://support.1password.com/install-linux/#arm-or-other-distributions-targz
+  - command: "tar -xf 1password-latest.tar.gz"
+    description: "Extract 1Password tarball"
+  - command: "mkdir -p /opt/1Password"
+    description: "Create directory for 1Password"
+  - command: "mv 1password-*/* /opt/1Password"
+    description: "Move 1Password files to /opt/1Password"
+  - command: "/opt/1Password/after-install.sh"
+    description: "Run 1Password post-install script"
+  - command: "rm -rf 1password-latest.tar.gz 1password-*"
+    description: "Clean up 1Password installation files"
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
