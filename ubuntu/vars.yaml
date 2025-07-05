@@ -5,26 +5,6 @@
 # Enable WSL-specific configurations if running in WSL
 is_wsl: false  # Set to true if running in WSL
 
-# External package keys
-apt_keys:
-  - name: Microsoft
-    url: https://packages.microsoft.com/keys/microsoft.asc
-    keyring: /etc/apt/keyrings/microsoft.gpg
-  # Add more keys as needed
-
- # External package repositories that need more complex setup
-external_repositories:
-  - name: Microsoft
-    repo: "deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main"
-  - name: Docker
-    repo: "deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  # Add more repositories as needed
-
-# External package repositories
-apt_repositories:
-  - ppa:git-core/ppa  # Git PPA for latest Git version
-  # Add more repositories as needed
-
 # APT prerequisite packages (installed first)
 # These are essential packages needed for adding external repositories and installing tools like Azure CLI
 apt_packages_prereqs:
@@ -40,6 +20,31 @@ apt_packages_prereqs:
   - wget
   # For Docker Desktop
   - gnome-terminal
+  # For Cursor
+  - libfuse2
+
+# External package keys
+apt_keys:
+  - name: Docker
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/keyrings/docker.asc
+  - name: Microsoft
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    keyring: /etc/apt/keyrings/microsoft.asc
+  # Add more keys as needed
+
+ # External package repositories that need more complex setup
+external_repositories:
+  - name: Microsoft
+    repo: 'deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod {{ ansible_distribution_release }} main'
+  - name: Docker
+    repo: 'deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+  # Add more repositories as needed
+
+# External package repositories
+apt_repositories:
+  - ppa:git-core/ppa  # Git PPA for latest Git version
+  # Add more repositories as needed
 
 # APT packages
 apt_packages:

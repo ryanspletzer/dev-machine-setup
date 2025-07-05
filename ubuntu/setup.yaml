@@ -36,7 +36,6 @@
     - name: Set Debian architecture fact
       ansible.builtin.set_fact:
         deb_architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
-        go_architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
       tags:
         - system
         - architecture
@@ -46,12 +45,11 @@
         msg:
           - "Detected system architecture: {{ ansible_architecture }}"
           - "Using Debian architecture: {{ deb_architecture }}"
-          - "Using Go architecture: {{ go_architecture }}"
       tags:
         - system
         - architecture
 
-    # APT setup
+    # apt update
     - name: Update APT cache
       ansible.builtin.apt:
         update_cache: yes
@@ -61,6 +59,7 @@
         - apt
         - update
 
+    # apt upgrade
     - name: Upgrade all packages
       ansible.builtin.apt:
         upgrade: yes
@@ -80,6 +79,7 @@
         - prereqs
         - packages
 
+    # Create keyrings directory
     - name: Create keyrings directory
       ansible.builtin.file:
         path: /etc/apt/keyrings
@@ -90,27 +90,14 @@
         - apt
         - repositories
 
-    # APT keys
-    - name: Add APT keys
+    # Download apt keys
+    - name: Download APT keys
       ansible.builtin.get_url:
         url: "{{ item.url }}"
-        dest: /tmp/key.asc
+        dest: "{{ item.keyring }}"
       loop: "{{ apt_keys }}"
       loop_control:
-        label: "Adding key: {{ item.name }}"
-      become: yes
-      tags:
-        - apt
-        - keys
-
-    - name: Install APT keys
-      ansible.builtin.shell: |
-        mkdir -p $(dirname {{ item.keyring }})
-        cat /tmp/key.asc | gpg --dearmor -o {{ item.keyring }}
-        chmod 644 {{ item.keyring }}
-      loop: "{{ apt_keys }}"
-      loop_control:
-        label: "Installing key: {{ item.name }}"
+        label: "Downloading key: {{ item.name }}"
       become: yes
       tags:
         - apt
@@ -152,7 +139,7 @@
         - apt
         - packages
 
-    # Snap packages
+    # Snap packages (classic)
     - name: Install Snap packages (classic)
       community.general.snap:
         name: "{{ item.name }}"
@@ -166,6 +153,7 @@
         - snap
         - packages
 
+    # Snap packages (regular)
     - name: Install Snap packages (regular)
       community.general.snap:
         name: "{{ item.name }}"
@@ -420,8 +408,8 @@
       block:
         - name: Download Go
           ansible.builtin.get_url:
-            url: "https://go.dev/dl/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
-            dest: "/tmp/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
+            url: "https://go.dev/dl/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
+            dest: "/tmp/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
           register: go_download
 
         - name: Remove existing Go installation if present
@@ -433,7 +421,7 @@
 
         - name: Extract Go
           ansible.builtin.unarchive:
-            src: "/tmp/go{{ go_version }}.linux-{{ go_architecture }}.tar.gz"
+            src: "/tmp/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
             dest: /usr/local
             remote_src: yes
           become: yes
@@ -585,7 +573,7 @@
         - custom
         - elevated-commands
 
-    # Execute custom script if defined
+    # Check if custom script is defined and exists
     - name: Check if custom script exists
       ansible.builtin.stat:
         path: "{{ custom_script }}"
@@ -595,6 +583,7 @@
         - custom
         - script
 
+    # Make custom script executable
     - name: Make custom script executable
       ansible.builtin.file:
         path: "{{ custom_script }}"
@@ -604,6 +593,7 @@
         - custom
         - script
 
+    # Execute custom script
     - name: Execute custom script
       ansible.builtin.command:
         cmd: "{{ custom_script }}"
