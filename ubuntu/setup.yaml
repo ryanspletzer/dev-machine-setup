@@ -79,29 +79,23 @@
         - prereqs
         - packages
 
-    # Create keyrings directory
-    - name: Create keyrings directory
-      ansible.builtin.file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: '0755'
+    # Add external APT repositories using deb822 format
+    - name: Add external APT repositories
+      ansible.builtin.deb822_repository:
+        name: "{{ item.name }}"
+        signed_by: "{{ item.signed_by }}"
+        uris: "{{ item.uris }}"
+        suites: "{{ item.suites }}"
+        components: "{{ item.components }}"
+        architectures: "{{ item.architectures }}"
+        state: present
+      loop: "{{ external_apt_repositories }}"
+      loop_control:
+        label: "Adding repository: {{ item.name }}"
       become: yes
       tags:
         - apt
         - repositories
-
-    # Download APT keys
-    - name: Download APT keys
-      ansible.builtin.get_url:
-        url: "{{ item.url }}"
-        dest: "{{ item.keyring }}"
-      loop: "{{ apt_keys }}"
-      loop_control:
-        label: "Downloading key: {{ item.name }}"
-      become: yes
-      tags:
-        - apt
-        - keys
 
     # Add PPA APT repositories
     - name: Add PPA APT repositories
@@ -111,19 +105,6 @@
       loop: "{{ ppa_apt_repositories }}"
       loop_control:
         label: "Adding repository: {{ item }}"
-      become: yes
-      tags:
-        - apt
-        - repositories
-
-    # Add external APT repositories
-    - name: Add external APT repositories
-      ansible.builtin.apt_repository:
-        repo: "{{ item.repo }}"
-        state: present
-      loop: "{{ external_repositories }}"
-      loop_control:
-        label: "Adding external repository: {{ item.name }}"
       become: yes
       tags:
         - apt
@@ -169,24 +150,6 @@
     # Docker setup
     - name: Install Docker
       block:
-        - name: Install Docker GPG key
-          ansible.builtin.get_url:
-            url: https://download.docker.com/linux/ubuntu/gpg
-            dest: /tmp/docker.key
-          become: yes
-
-        - name: Install Docker GPG key to keyring
-          ansible.builtin.shell: |
-            cat /tmp/docker.key | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-            chmod 644 /etc/apt/keyrings/docker.gpg
-          become: yes
-
-        - name: Add Docker repository
-          ansible.builtin.apt_repository:
-            repo: "deb [arch={{ deb_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-            state: present
-          become: yes
-
         - name: Install Docker packages
           ansible.builtin.apt:
             name:
