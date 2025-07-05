@@ -108,7 +108,7 @@
       ansible.builtin.apt_repository:
         repo: "{{ item }}"
         state: present
-      loop: "{{ apt_repositories }}"
+      loop: "{{ ppa_repositories }}"
       loop_control:
         label: "Adding repository: {{ item }}"
       become: yes
