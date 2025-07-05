@@ -32,14 +32,25 @@
         - system
         - wsl
 
-    # Set Debian architecture mapping
-    - name: Set Debian architecture fact
-      ansible.builtin.set_fact:
-        deb_architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    # Get Debian architecture dynamically using dpkg
+    - name: Get Debian architecture from dpkg
+      ansible.builtin.command:
+        cmd: dpkg --print-architecture
+      register: dpkg_architecture
+      changed_when: false
       tags:
         - system
         - architecture
 
+    # Set the deb_architecture fact based on dpkg output
+    - name: Set Debian architecture fact
+      ansible.builtin.set_fact:
+        deb_architecture: "{{ dpkg_architecture.stdout }}"
+      tags:
+        - system
+        - architecture
+
+    # Display detected architecture
     - name: Display detected architecture
       ansible.builtin.debug:
         msg:
