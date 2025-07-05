@@ -42,7 +42,7 @@ external_repositories:
   # Add more repositories as needed
 
 # External package repositories
-ppa_repositories:
+ppa_apt_repositories:
   - ppa:git-core/ppa  # Git PPA for latest Git version
   # Add more repositories as needed
 
