@@ -95,6 +95,10 @@ apt_packages:
 
 # Snap packages
 snap_packages:
+  # Add more snap packages as needed
+  # This is an alternative to APT for 1password, but it doesn't work on ARM64
+  - name: 1password
+    classic: true
   - name: code
     classic: true
   - name: drawio
