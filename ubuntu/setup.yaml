@@ -16,8 +16,24 @@
 
   tasks:
     # System setup
-    - name: Check if running in WSL
-      ansible.builtin.shell: grep -q Microsoft /proc/version || (uname -r | grep -q microsoft)
+    - name: Check WSL version (0=not WSL, 1=WSL1, 2=WSL2)
+      ansible.builtin.shell: |
+        # Check if we're in WSL at all
+        if ! grep -q -i microsoft /proc/version && ! (uname -r | grep -q microsoft); then
+          exit 0  # Not in WSL
+        fi
+
+        # We're in WSL, now determine version
+        if grep -q -i "microsoft.*wsl2" /proc/version || (uname -r | grep -q "microsoft.*wsl2"); then
+          exit 2  # WSL 2
+        elif [ -f /proc/sys/kernel/osrelease ] && grep -q "microsoft" /proc/sys/kernel/osrelease; then
+          exit 1  # WSL 1
+        elif grep -q -i microsoft /proc/version || (uname -r | grep -q microsoft); then
+          # Fallback: if we detect Microsoft but can't determine version, assume WSL 1
+          exit 1  # WSL 1
+        else
+          exit 0  # Not in WSL (fallback)
+        fi
       register: wsl_check
       ignore_errors: yes
       changed_when: false
@@ -25,9 +41,12 @@
         - system
         - wsl
 
-    - name: Set is_wsl fact
+    - name: Set WSL facts
       ansible.builtin.set_fact:
-        is_wsl: "{{ wsl_check.rc == 0 }}"
+        is_wsl: "{{ wsl_check.rc != 0 }}"
+        wsl_version: "{{ wsl_check.rc }}"
+        is_wsl1: "{{ wsl_check.rc == 1 }}"
+        is_wsl2: "{{ wsl_check.rc == 2 }}"
       tags:
         - system
         - wsl
