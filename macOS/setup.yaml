@@ -176,10 +176,10 @@
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
       loop: "{{ dotnet_tools | default([]) }}"
-      register: dotnet_install_result
-      changed_when: "'already installed' not in dotnet_install_result.stderr and dotnet_install_result.rc == 0"
+      register: dotnet_tool_install_result
+      changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
       failed_when: false
-      when: 
+      when:
         - dotnet_check.rc == 0
         - "item not in dotnet_tools_list.stdout"
       loop_control:
