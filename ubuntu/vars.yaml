@@ -31,6 +31,8 @@ external_apt_repositories:
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
   - name: docker
     signed_by: https://download.docker.com/linux/ubuntu/gpg
     uris: https://download.docker.com/linux/ubuntu

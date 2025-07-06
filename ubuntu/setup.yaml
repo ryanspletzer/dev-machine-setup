@@ -103,6 +103,7 @@
       loop: "{{ external_apt_repositories }}"
       loop_control:
         label: "Adding repository: {{ item.name }}"
+      when: item.architectures is not defined or item.architectures == deb_architecture
       become: yes
       tags:
         - apt
