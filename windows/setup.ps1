@@ -646,6 +646,68 @@ if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
 
 #endregion Ensure npm global Packages from Vars file are Installed
 
+#region Ensure .NET Global Tools from Vars file are Installed
+
+$step++
+$stepText = 'Ensure .NET Global Tools from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for .NET global tools to install...'
+
+# Get
+Write-Verbose -Message '[Get] .NET global tools from Vars file import...'
+$dotnetTools = $vars.dotnet_tools
+
+# Test if dotnet is installed
+Write-Verbose -Message '[Test] dotnet is installed...'
+$dotnetCommand = Get-Command -Name dotnet -ErrorAction SilentlyContinue
+if (-not $dotnetCommand) {
+    Write-Information -MessageData '.NET SDK is not installed, skipping .NET global tools installation.'
+} elseif ($dotnetTools -and $dotnetTools.Count -gt 0) {
+    # Get the list of currently installed .NET global tools
+    Write-Verbose -Message '[Get] Currently installed .NET global tools...'
+    try {
+        $dotnetToolsInstalled = dotnet tool list -g --verbosity quiet | ForEach-Object -Process{
+            if ($_ -match '^(\S+)\s+') {
+                $matches[1]
+            }
+        }
+    } catch {
+        Write-Warning -Message "Failed to get installed .NET global tools list: $_"
+        $dotnetToolsInstalled = @()
+    }
+
+    foreach ($tool in $dotnetTools) {
+        Write-Progress -Activity $activity -Status (
+            & $StatusBlock
+        ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
+        Write-Information -MessageData "Checking for .NET global tool $tool..."
+
+        # Get
+        Write-Verbose -Message "[Get] .NET global tool: $tool"
+        $toolInstalled = $tool -in $dotnetToolsInstalled
+
+        # Test
+        Write-Verbose -Message "[Test] .NET global tool: $tool"
+        if (-not $toolInstalled) {
+            # Set
+            Write-Verbose -Message "[Set] .NET global tool $tool is not installed, installing..."
+            try {
+                dotnet tool install -g $tool
+                Write-Verbose -Message "[Set] .NET global tool $tool is now installed."
+                Write-Information -MessageData "Installed .NET global tool: $tool."
+            } catch {
+                Write-Error -Message "Failed to install .NET global tool: $tool. Error: $_"
+            }
+        } else {
+            Write-Information -MessageData ".NET global tool $tool is already installed."
+        }
+    }
+} else {
+    Write-Information -MessageData 'No .NET global tools specified in vars.yaml file.'
+}
+
+#endregion Ensure .NET Global Tools from Vars file are Installed
+
 #region Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
 
 $step++
