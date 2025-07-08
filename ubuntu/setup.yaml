@@ -205,6 +205,44 @@
         - npm
         - packages
 
+    # .NET Global Tools setup
+    - name: Check if dotnet is installed
+      ansible.builtin.command:
+        cmd: dotnet --version
+      register: dotnet_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - dotnet
+        - tools
+
+    - name: Check if .NET tools are already installed
+      ansible.builtin.command:
+        cmd: dotnet tool list -g
+      register: dotnet_tools_list
+      changed_when: false
+      failed_when: false
+      when: dotnet_check.rc == 0
+      tags:
+        - dotnet
+        - tools
+
+    - name: Ensure .NET global tools are installed
+      ansible.builtin.command:
+        cmd: dotnet tool install -g {{ item }}
+      loop: "{{ dotnet_tools | default([]) }}"
+      register: dotnet_tool_install_result
+      changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
+      failed_when: false
+      when:
+        - dotnet_check.rc == 0
+        - item not in dotnet_tools_list.stdout
+      loop_control:
+        label: "Installing .NET tool: {{ item }}"
+      tags:
+        - dotnet
+        - tools
+
     # Docker setup
     - name: Install Docker
       block:

@@ -164,6 +164,14 @@ npm_global_packages:
   - npmrc
   - '@vue/cli'
 
+# .NET Global Tools
+dotnet_tools:
+  - Amazon.Lambda.Tools
+  # This is the preferred way to install Git Credential Manager on Linux
+  # since it can be updated via the dotnet cli.
+  - git-credential-manager
+  # Add more .NET tools as needed
+
 # VS Code extensions (same as macOS for consistency)
 # You can list your VS Code extensions with the command:
 # code --list-extensions
