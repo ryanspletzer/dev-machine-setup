@@ -178,6 +178,33 @@
         - snap
         - packages
 
+    # npm global package setup
+    - name: Check if npm packages are already installed
+      ansible.builtin.command:
+        cmd: npm list -g {{ item }}
+      register: npm_check_result
+      changed_when: false
+      failed_when: false
+      loop: "{{ npm_global_packages | default([]) }}"
+      loop_control:
+        label: "Checking npm package: {{ item }}"
+      tags:
+        - npm
+        - packages
+
+    - name: Ensure npm global packages are installed
+      ansible.builtin.command:
+        cmd: npm install -g {{ item.0 }}
+      loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
+      when: "item.1.rc != 0"
+      register: npm_install_result
+      changed_when: "npm_install_result.rc == 0"
+      loop_control:
+        label: "Installing npm package: {{ item.0 }}"
+      tags:
+        - npm
+        - packages
+
     # Docker setup
     - name: Install Docker
       block:
@@ -325,7 +352,7 @@
         - python
         - pyenv
 
-    # pipx setup
+    # Install pipx
     - name: Install pipx
       ansible.builtin.apt:
         name: pipx
@@ -335,6 +362,7 @@
         - pipx
         - install
 
+    # Install pipx modules
     - name: Install pipx modules
       ansible.builtin.shell: |
         pipx install {{ item }}

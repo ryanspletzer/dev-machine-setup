@@ -158,6 +158,12 @@ pipx_modules:
   - awscli
   # Add more pipx modules as needed
 
+# npm global packages
+npm_global_packages:
+  - aws-cdk
+  - npmrc
+  - '@vue/cli'
+
 # VS Code extensions (same as macOS for consistency)
 # You can list your VS Code extensions with the command:
 # code --list-extensions
