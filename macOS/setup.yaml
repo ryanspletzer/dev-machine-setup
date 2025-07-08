@@ -181,7 +181,7 @@
       failed_when: false
       when:
         - dotnet_check.rc == 0
-        - "item not in dotnet_tools_list.stdout"
+        - item not in dotnet_tools_list.stdout
       loop_control:
         label: "Installing .NET tool: {{ item }}"
       tags:
