@@ -51,6 +51,12 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: ngrok
+    signed_by: https://ngrok-agent.s3.amazonaws.com/ngrok.asc
+    uris: https://ngrok-agent.s3.amazonaws.com
+    suites: buster
+    components: main
+    architectures: "{{ deb_architecture }}"
 
 # External package repositories
 ppa_apt_repositories:
@@ -60,10 +66,6 @@ ppa_apt_repositories:
 
 # APT packages
 apt_packages:
-  - dotnet-sdk-9.0
-  - google-chrome-stable
-  - microsoft-edge-stable
-  - snapd
   # Development tools
   - build-essential
   - cmake
@@ -100,7 +102,12 @@ apt_packages:
   - maven
   - direnv
   # Add more packages as needed
+  - dotnet-sdk-9.0
   - fonts-cascadia-code
+  - google-chrome-stable
+  - microsoft-edge-stable
+  - ngrok
+  - snapd
 
 # Snap packages
 snap_packages:
