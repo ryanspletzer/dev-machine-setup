@@ -62,6 +62,7 @@ ppa_apt_repositories:
 apt_packages:
   - dotnet-sdk-9.0
   - google-chrome-stable
+  - snapd
   # Development tools
   - build-essential
   - cmake
@@ -330,6 +331,11 @@ custom_commands_elevated:
     description: "Run 1Password post-install script"
   - command: "rm -rf 1password-latest.tar.gz 1password-*"
     description: "Clean up 1Password installation files"
+  # Connect Azure Storage Explorer to password manager service
+  # See:
+  # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
+  - command: "snap connect storage-explorer:password-manager-service :password-manager-service"
+    description: "Connect Azure Storage Explorer to password manager service"
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
