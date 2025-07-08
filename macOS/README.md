@@ -9,6 +9,8 @@ development environment.
 - 🍺 **Homebrew Package Management**: Installs Homebrew taps, casks, and formulae
 - 🔧 **PowerShell Module Installation**: Sets up PowerShell modules for development
 - 📦 **Python Package Management**: Installs pipx modules
+- 🧩 **Node.js Package Management**: Installs npm packages globally
+- ⚙️ **.NET Global Tools**: Installs .NET global tools (when .NET SDK is available)
 - 💻 **VS Code Extensions**: Configures VS Code with essential development extensions
 - 🔄 **Git Setup**: Configures Git with user information and LFS support
 - ⚙️ **macOS System Preferences**: Applies recommended macOS system preferences
@@ -102,6 +104,7 @@ Edit `vars.yaml` to customize which packages get installed:
 - `powershell_modules`: PowerShell modules to install
 - `pipx_modules`: Python packages to install via pipx
 - `npm_global_packages`: Node.js packages to install globally via npm
+- `dotnet_tools`: .NET global tools to install (requires .NET SDK)
 - `vscode_extensions`: VS Code extensions to install
 
 ### macOS System Preferences
@@ -149,6 +152,7 @@ The default setup includes a curated selection of popular development tools and 
 - AWS CLI, Azure CLI, Terraform, Packer
 - PowerShell
 - Global npm packages (AWS CDK, npmrc)
+- .NET global tools (Amazon Lambda Tools)
 
 ### Applications
 
@@ -173,6 +177,7 @@ The playbook uses tags to allow selective execution of tasks:
 - `powershell`: PowerShell module installation
 - `pipx`: Python package installation via pipx
 - `npm`: Node.js package installation via npm
+- `dotnet`: .NET global tools installation
 - `vscode`: VS Code extension installation
 - `git`: Git configuration tasks
 - `macos`: macOS system preferences

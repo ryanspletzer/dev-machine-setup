@@ -11,6 +11,8 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 - [PowerShell](https://github.com/PowerShell/PowerShell) modules (via PSResourceGet)
 - Windows PowerShell modules (via PowerShellGet)
 - [pipx](https://pypa.github.io/pipx/) packages (Python tools)
+- [npm](https://www.npmjs.com/) global packages (Node.js tools)
+- [.NET Global Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) (when .NET SDK is available)
 - [Visual Studio Code](https://code.visualstudio.com/) extensions
 - Git configuration
 - System preferences and Windows features
@@ -58,6 +60,33 @@ Windows user information (as long as it is not empty -- if it is the script will
 # Provide your name for git user.name config if you know your proper full name isn't set for your local windows user
 .\setup.ps1 -e your.email@example.com -n 'Your Name'
 ```
+
+## Notable Default Packages
+
+The default setup includes a curated selection of popular development tools and applications:
+
+### Developer Tools
+
+- Docker
+- Git and Git LFS
+- Visual Studio Code
+- .NET SDK and .NET Framework
+- Python, Node.js, Go, Rust
+- AWS CLI, Azure CLI, Terraform, Packer, Vault
+- PowerShell 7+
+- Global npm packages (AWS CDK, npmrc)
+- .NET global tools (Amazon Lambda Tools)
+
+### Applications
+
+- 1Password
+- Microsoft Office 365 Business
+- Slack
+- Zoom
+- SQL Server Management Studio
+- Microsoft Azure Storage Explorer
+
+See `vars.yaml` for the complete list of installed packages.
 
 ## Configuration
 
@@ -131,6 +160,19 @@ npm_global_packages:
   - npmrc
   # etc.
 ```
+
+### .NET Global Tools
+
+.NET global tools to install (requires .NET SDK):
+
+```yaml
+dotnet_tools:
+  - Amazon.Lambda.Tools
+  # etc.
+```
+
+> **Note**: .NET global tools are only installed if the .NET SDK is available on the system. The setup script will
+> automatically detect if `dotnet` command is available and skip this section if not found.
 
 ### Visual Studio Code Extensions
 

@@ -124,6 +124,11 @@ npm_global_packages:
   - npmrc
   - '@vue.cli'
 
+# .NET Global Tools
+dotnet_tools:
+  - Amazon.Lambda.Tools
+  # Add more .NET tools as needed
+
 # Visual Studio Code extensions
 # You can list your Visual Studio Code extensions with the command:
 # code --list-extensions
