@@ -678,7 +678,7 @@ if (-not $dotnetCommand) {
 
     foreach ($tool in $dotnetTools) {
         Write-Progress -Activity $activity -Status (
-            & $StatusBlock
+            & $statusBlock
         ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for .NET global tool $tool..."
 
