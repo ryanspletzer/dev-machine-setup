@@ -118,8 +118,6 @@ debian_packages:
   # Docker Desktop is AMD 64 only, uncomment and modify for your architecture if needed
   # - name: docker-desktop
   #   url: "https://desktop.docker.com/linux/main/{{ deb_architecture }}/docker-desktop-{{ deb_architecture }}.deb"
-  - name: git-credential-manager
-    url: https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest
   - name: google-chrome
     url: "https://dl.google.com/linux/direct/google-chrome-stable_current_{{ deb_architecture }}.deb"
 
