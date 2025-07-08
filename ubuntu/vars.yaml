@@ -62,6 +62,7 @@ ppa_apt_repositories:
 apt_packages:
   - dotnet-sdk-9.0
   - google-chrome-stable
+  - microsoft-edge-stable
   - snapd
   # Development tools
   - build-essential
