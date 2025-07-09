@@ -60,12 +60,12 @@ external_apt_repositories:
 
 # External package repositories
 ppa_apt_repositories:
-  # Add more PPA APT repositories as needed
-  # Git PPA for latest Git version
-  - ppa:git-core/ppa
   # For dotnet-sdk-9.0 for Ubuntu 24.04
   # Not required on Ubuntu 24.10 and later
   - ppa:dotnet/backports
+  # Add more PPA APT repositories as needed
+  # Git PPA for latest Git version
+  - ppa:git-core/ppa
 
 # APT packages
 apt_packages:
