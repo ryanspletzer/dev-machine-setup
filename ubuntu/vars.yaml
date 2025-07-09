@@ -187,6 +187,15 @@ dotnet_tools:
   # This is the preferred way to install Git Credential Manager on Linux
   # since it can be updated via the dotnet cli.
   - git-credential-manager
+  # This is the preferred way to install PowerShell on Linux for ARM64
+  # since it can be updated via the dotnet cli.
+  # Other chip architectures like x86/x64 can use the APT repository and Snap.
+  # 32-bit ARM does not work on APT, but is in theory available via Snap.
+  # dotnet tools is the only reliable way to install PowerShell
+  # which works across all architectures, at the time of this writing.
+  # Add dotnet tools to your PATH,
+  # this will allow you to run `pwsh` from the terminal.
+  - powershell
   # Add more .NET tools as needed
 
 # VS Code extensions (same as macOS for consistency)
