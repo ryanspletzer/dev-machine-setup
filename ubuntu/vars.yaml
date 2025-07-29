@@ -57,6 +57,14 @@ external_apt_repositories:
     suites: buster
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: spotify
+    signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
+    uris: http://repository.spotify.com
+    suites: stable
+    components: non-free
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
 
 # External package repositories
 ppa_apt_repositories:
@@ -111,6 +119,8 @@ apt_packages:
   - microsoft-edge-stable
   - ngrok
   - snapd
+  # amd64 only, arm64 not supported
+  - spotify-client
 
 # Snap packages
 snap_packages:
@@ -124,7 +134,6 @@ snap_packages:
     classic: true
   - name: azure-cli
     classic: true
-  - name: spotify
   - name: slack
     classic: true
   # Azure Storage Explorer
