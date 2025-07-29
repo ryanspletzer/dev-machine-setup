@@ -79,6 +79,14 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: virtualbox
+    signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+    uris: https://download.virtualbox.org/virtualbox/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: contrib
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
 
 # External package repositories
 ppa_apt_repositories:
@@ -147,6 +155,9 @@ apt_packages:
   # amd64 only, arm64 not supported
   - steam-launcher
   - tailscale
+  # Oracle VirtualBox
+  # amd64 only, arm64 not supported
+  - virtualbox-7.1
 
 # Snap packages
 snap_packages:
