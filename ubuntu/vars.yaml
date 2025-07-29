@@ -132,6 +132,15 @@ apt_packages:
   - google-chrome-stable
   - microsoft-edge-stable
   - ngrok
+  # QEMU virtualization packages
+  - qemu-system
+  - qemu-user-static
+  - qemu-utils
+  - qemu-kvm
+  - libvirt-daemon-system
+  - libvirt-clients
+  - bridge-utils
+  - virt-manager
   - snapd
   # amd64 only, arm64 not supported
   - spotify-client
