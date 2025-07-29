@@ -109,6 +109,8 @@ ppa_apt_repositories:
   # Add more PPA APT repositories as needed
   # Git PPA for latest Git version
   - ppa:git-core/ppa
+  # FEX emulator for running x86/x64 applications on ARM64
+  - ppa:fex-emu/fex
 
 # APT packages
 apt_packages:
@@ -175,6 +177,9 @@ apt_packages:
   - code
   # Wine64 - Windows compatibility layer
   - winehq-stable
+  # FEX emulator for running x86/x64 applications on ARM64
+  - fex-emu
+  - fex-emu-wine
 
 # Snap packages
 snap_packages:

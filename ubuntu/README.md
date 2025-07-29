@@ -18,6 +18,7 @@ development environment.
 - 🔷 **.NET Setup**: Installs .NET SDK
 - 💻 **VS Code Extensions**: Configures VS Code with essential development extensions
 - 🔄 **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
+- 🏗️ **FEX Emulator**: Installs FEX for running x86/x64 applications on ARM64 systems
 - 🚀 **Custom Script Support**: Allows for additional customization via custom scripts
 
 ## Prerequisites
