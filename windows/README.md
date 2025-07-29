@@ -88,6 +88,8 @@ The default setup includes a curated selection of popular development tools and 
 
 See `vars.yaml` for the complete list of installed packages.
 
+> **Note**: For cross-platform compatibility, Wine64 is available in the Ubuntu setup to run Windows applications on Linux.
+
 ## Configuration
 
 The setup is driven by the `vars.yaml` file, which contains configurable options for the following items below.

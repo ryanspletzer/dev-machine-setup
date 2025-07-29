@@ -141,6 +141,7 @@ The default setup includes a curated selection of popular development tools and 
 - Python, Node.js, Ruby, Go, Rust
 - AWS CLI, Azure CLI
 - PowerShell
+- Wine64 (Windows compatibility layer)
 
 ### Applications
 
