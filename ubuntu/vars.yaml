@@ -73,6 +73,12 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  - name: tailscale
+    signed_by: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
+    uris: https://pkgs.tailscale.com/stable/ubuntu/noble
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
 
 # External package repositories
 ppa_apt_repositories:
@@ -131,6 +137,7 @@ apt_packages:
   - spotify-client
   # amd64 only, arm64 not supported
   - steam-launcher
+  - tailscale
 
 # Snap packages
 snap_packages:
