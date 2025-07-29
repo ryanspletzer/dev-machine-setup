@@ -65,6 +65,14 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  - name: steam
+    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
+    uris: https://repo.steampowered.com/steam
+    suites: stable
+    components: steam
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
 
 # External package repositories
 ppa_apt_repositories:
@@ -121,6 +129,8 @@ apt_packages:
   - snapd
   # amd64 only, arm64 not supported
   - spotify-client
+  # amd64 only, arm64 not supported
+  - steam-launcher
 
 # Snap packages
 snap_packages:
