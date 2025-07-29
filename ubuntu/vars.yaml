@@ -108,6 +108,12 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  - name: zulu
+    signed_by: https://www.azul.com/files/0xB1998361219BD9C9.txt
+    uris: https://repos.azul.com/zulu/deb
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
 
 # External package repositories
 ppa_apt_repositories:
@@ -191,6 +197,8 @@ apt_packages:
   # Zoom Workplace for Linux
   # amd64 only, arm64 not supported
   - zoom
+  # Zulu OpenJDK
+  - zulu21-jdk
 
 # Snap packages
 snap_packages:
