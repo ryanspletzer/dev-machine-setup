@@ -33,6 +33,13 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  # Visual Studio Code repository
+  - name: vscode
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/code
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: docker
     signed_by: https://download.docker.com/linux/ubuntu/gpg
     uris: https://download.docker.com/linux/ubuntu
@@ -158,14 +165,14 @@ apt_packages:
   # Oracle VirtualBox
   # amd64 only, arm64 not supported
   - virtualbox-7.1
+  # Visual Studio Code
+  - code
 
 # Snap packages
 snap_packages:
   # Add more snap packages as needed
   # This is an alternative to APT for 1password, but it doesn't work on ARM64
   - name: 1password
-    classic: true
-  - name: code
     classic: true
   - name: drawio
     classic: true
