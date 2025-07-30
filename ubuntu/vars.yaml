@@ -447,8 +447,14 @@ custom_commands_elevated:
   # Connect Azure Storage Explorer to password manager service
   # See:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
+  # Install Bicep CLI via Azure CLI
+  - command: az bicep install
+    description: Install Bicep CLI via Azure CLI
   - command: "snap connect storage-explorer:password-manager-service :password-manager-service"
     description: "Connect Azure Storage Explorer to password manager service"
+  - # keep the Azure CLI itself fresh
+  - command: az config set auto-upgrade.enable=yes
+    description: "Enable automatic upgrades for Azure CLI"
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
