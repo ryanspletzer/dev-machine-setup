@@ -172,6 +172,7 @@ apt_packages:
   - direnv
   # Add more packages as needed
   - azure-cli
+  - azure-functions-core-tools-4
   - dotnet-sdk-9.0
   - fonts-cascadia-code
   - google-chrome-stable
