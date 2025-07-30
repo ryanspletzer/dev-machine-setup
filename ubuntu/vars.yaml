@@ -33,6 +33,13 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  # Azure CLI repository
+  - name: azure-cli
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/azure-cli
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   # Visual Studio Code repository
   - name: vscode
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
@@ -164,6 +171,7 @@ apt_packages:
   - maven
   - direnv
   # Add more packages as needed
+  - azure-cli
   - dotnet-sdk-9.0
   - fonts-cascadia-code
   - google-chrome-stable
@@ -207,8 +215,6 @@ snap_packages:
   - name: 1password
     classic: true
   - name: aws-cli
-    classic: true
-  - name: azure-cli
     classic: true
   - name: drawio
     classic: true
@@ -258,7 +264,6 @@ powershell_modules:
 # pipx modules
 pipx_modules:
   - taskcat
-  - azure-cli
   # Add more pipx modules as needed
 
 # npm global packages
