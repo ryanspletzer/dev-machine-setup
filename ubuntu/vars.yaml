@@ -263,6 +263,7 @@ powershell_modules:
 
 # pipx modules
 pipx_modules:
+  - aws-sam-cli
   - taskcat
   # Add more pipx modules as needed
 
