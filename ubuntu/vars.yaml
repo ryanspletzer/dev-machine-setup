@@ -206,9 +206,11 @@ snap_packages:
   # This is an alternative to APT for 1password, but it doesn't work on ARM64
   - name: 1password
     classic: true
-  - name: drawio
+  - name: aws-cli
     classic: true
   - name: azure-cli
+    classic: true
+  - name: drawio
     classic: true
   - name: slack
     classic: true
@@ -257,7 +259,6 @@ powershell_modules:
 pipx_modules:
   - taskcat
   - azure-cli
-  - awscli
   # Add more pipx modules as needed
 
 # npm global packages
