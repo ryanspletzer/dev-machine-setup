@@ -40,13 +40,6 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
-  # Visual Studio Code repository
-  - name: vscode
-    signed_by: https://packages.microsoft.com/keys/microsoft.asc
-    uris: https://packages.microsoft.com/repos/code
-    suites: stable
-    components: main
-    architectures: "{{ deb_architecture }}"
   - name: docker
     signed_by: https://download.docker.com/linux/ubuntu/gpg
     uris: https://download.docker.com/linux/ubuntu
@@ -91,6 +84,13 @@ external_apt_repositories:
     signed_by: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
     uris: https://pkgs.tailscale.com/stable/ubuntu/noble
     suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Visual Studio Code repository
+  - name: vscode
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/code
+    suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
   - name: virtualbox
@@ -173,11 +173,13 @@ apt_packages:
   # Add more packages as needed
   - azure-cli
   - azure-functions-core-tools-4
+  - chruby
   - dotnet-sdk-9.0
   - fonts-cascadia-code
   - google-chrome-stable
   - microsoft-edge-stable
   - ngrok
+  - ruby-install
   # QEMU virtualization packages
   - qemu-system
   - qemu-user-static
