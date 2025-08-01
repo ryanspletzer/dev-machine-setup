@@ -132,6 +132,8 @@ ppa_apt_repositories:
   - ppa:git-core/ppa
   # FEX emulator for running x86/x64 applications on ARM64
   - ppa:fex-emu/fex
+  # Fish shell release PPA for latest stable version
+  - ppa:fish-shell/release-4
 
 # APT packages
 apt_packages:
@@ -175,8 +177,11 @@ apt_packages:
   - azure-functions-core-tools-4
   - chruby
   - dotnet-sdk-9.0
+  - ffmpeg
   - fonts-cascadia-code
   - google-chrome-stable
+  # Extra codecs for multimedia support
+  - libavcodec-extra
   - microsoft-edge-stable
   - ngrok
   - ruby-install
