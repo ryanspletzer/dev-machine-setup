@@ -179,6 +179,7 @@ apt_packages:
   - dotnet-sdk-9.0
   - ffmpeg
   - fonts-cascadia-code
+  - fzf
   - google-chrome-stable
   # Extra codecs for multimedia support
   - libavcodec-extra
