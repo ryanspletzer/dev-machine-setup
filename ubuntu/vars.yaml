@@ -296,14 +296,6 @@ snap_packages:
     classic: true
   # Add more snap packages as needed
 
-# Debian packages
-debian_packages:
-  # Docker Desktop is AMD 64 only, uncomment and modify for your architecture if needed
-  # - name: docker-desktop
-  #   url: "https://desktop.docker.com/linux/main/{{ deb_architecture }}/docker-desktop-{{ deb_architecture }}.deb"
-  - name: google-chrome
-    url: "https://dl.google.com/linux/direct/google-chrome-stable_current_{{ deb_architecture }}.deb"
-
 # Docker configuration
 docker_users:
   - "{{ ansible_user_id }}"
@@ -486,22 +478,21 @@ custom_commands_user:
     description: Enable automatic remote setup for push
   - command: git config --global user.signingKey 787AEF0BAE232359
     description: Set GPG signing key
-
-# These commands will be executed with elevated privileges (sudo)
-custom_commands_elevated:
-  # Add commands to execute with elevated privileges
-  # Connect Azure Storage Explorer to password manager service
-  # See:
-  # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
-  # Install Bicep CLI via Azure CLI
+  # Azure CLI configuration (run as user to modify user-specific config)
   - command: az bicep install
     description: Install Bicep CLI via Azure CLI
-  - command: snap connect storage-explorer:password-manager-service :password-manager-service
-    description: Connect Azure Storage Explorer to password manager service
-  - # keep the Azure CLI itself fresh
   - command: az config set auto-upgrade.enable=yes
     description: Enable automatic upgrades for Azure CLI
 
+# These commands will be executed with elevated privileges (sudo)
+custom_commands_elevated:
+  # Connect Azure Storage Explorer to password manager service
+  # See:
+  # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
+  - command: snap connect storage-explorer:password-manager-service :password-manager-service
+    description: Connect Azure Storage Explorer to password manager service
+
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
+custom_script: ./examples/custom_script.sh
 custom_script: ./examples/custom_script.sh
