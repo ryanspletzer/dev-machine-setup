@@ -1,0 +1,506 @@
+# vars.yaml
+# Externalized variables for Ansible setup
+
+# System configuration
+# Enable WSL-specific configurations if running in WSL
+is_wsl: false  # Set to true if running in WSL
+
+# APT prerequisite packages (installed first)
+# These are essential packages needed for basic system operations and some specific applications
+apt_packages_prereqs:
+  # Basic networking and certificate tools
+  - name: apt-transport-https
+  - name: ca-certificates
+  - name: curl
+  - name: wget
+  # PPA support
+  - name: software-properties-common
+  # For Docker Desktop
+  - name: gnome-terminal
+  # For Cursor
+  - name: libfuse2
+  # For Wine
+  - name: libfaudio0
+
+# External package repositories using deb822 format
+# This uses the newer ansible.builtin.deb822_repository module
+external_apt_repositories:
+  # 1password only works on amd64 through apt, so we install it via tarball for ARM64 in custom_commands_elevated
+  - name: 1password
+    signed_by: https://downloads.1password.com/linux/keys/1password.asc
+    uris: https://downloads.1password.com/linux/debian
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  # Azure CLI repository
+  - name: azure-cli
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/azure-cli
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: docker
+    signed_by: https://download.docker.com/linux/ubuntu/gpg
+    uris: https://download.docker.com/linux/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    architectures: "{{ deb_architecture }}"
+  # .NET SDK 9.0 repository (replaces the dotnet/backports PPA)
+  - name: dotnet-backports
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xA4B469963BF863CC"
+    uris: http://ppa.launchpad.net/dotnet/backports/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # FEX emulator for ARM64
+  - name: fex-emu
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xEDB98BFE8A2310DC9C4A376E76DBFEBEA206F5AC"
+    uris: http://ppa.launchpad.net/fex-emu/fex/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Fish shell latest stable releases
+  - name: fish-shell
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x59FDA1CE1B84B3FAD89366C027557F056DC33CA5
+    uris: http://ppa.launchpad.net/fish-shell/release-4/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Git latest stable releases
+  - name: git-core
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE1DD270288B4E6030699E45FA1715D88E1DF1F24
+    uris: http://ppa.launchpad.net/git-core/ppa/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: github-cli
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: google-chrome
+    signed_by: https://dl.google.com/linux/linux_signing_key.pub
+    uris: https://dl.google.com/linux/chrome/deb
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: hashicorp
+    signed_by: https://apt.releases.hashicorp.com/gpg
+    uris: https://apt.releases.hashicorp.com
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: microsoft
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: "https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod"
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: ngrok
+    signed_by: https://ngrok-agent.s3.amazonaws.com/ngrok.asc
+    uris: https://ngrok-agent.s3.amazonaws.com
+    suites: buster
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # NodeSource repository for Node.js LTS
+  - name: nodesource
+    signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    uris: https://deb.nodesource.com/node_22.x
+    suites: nodistro
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Ookla Speedtest CLI repository
+  - name: speedtest
+    signed_by: https://packagecloud.io/ookla/speedtest-cli/gpgkey
+    uris: https://packagecloud.io/ookla/speedtest-cli/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: spotify
+    signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
+    uris: http://repository.spotify.com
+    suites: stable
+    components: non-free
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: steam
+    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
+    uris: https://repo.steampowered.com/steam
+    suites: stable
+    components: steam
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: tailscale
+    signed_by: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+    uris: https://pkgs.tailscale.com/stable/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Visual Studio Code repository
+  - name: vscode
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/code
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: virtualbox
+    signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+    uris: https://download.virtualbox.org/virtualbox/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: contrib
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: zoom
+    signed_by: https://zoom.us/linux/download/pubkey
+    uris: https://zoom.us/client/latest
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: zulu
+    signed_by: https://www.azul.com/files/0xB1998361219BD9C9.txt
+    uris: https://repos.azul.com/zulu/deb
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+
+# APT packages
+apt_packages:
+  # Development tools
+  - name: build-essential
+  - name: cmake
+  - name: make
+  - name: pkg-config
+  - name: autoconf
+  - name: automake
+  - name: libtool
+  - name: unzip
+  # Python dependencies
+  - name: libssl-dev
+  - name: zlib1g-dev
+  - name: libbz2-dev
+  - name: libreadline-dev
+  - name: libsqlite3-dev
+  - name: llvm
+  - name: libncurses5-dev
+  - name: libncursesw5-dev
+  - name: tk-dev
+  - name: libffi-dev
+  - name: liblzma-dev
+  - name: python3-openssl
+  - name: python3-pip
+  - name: python3-venv
+  # Git and version control
+  - name: git
+  - name: git-lfs
+  # Shell tools
+  - name: zsh
+  - name: fish
+  - name: bash-completion
+  # Other tools
+  - name: jq
+  - name: maven
+  - name: direnv
+  # 1password amd64 only, arm64 not supported
+  - name: 1password
+    supported_architectures:
+      - amd64
+  - name: azure-cli
+  - name: docker-ce
+  - name: docker-ce-cli
+  - name: containerd.io
+  - name: docker-buildx-plugin
+  - name: docker-compose-plugin
+  - name: dotnet-sdk-9.0
+  - name: ffmpeg
+  - name: fonts-cascadia-code
+  - name: fzf
+  - name: gh
+  - name: golang-go
+  - name: google-chrome-stable
+    supported_architectures:
+      - amd64
+  # Extra codecs for multimedia support
+  - name: libavcodec-extra
+  - name: microsoft-edge-stable
+    supported_architectures:
+      - amd64
+  - name: ngrok
+  # Node.js from NodeSource repository
+  - name: nodejs
+  - name: packer
+  - name: pipx
+  - name: ruby-full
+  - name: rustup
+  # QEMU virtualization packages
+  - name: qemu-system
+  - name: qemu-user-static
+  - name: qemu-utils
+  - name: qemu-kvm
+  - name: libvirt-daemon-system
+  - name: libvirt-clients
+  - name: bridge-utils
+  - name: virt-manager
+  - name: snapd
+  # Ookla Speedtest CLI - correct package name
+  - name: speedtest-cli
+  # amd64 only, arm64 not supported
+  - name: spotify-client
+    supported_architectures:
+      - amd64
+  # amd64 only, arm64 not supported
+  - name: steam-launcher
+    supported_architectures:
+      - amd64
+  - name: tailscale
+  - name: terraform
+  - name: vault
+  # Oracle VirtualBox
+  # amd64 only, arm64 not supported
+  - name: virtualbox-7.1
+    supported_architectures:
+      - amd64
+  # Visual Studio Code
+  - name: code
+  # Wine64 - Windows compatibility layer
+  - name: wine
+  # FEX emulator for running x86/x64 applications on ARM64
+  - name: fex-emu-armv8.4
+  - name: fex-emu-wine
+  # wget
+  - name: wget
+  # Zoom Workplace for Linux
+  # amd64 only, arm64 not supported
+  - name: zoom
+    supported_architectures:
+      - amd64
+  # Zulu OpenJDK
+  - name: zulu21-jdk
+  - name: zsh-autosuggestions
+  - name: zsh-syntax-highlighting
+
+# Snap packages
+snap_packages:
+  # AMD64 only, ARM64 not supported
+  - name: drawio
+    classic: true
+    supported_architectures:
+      - amd64
+  # AMD64 only, ARM64 not supported
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
+  # AMD64 only, ARM64 not supported
+  # Azure Storage Explorer
+  - name: storage-explorer
+    classic: true
+    supported_architectures:
+      - amd64
+
+# PowerShell modules
+powershell_modules:
+  - AWS.Tools.Common
+  - Az.Accounts
+  - Microsoft.Graph.Authentication
+  - MSAL.PS
+  - Pester
+  - platyPS
+  - poetry
+  - posh-git
+  - powershell-yaml
+  - PowerShellBuild
+  - psake
+  - PSGraphQL
+  - PSJsonWebToken
+  - PSReadLine
+  - PSScriptAnalyzer
+  - PSTcpIp
+  - Terminal-Icons
+
+# pipx modules
+pipx_modules:
+  - aws-sam-cli
+  - cfn-lint
+  - ruff
+  - taskcat
+  - uv
+
+# npm global packages
+npm_global_packages:
+  - aws-cdk
+  - azure-functions-core-tools@4
+  - npmrc
+  - '@vue/cli'
+
+# .NET Global Tools
+dotnet_tools:
+  - Amazon.Lambda.Tools
+  # This is the preferred way to install Git Credential Manager on Linux
+  # for all architectures since it can be updated via the dotnet cli.
+  - git-credential-manager
+  # This is the preferred way to install PowerShell on Linux for ARM64
+  # since it can be updated via the dotnet cli.
+  # Other chip architectures like x86/x64 can use the APT repository and Snap.
+  # 32-bit ARM does not work on APT, but is in theory available via Snap.
+  # dotnet tools is the only reliable way to install PowerShell
+  # which works across all architectures, at the time of this writing.
+  # Add dotnet tools to your PATH,
+  # this will allow you to run `pwsh` from the terminal.
+  - powershell
+
+# VS Code extensions (same as macOS for consistency)
+# You can list your VS Code extensions with the command:
+# code --list-extensions
+vscode_extensions:
+  - 4ops.packer
+  - alefragnani.project-manager
+  - arjun.swagger-viewer
+  - aws-scripting-guy.cform
+  - charliermarsh.ruff
+  - codezombiech.gitignore
+  - davidanson.vscode-markdownlint
+  - dbaeumer.vscode-eslint
+  - docker.docker
+  - donjayamanne.git-extension-pack
+  - donjayamanne.githistory
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+  - fernandoescolar.vscode-solution-explorer
+  - github.copilot
+  - github.copilot-chat
+  - github.vscode-github-actions
+  - github.vscode-pull-request-github
+  - golang.go
+  - grapecity.gc-excelviewer
+  - hbenl.vscode-test-explorer
+  - josin.kusto-syntax-highlighting
+  - k--kato.docomment
+  - medo64.render-crlf
+  - mhutchie.git-graph
+  - mimarec.swagger-doc-viewer
+  - mohsen1.prettify-json
+  - ms-azuretools.vscode-azurefunctions
+  - ms-azuretools.vscode-azureresourcegroups
+  - ms-azuretools.vscode-bicep
+  - ms-azuretools.vscode-containers
+  - ms-azuretools.vscode-docker
+  - ms-dotnettools.csdevkit
+  - ms-dotnettools.csharp
+  - ms-dotnettools.vscode-dotnet-runtime
+  - ms-kubernetes-tools.vscode-kubernetes-tools
+  - ms-mssql.data-workspace-vscode
+  - ms-mssql.mssql
+  - ms-mssql.sql-bindings-vscode
+  - ms-mssql.sql-database-projects-vscode
+  - ms-python.debugpy
+  - ms-python.isort
+  - ms-python.python
+  - ms-python.vscode-pylance
+  - ms-toolsai.jupyter
+  - ms-toolsai.jupyter-keymap
+  - ms-toolsai.jupyter-renderers
+  - ms-toolsai.vscode-jupyter-cell-tags
+  - ms-toolsai.vscode-jupyter-slideshow
+  - ms-vscode-remote.remote-containers
+  - ms-vscode-remote.remote-ssh
+  - ms-vscode-remote.remote-ssh-edit
+  - ms-vscode-remote.remote-wsl
+  - ms-vscode-remote.vscode-remote-extensionpack
+  - ms-vscode.cmake-tools
+  - ms-vscode.cpptools
+  - ms-vscode.cpptools-extension-pack
+  - ms-vscode.cpptools-themes
+  - ms-vscode.hexeditor
+  - ms-vscode.makefile-tools
+  - ms-vscode.powershell
+  - ms-vscode.remote-explorer
+  - ms-vscode.remote-server
+  - ms-vscode.test-adapter-converter
+  - ms-vsliveshare.vsliveshare
+  - msazurermtools.azurerm-vscode-tools
+  - octref.vetur
+  - oderwat.indent-rainbow
+  - parallelsdesktop.parallels-desktop
+  - pspester.pester-test
+  - rangav.vscode-thunder-client
+  - redhat.java
+  - redhat.vscode-commons
+  - redhat.vscode-yaml
+  - samirat.csharp-test-adapter
+  - sibiraj-s.vscode-scss-formatter
+  - streetsidesoftware.code-spell-checker
+  - takumii.markdowntable
+  - teamsdevapp.ms-teams-vscode-extension
+  - teamsdevapp.vscode-adaptive-cards
+  - twxs.cmake
+  - tylerleonhardt.vscode-inline-values-powershell
+  - tyriar.sort-lines
+  - usernamehw.errorlens
+  - visualstudioexptteam.intellicode-api-usage-examples
+  - visualstudioexptteam.vscodeintellicode
+  - vscjava.vscode-gradle
+  - vscjava.vscode-java-debug
+
+# Git configuration
+git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
+git_user_name: "{{ ansible_user_id }}"  # Defaults to the current user's username
+
+# Custom commands and scripts (optional)
+# These commands will be executed as the current user (non-elevated)
+custom_commands_user:
+  # Add commands to execute as the current user
+  - command: pipx ensurepath
+    description: Ensure pipx is in PATH
+  # Update PowerShell help
+  - command: ~/.dotnet/tools/pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+    description: Update PowerShell help documentation
+  # Install Git LFS
+  - command: git lfs install
+    description: Install Git LFS
+  # Set git configs
+  - command: git config --global commit.gpgsign true
+    description: Enable GPG signing for commits
+  - command: git config --global init.defaultBranch main
+    description: Set default branch to main
+  - command: git config --global gpg.program /usr/bin/gpg
+    description: Set GPG program path for Ubuntu
+  - command: git config --global push.default current
+    description: Set push default to current branch
+  - command: git config --global push.autoSetupRemote true
+    description: Enable automatic remote setup for push
+  - command: git config --global user.signingKey 787AEF0BAE232359
+    description: Set GPG signing key
+  # Azure CLI configuration
+  - command: az bicep install
+    description: Install Bicep CLI via Azure CLI
+  - command: az config set auto-upgrade.enable=yes
+    description: Enable automatic upgrades for Azure CLI
+
+# These commands will be executed with elevated privileges (sudo)
+custom_commands_elevated:
+  # Add commands to execute with elevated privileges
+  # Add Docker User
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
+  # Connect Azure Storage Explorer to password manager service
+  # See:
+  # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
+  # - command: snap connect storage-explorer:password-manager-service :password-manager-service
+  #   description: Connect Azure Storage Explorer to password manager service
+  # Enable and start Tailscale service
+  # - command: systemctl enable --now tailscaled
+  #   description: Enable and start Tailscale service
+
+# Custom script path (optional)
+# Provide the path to a custom script that will be executed at the end of the setup
+custom_script: ./examples/custom_script.sh

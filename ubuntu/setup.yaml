@@ -1,0 +1,407 @@
+---
+# Ansible playbook for Ubuntu development machine setup
+# Manages APT packages, Snap packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
+
+- name: Setup development environment on Ubuntu
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  # Define the become password at the play level so it's available to all tasks
+  vars:
+    ansible_become_pass: "{{ lookup('env', 'ANSIBLE_SUDO_PASS') }}"
+    ansible_connection: local
+
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    # System setup
+    - name: Check WSL version (0=not WSL, 1=WSL1, 2=WSL2)
+      ansible.builtin.shell: |
+        if ! grep -q -i microsoft /proc/version && ! uname -r | grep -q microsoft; then
+          exit 0
+        fi
+
+        if grep -q -i "microsoft.*wsl2" /proc/version || uname -r | grep -q "microsoft.*wsl2"; then
+          exit 2
+        elif [ -f /proc/sys/kernel/osrelease ] && grep -q "microsoft" /proc/sys/kernel/osrelease; then
+          exit 1
+        elif grep -q -i microsoft /proc/version || uname -r | grep -q microsoft; then
+          exit 1
+        else
+          exit 0
+        fi
+      register: wsl_check
+      ignore_errors: yes
+      changed_when: false
+      tags:
+        - system
+        - wsl
+
+    # Set WSL facts based on the WSL check result
+    - name: Set WSL facts
+      ansible.builtin.set_fact:
+        is_wsl: "{{ wsl_check.rc != 0 }}"
+        wsl_version: "{{ wsl_check.rc }}"
+        is_wsl1: "{{ wsl_check.rc == 1 }}"
+        is_wsl2: "{{ wsl_check.rc == 2 }}"
+      tags:
+        - system
+        - wsl
+
+    # Get Debian architecture dynamically using dpkg
+    - name: Get Debian architecture from dpkg
+      ansible.builtin.command:
+        cmd: dpkg --print-architecture
+      register: dpkg_architecture
+      changed_when: false
+      tags:
+        - system
+        - architecture
+
+    # Set the deb_architecture fact based on dpkg output
+    - name: Set Debian architecture fact
+      ansible.builtin.set_fact:
+        deb_architecture: "{{ dpkg_architecture.stdout }}"
+      tags:
+        - system
+        - architecture
+
+    # Display detected architecture
+    - name: Display detected architecture
+      ansible.builtin.debug:
+        msg:
+          - "Detected system architecture: {{ ansible_architecture }}"
+          - "Using Debian architecture: {{ deb_architecture }}"
+      tags:
+        - system
+        - architecture
+
+    # apt update
+    - name: Update APT cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      become: yes
+      tags:
+        - apt
+        - update
+
+    # apt upgrade
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: yes
+      become: yes
+      tags:
+        - apt
+        - upgrade
+
+    # Install prerequisite APT packages
+    - name: Install prerequisite APT packages
+      ansible.builtin.apt:
+        name: "{{ apt_packages_prereqs | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages_prereqs | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
+        state: present
+      become: yes
+      tags:
+        - apt
+        - prereqs
+        - packages
+
+    # Add external APT repositories using deb822 format
+    - name: Add external APT repositories
+      ansible.builtin.deb822_repository:
+        name: "{{ item.name }}"
+        signed_by: "{{ item.signed_by }}"
+        uris: "{{ item.uris }}"
+        suites: "{{ item.suites }}"
+        components: "{{ item.components }}"
+        architectures: "{{ item.architectures }}"
+        state: present
+      loop: "{{ external_apt_repositories }}"
+      loop_control:
+        label: "Adding repository: {{ item.name }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      become: yes
+      tags:
+        - apt
+        - repositories
+
+    # Install APT packages
+    - name: Install APT packages
+      ansible.builtin.apt:
+        name: "{{ apt_packages | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
+        state: present
+      become: yes
+      tags:
+        - apt
+        - packages
+
+    # Snap packages (classic)
+    - name: Install Snap packages (classic)
+      ansible.builtin.command:
+        cmd: snap install {{ item.name }} --classic
+      become: yes
+      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | list }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      register: snap_classic_result
+      changed_when: "snap_classic_result.rc == 0 and 'already installed' not in snap_classic_result.stdout"
+      failed_when: false
+      loop_control:
+        label: "Installing classic snap: {{ item.name }}"
+      tags:
+        - snap
+        - packages
+
+    # Snap packages (regular)
+    - name: Install Snap packages (regular)
+      ansible.builtin.command:
+        cmd: snap install {{ item.name }}
+      become: yes
+      loop: "{{ snap_packages | rejectattr('classic', 'defined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      register: snap_regular_result
+      changed_when: "snap_regular_result.rc == 0 and 'already installed' not in snap_regular_result.stdout"
+      failed_when: false
+      loop_control:
+        label: "Installing regular snap: {{ item.name }}"
+      tags:
+        - snap
+        - packages
+
+    # npm configuration and installation
+    - name: Configure npm to use user directory for global packages
+      ansible.builtin.shell: |
+        mkdir -p ~/.local
+        npm config set prefix ~/.local
+      args:
+        creates: ~/.local/lib/node_modules
+      tags:
+        - npm
+        - packages
+
+    # npm global package checks
+    - name: Check if npm packages are already installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        npm list -g {{ item }}
+      register: npm_check_result
+      changed_when: false
+      failed_when: false
+      loop: "{{ npm_global_packages | default([]) }}"
+      loop_control:
+        label: "Checking npm package: {{ item }}"
+      tags:
+        - npm
+        - packages
+
+    # npm global package installs
+    - name: Ensure npm global packages are installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        npm install -g {{ item.0 }}
+      loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
+      when: "item.1.rc != 0"
+      register: npm_install_result
+      changed_when: "npm_install_result.rc == 0"
+      loop_control:
+        label: "Installing npm package: {{ item.0 }}"
+      tags:
+        - npm
+        - packages
+
+    # .NET Install check
+    - name: Check if dotnet is installed
+      ansible.builtin.command:
+        cmd: dotnet --version
+      register: dotnet_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - dotnet
+        - tools
+
+    # .NET global tools install check
+    - name: Check if .NET global tools are already installed
+      ansible.builtin.command:
+        cmd: dotnet tool list -g
+      register: dotnet_tools_list
+      changed_when: false
+      failed_when: false
+      when: dotnet_check.rc == 0
+      tags:
+        - dotnet
+        - tools
+
+    # Install .NET global tools
+    - name: Ensure .NET global tools are installed
+      ansible.builtin.command:
+        cmd: dotnet tool install -g {{ item }}
+      loop: "{{ dotnet_tools | default([]) }}"
+      register: dotnet_tool_install_result
+      changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
+      failed_when: false
+      when:
+        - dotnet_check.rc == 0
+        - item not in dotnet_tools_list.stdout
+      loop_control:
+        label: "Installing .NET tool: {{ item }}"
+      tags:
+        - dotnet
+        - tools
+
+    # Add .NET global tools to PATH
+    - name: Add .NET global tools to PATH
+      ansible.builtin.lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH="$HOME/.dotnet/tools:$PATH"'
+        state: present
+      when: dotnet_check.rc == 0
+      tags:
+        - dotnet
+        - tools
+        - path
+
+    # PowerShell installation check
+    - name: Check if PowerShell is installed
+      ansible.builtin.command:
+        cmd: pwsh --version
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
+      register: pwsh_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - powershell
+        - modules
+
+    # PowerShell modules
+    - name: Install PowerShell modules
+      ansible.builtin.command:
+        cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
+      loop: "{{ powershell_modules }}"
+      register: pwsh_install_result
+      changed_when: "'is already installed' not in pwsh_install_result.stdout"
+      loop_control:
+        label: "Installing PowerShell module: {{ item }}"
+      when: pwsh_check.rc == 0
+      tags:
+        - powershell
+        - modules
+
+    # Install pipx modules
+    - name: Install pipx modules
+      ansible.builtin.shell: |
+        pipx install {{ item }}
+      loop: "{{ pipx_modules }}"
+      register: pipx_install_result
+      changed_when: "'already installed' not in pipx_install_result.stdout"
+      loop_control:
+        label: "Installing pipx module: {{ item }}"
+      tags:
+        - pipx
+        - modules
+
+    # VS Code extension setup
+    - name: Ensure VS Code extensions are installed
+      ansible.builtin.command:
+        cmd: code --install-extension {{ item }}
+      loop: "{{ vscode_extensions }}"
+      register: vscode_ext_result
+      changed_when: "'already installed' not in vscode_ext_result.stdout"
+      loop_control:
+        label: "Installing VS Code extension: {{ item }}"
+      tags:
+        - vscode
+        - extensions
+
+    # Git LFS setup
+    - name: Ensure Git LFS is initialized
+      ansible.builtin.command:
+        cmd: git lfs install --system
+      register: git_lfs_result
+      changed_when: "'Already initialized' not in git_lfs_result.stdout"
+      tags:
+        - git
+        - lfs
+
+    # Git configuration (user.name)
+    - name: Configure Git user.name
+      ansible.builtin.command:
+        cmd: git config --global user.name "{{ git_user_name }}"
+      register: git_name_result
+      changed_when: git_name_result.rc == 0
+      when: git_user_name is defined and git_user_name != ""
+      tags:
+        - git
+        - config
+
+    # Git configuration (user.email)
+    - name: Configure Git user.email
+      ansible.builtin.command:
+        cmd: git config --global user.email "{{ git_user_email }}"
+      register: git_email_result
+      changed_when: git_email_result.rc == 0
+      when: git_user_email is defined and git_user_email != ""
+      tags:
+        - git
+        - config
+
+    # Custom user commands
+    - name: Execute custom user commands
+      ansible.builtin.shell: "{{ item.command }}"
+      loop: "{{ custom_commands_user }}"
+      loop_control:
+        label: "Executing: {{ item.description }}"
+      tags:
+        - custom
+        - user-commands
+
+    # Custom elevated commands
+    - name: Execute custom elevated commands
+      ansible.builtin.shell: "{{ item.command }}"
+      become: yes
+      loop: "{{ custom_commands_elevated }}"
+      loop_control:
+        label: "Executing: {{ item.description }}"
+      tags:
+        - custom
+        - elevated-commands
+
+    # Check if custom script is defined and exists
+    - name: Check if custom script exists
+      ansible.builtin.stat:
+        path: "{{ custom_script }}"
+      register: custom_script_stat
+      when: custom_script is defined and custom_script != ""
+      tags:
+        - custom
+        - script
+
+    # Make custom script executable
+    - name: Make custom script executable
+      ansible.builtin.file:
+        path: "{{ custom_script }}"
+        mode: '0755'
+      when: custom_script is defined and custom_script != "" and custom_script_stat.stat.exists
+      tags:
+        - custom
+        - script
+
+    # Execute custom script
+    - name: Execute custom script
+      ansible.builtin.command:
+        cmd: "{{ custom_script }}"
+      when: custom_script is defined and custom_script != "" and custom_script_stat.stat.exists
+      tags:
+        - custom
+        - script
+
+    # Notify user of completion
+    - name: Setup complete
+      ansible.builtin.debug:
+        msg: "Ubuntu development environment setup complete!"
+      tags:
+        - always
+
