@@ -136,8 +136,8 @@ external_apt_repositories:
     supported_architectures:
       - amd64
   - name: tailscale
-    signed_by: https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg
-    uris: https://pkgs.tailscale.com/stable/ubuntu/noble
+    signed_by: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+    uris: https://pkgs.tailscale.com/stable/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
@@ -497,6 +497,9 @@ custom_commands_elevated:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
   - command: snap connect storage-explorer:password-manager-service :password-manager-service
     description: Connect Azure Storage Explorer to password manager service
+  # Enable and start Tailscale service
+  # - command: systemctl enable --now tailscaled
+  #   description: Enable and start Tailscale service
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
