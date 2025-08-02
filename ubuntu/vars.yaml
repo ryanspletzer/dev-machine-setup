@@ -19,6 +19,8 @@ apt_packages_prereqs:
   - name: gnome-terminal
   # For Cursor
   - name: libfuse2
+  # For WineHQ
+  - name: libfaudio0
 
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module
@@ -276,7 +278,7 @@ apt_packages:
   # Visual Studio Code
   - name: code
   # Wine64 - Windows compatibility layer
-  - name: winehq-stable
+  - name: wine
   # FEX emulator for running x86/x64 applications on ARM64
   - name: fex-emu
   - name: fex-emu-wine
