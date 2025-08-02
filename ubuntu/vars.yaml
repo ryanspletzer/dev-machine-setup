@@ -19,7 +19,7 @@ apt_packages_prereqs:
   - name: gnome-terminal
   # For Cursor
   - name: libfuse2
-  # For WineHQ
+  # For Wine
   - name: libfaudio0
 
 # External package repositories using deb822 format
@@ -158,12 +158,6 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
-  - name: winehq
-    signed_by: https://dl.winehq.org/wine-builds/winehq.key
-    uris: https://dl.winehq.org/wine-builds/ubuntu
-    suites: "{{ ansible_distribution_release }}"
-    components: main
-    architectures: "{{ deb_architecture }}"
   - name: zoom
     signed_by: https://zoom.us/linux/download/pubkey
     uris: https://zoom.us/client/latest
