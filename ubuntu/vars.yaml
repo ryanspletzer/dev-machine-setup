@@ -478,7 +478,7 @@ custom_commands_user:
     description: Enable automatic remote setup for push
   - command: git config --global user.signingKey 787AEF0BAE232359
     description: Set GPG signing key
-  # Azure CLI configuration (run as user to modify user-specific config)
+  # Azure CLI configuration
   - command: az bicep install
     description: Install Bicep CLI via Azure CLI
   - command: az config set auto-upgrade.enable=yes
@@ -486,6 +486,7 @@ custom_commands_user:
 
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
+  # Add commands to execute with elevated privileges
   # Connect Azure Storage Explorer to password manager service
   # See:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
@@ -494,5 +495,4 @@ custom_commands_elevated:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-custom_script: ./examples/custom_script.sh
 custom_script: ./examples/custom_script.sh
