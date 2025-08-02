@@ -255,8 +255,8 @@ apt_packages:
   - name: bridge-utils
   - name: virt-manager
   - name: snapd
-  # Ookla Speedtest CLI
-  - name: speedtest
+  # Ookla Speedtest CLI - correct package name
+  - name: speedtest-cli
   # amd64 only, arm64 not supported
   - name: spotify-client
     supported_architectures:
