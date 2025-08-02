@@ -81,6 +81,12 @@ if command -v brew &> /dev/null; then
     brew install pyenv-virtualenv
 fi
 
+# Install ruby-install using Homebrew
+if command -v brew &> /dev/null; then
+  echo "Installing ruby-install..."
+  brew install ruby-install
+fi
+
 # Install zsh-autocomplete using Homebrew
 if command -v brew &> /dev/null; then
   echo "Installing zsh-autocomplete..."
