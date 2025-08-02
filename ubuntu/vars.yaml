@@ -217,6 +217,7 @@ apt_packages:
   # amd64 only, arm64 not supported
   - steam-launcher
   - tailscale
+  - terraform
   # Oracle VirtualBox
   # amd64 only, arm64 not supported
   - virtualbox-7.1
