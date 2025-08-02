@@ -290,16 +290,22 @@ apt_packages:
 
 # Snap packages
 snap_packages:
+  # AMD64 only, ARM64 not supported
   - name: drawio
     classic: true
+    supported_architectures:
+      - amd64
   # AMD64 only, ARM64 not supported
   - name: slack
     classic: true
     supported_architectures:
       - amd64
+  # AMD64 only, ARM64 not supported
   # Azure Storage Explorer
   - name: storage-explorer
     classic: true
+    supported_architectures:
+      - amd64
 
 # PowerShell modules
 powershell_modules:

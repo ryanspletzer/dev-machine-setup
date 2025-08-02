@@ -138,12 +138,14 @@
 
     # Snap packages (classic)
     - name: Install Snap packages (classic)
-      community.general.snap:
-        name: "{{ item.name }}"
-        classic: yes
-        state: present
+      ansible.builtin.command:
+        cmd: snap install {{ item.name }} --classic
       become: yes
-      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | selectattr('supported_architectures', 'undefined') | list + snap_packages | selectattr('classic', 'defined') | selectattr('classic') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list }}"
+      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | list }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      register: snap_classic_result
+      changed_when: "snap_classic_result.rc == 0 and 'already installed' not in snap_classic_result.stdout"
+      failed_when: false
       loop_control:
         label: "Installing classic snap: {{ item.name }}"
       tags:
@@ -152,11 +154,14 @@
 
     # Snap packages (regular)
     - name: Install Snap packages (regular)
-      community.general.snap:
-        name: "{{ item.name }}"
-        state: present
+      ansible.builtin.command:
+        cmd: snap install {{ item.name }}
       become: yes
-      loop: "{{ snap_packages | rejectattr('classic', 'defined') | selectattr('supported_architectures', 'undefined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | selectattr('supported_architectures', 'undefined') | list + snap_packages | rejectattr('classic', 'defined') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list }}"
+      loop: "{{ snap_packages | rejectattr('classic', 'defined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      register: snap_regular_result
+      changed_when: "snap_regular_result.rc == 0 and 'already installed' not in snap_regular_result.stdout"
+      failed_when: false
       loop_control:
         label: "Installing regular snap: {{ item.name }}"
       tags:
