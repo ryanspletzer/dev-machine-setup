@@ -168,25 +168,22 @@
         - snap
         - packages
 
-    # npm global package checks
+    # npm configuration and installation
     - name: Configure npm to use user directory for global packages
       ansible.builtin.shell: |
         mkdir -p ~/.local
-        npm config set prefix '~/.local'
-        echo 'export PATH=~/.local/bin:$PATH' >> ~/.bashrc
-        source ~/.bashrc
+        npm config set prefix ~/.local
       args:
-        creates: ~/.local
+        creates: ~/.local/lib/node_modules
       tags:
         - npm
         - packages
 
     # npm global package checks
     - name: Check if npm packages are already installed
-      ansible.builtin.command:
-        cmd: npm list -g {{ item }}
-      environment:
-        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        npm list -g {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -199,10 +196,9 @@
 
     # npm global package installs
     - name: Ensure npm global packages are installed
-      ansible.builtin.command:
-        cmd: npm install -g {{ item.0 }}
-      environment:
-        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        npm install -g {{ item.0 }}
       loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
@@ -381,3 +377,4 @@
         msg: "Ubuntu development environment setup complete!"
       tags:
         - always
+
