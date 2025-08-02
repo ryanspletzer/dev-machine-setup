@@ -249,10 +249,24 @@
         - dotnet
         - tools
 
+    # Add .NET global tools to PATH
+    - name: Add .NET global tools to PATH
+      ansible.builtin.lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH="$HOME/.dotnet/tools:$PATH"'
+        state: present
+      when: dotnet_check.rc == 0
+      tags:
+        - dotnet
+        - tools
+        - path
+
     # PowerShell installation check
     - name: Check if PowerShell is installed
       ansible.builtin.command:
         cmd: pwsh --version
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
       register: pwsh_check
       changed_when: false
       failed_when: false
@@ -264,6 +278,8 @@
     - name: Install PowerShell modules
       ansible.builtin.command:
         cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
       loop: "{{ powershell_modules }}"
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
