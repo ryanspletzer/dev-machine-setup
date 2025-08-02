@@ -445,9 +445,6 @@ vscode_extensions:
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
 git_user_name: "{{ ansible_user_id }}"  # Defaults to the current user's username
 
-# Git Credential Manager configuration
-install_git_credential_manager: true
-
 # Custom commands and scripts (optional)
 # These commands will be executed as the current user (non-elevated)
 custom_commands_user:
