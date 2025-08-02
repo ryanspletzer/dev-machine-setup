@@ -22,4 +22,10 @@ if command -v brew &> /dev/null; then
     brew install jandedobbeleer/oh-my-posh/oh-my-posh
 fi
 
+# Install nvm using Homebrew
+if command -v brew &> /dev/null; then
+    echo "Installing nvm..."
+    brew install nvm
+fi
+
 echo "Custom script completed successfully."

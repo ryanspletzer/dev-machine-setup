@@ -295,34 +295,6 @@
         - powershell
         - modules
 
-    # Node.js setup
-    - name: Install Node.js using nvm
-      block:
-        - name: Download nvm install script
-          ansible.builtin.get_url:
-            url: https://raw.githubusercontent.com/nvm-sh/nvm/v{{ nvm_version }}/install.sh
-            dest: /tmp/nvm-install.sh
-            mode: '0755'
-
-        - name: Install nvm
-          ansible.builtin.shell: |
-            bash /tmp/nvm-install.sh
-          args:
-            creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
-
-        - name: Install Node.js using nvm
-          ansible.builtin.shell: |
-            export NVM_DIR="{{ ansible_env.HOME }}/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm install {{ node_version }}
-            nvm alias default {{ node_version }}
-          args:
-            executable: /bin/bash
-      when: install_nvm | bool
-      tags:
-        - nodejs
-        - nvm
-
     # Python setup with pyenv
     - name: Install Python using pyenv
       block:
@@ -390,16 +362,6 @@
         - python
         - pyenv
 
-    # Install pipx
-    - name: Install pipx
-      ansible.builtin.apt:
-        name: pipx
-        state: present
-      become: yes
-      tags:
-        - pipx
-        - install
-
     # Install pipx modules
     - name: Install pipx modules
       ansible.builtin.shell: |
@@ -463,39 +425,6 @@
         - ruby
         - rbenv
 
-    # Go installation
-    - name: Install Go
-      block:
-        - name: Download Go
-          ansible.builtin.get_url:
-            url: "https://go.dev/dl/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
-            dest: "/tmp/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
-          register: go_download
-
-        - name: Remove existing Go installation if present
-          ansible.builtin.file:
-            path: /usr/local/go
-            state: absent
-          become: yes
-          when: go_download.changed
-
-        - name: Extract Go
-          ansible.builtin.unarchive:
-            src: "/tmp/go{{ go_version }}.linux-{{ deb_architecture }}.tar.gz"
-            dest: /usr/local
-            remote_src: yes
-          become: yes
-          when: go_download.changed
-
-        - name: Add Go to PATH in .bashrc if not already present
-          ansible.builtin.lineinfile:
-            path: "{{ ansible_env.HOME }}/.bashrc"
-            line: 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin'
-            state: present
-      when: install_go | bool
-      tags:
-        - go
-
     # Rust installation
     - name: Install Rust
       block:
@@ -513,18 +442,6 @@
       when: install_rust | bool
       tags:
         - rust
-
-    # .NET installation
-    - name: Install .NET SDK
-      block:
-        - name: Install .NET SDK
-          ansible.builtin.apt:
-            name: "dotnet-sdk-{{ dotnet_version }}"
-            state: present
-          become: yes
-      when: install_dotnet | bool
-      tags:
-        - dotnet
 
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed
@@ -549,7 +466,7 @@
         - git
         - lfs
 
-    # Git configuration
+    # Git configuration (user.name)
     - name: Configure Git user.name
       ansible.builtin.command:
         cmd: git config --global user.name "{{ git_user_name }}"
@@ -560,6 +477,7 @@
         - git
         - config
 
+    # Git configuration (user.email)
     - name: Configure Git user.email
       ansible.builtin.command:
         cmd: git config --global user.email "{{ git_user_email }}"
@@ -587,30 +505,6 @@
       tags:
         - git
         - git-credential-manager
-
-    # bash-git-prompt
-    - name: Install bash-git-prompt
-      block:
-        - name: Clone bash-git-prompt repository
-          ansible.builtin.git:
-            repo: https://github.com/magicmonty/bash-git-prompt.git
-            dest: "{{ ansible_env.HOME }}/.bash-git-prompt"
-            version: master
-
-        - name: Add bash-git-prompt to .bashrc if not already present
-          ansible.builtin.blockinfile:
-            path: "{{ ansible_env.HOME }}/.bashrc"
-            marker: "# {mark} BASH GIT PROMPT CONFIGURATION"
-            block: |
-              if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
-                  GIT_PROMPT_ONLY_IN_REPO=1
-                  source $HOME/.bash-git-prompt/gitprompt.sh
-              fi
-            state: present
-      when: install_bash_git_prompt | bool
-      tags:
-        - git
-        - bash-git-prompt
 
     # Custom user commands
     - name: Execute custom user commands

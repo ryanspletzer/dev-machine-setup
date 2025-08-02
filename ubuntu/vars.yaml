@@ -210,6 +210,7 @@ apt_packages:
   # Node.js from NodeSource repository
   - nodejs
   - packer
+  - pipx
   - ruby-install
   # QEMU virtualization packages
   - qemu-system
@@ -421,11 +422,6 @@ vscode_extensions:
   - vscjava.vscode-java-debug
   # Add more VS Code extensions as needed
 
-# Node Version Manager (nvm) configuration
-install_nvm: true
-nvm_version: "0.39.7"  # Check for the latest version
-node_version: "lts/*"  # Install latest LTS version
-
 # Python version manager (pyenv) configuration
 install_pyenv: true
 pyenv_version: "2.4.0"  # Check for the latest version
@@ -437,16 +433,8 @@ default_python_version: "3.12.2"
 install_rbenv: true
 ruby_version: "3.3.0"  # Check for the latest version
 
-# Go installation
-install_go: true
-go_version: "1.22.2"  # Check for the latest version
-
 # Rust installation
 install_rust: true
-
-# .NET SDK installation
-install_dotnet: true
-dotnet_version: "8.0"  # Check for the latest version
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
@@ -462,6 +450,8 @@ install_bash_git_prompt: true
 # These commands will be executed as the current user (non-elevated)
 custom_commands_user:
   # Add commands to execute as the current user
+  - command: pipx ensurepath
+    description: "Ensure pipx is in PATH"
   - command: "curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz"
     description: "Download 1Password tarball"
 
