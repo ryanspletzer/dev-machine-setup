@@ -45,6 +45,13 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: stable
     architectures: "{{ deb_architecture }}"
+  # .NET SDK 9.0 repository (replaces the dotnet/backports PPA)
+  - name: dotnet-backports
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xA4B469963BF863CC"
+    uris: http://ppa.launchpad.net/dotnet/backports/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   # FEX emulator for ARM64
   - name: fex-emu
     signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xEDB98BFE8A2310DC9C4A376E76DBFEBEA206F5AC"
@@ -169,14 +176,6 @@ external_apt_repositories:
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
-
-# External package repositories
-# Keep only the dotnet/backports PPA as it's Ubuntu-specific
-ppa_apt_repositories:
-  # For dotnet-sdk-9.0 for Ubuntu 24.04
-  # Not required on Ubuntu 24.10 and later
-  # This PPA doesn't have a direct deb822 equivalent
-  - ppa:dotnet/backports
 
 # APT packages
 apt_packages:

@@ -126,20 +126,6 @@
         - apt
         - repositories
 
-    # Add PPA APT repositories (only if any remain)
-    - name: Add PPA APT repositories
-      ansible.builtin.apt_repository:
-        repo: "{{ item }}"
-        state: present
-      loop: "{{ ppa_apt_repositories }}"
-      loop_control:
-        label: "Adding repository: {{ item }}"
-      when: ppa_apt_repositories is defined and ppa_apt_repositories | length > 0
-      become: yes
-      tags:
-        - apt
-        - repositories
-
     # Install APT packages
     - name: Install APT packages
       ansible.builtin.apt:
