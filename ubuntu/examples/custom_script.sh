@@ -3,6 +3,28 @@
 echo "This script is intended to be run on Ubuntu systems to customize settings."
 echo "You can add your own custom commands here."
 
+# 1password installation for arm64/aarch64 architecture
+arch="$(dpkg --print-architecture 2>/dev/null || uname -m)"
+if [[ "$arch" == "arm64" || "$arch" == "aarch64" ]]; then
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf "$tmpdir"' EXIT
+  cd "$tmpdir"
+
+  # aarch64 == arm64
+  curl -fsSLO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz
+  tar -xzf 1password-latest.tar.gz
+
+  sudo mkdir -p /opt/1Password
+  # Copy extracted contents into place (directory name includes version)
+  sudo cp -a 1password-*/. /opt/1Password/
+
+  sudo /opt/1Password/after-install.sh
+  echo "1Password installed/updated in /opt/1Password"
+else
+  echo "This machine architecture is '$arch' (not arm64/aarch64). Skipping install."
+  exit 1
+fi
+
 # Install Homebrew on Linux if not already installed
 if ! command -v brew &> /dev/null; then
     echo "Homebrew not found. Installing Homebrew..."
