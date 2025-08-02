@@ -216,6 +216,8 @@ apt_packages:
   - jq
   - maven
   - direnv
+  # 1password amd64 only, arm64 not supported
+  # - 1password
   - azure-cli
   - azure-functions-core-tools-4
   - chruby
@@ -284,15 +286,11 @@ apt_packages:
 # Snap packages
 snap_packages:
   # Add more snap packages as needed
-  # This is an alternative to APT for 1password, but it doesn't work on ARM64
-  - name: 1password
-    classic: true
-  - name: aws-cli
-    classic: true
   - name: drawio
     classic: true
-  - name: slack
-    classic: true
+  # AMD64 only, ARM64 not supported
+  # - name: slack
+  #   classic: true
   # Azure Storage Explorer
   - name: storage-explorer
     classic: true
