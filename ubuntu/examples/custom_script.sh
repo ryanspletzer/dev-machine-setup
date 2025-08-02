@@ -39,6 +39,12 @@ if command -v brew &> /dev/null; then
   brew install awscli
 fi
 
+# Install chruby using Homebrew
+if command -v brew &> /dev/null; then
+  echo "Installing chruby..."
+  brew install chruby
+fi
+
 # Install chruby-fish using Homebrew
 if command -v brew &> /dev/null; then
   echo "Installing chruby-fish..."

@@ -219,7 +219,6 @@ apt_packages:
     supported_architectures:
       - amd64
   - name: azure-cli
-  - name: chruby
   - name: docker-ce
   - name: docker-ce-cli
   - name: containerd.io
