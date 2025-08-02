@@ -93,6 +93,4 @@ if command -v brew &> /dev/null; then
   brew install zsh-autocomplete
 fi
 
-# Install
-
 echo "Custom script completed successfully."
