@@ -160,7 +160,7 @@
         classic: yes
         state: present
       become: yes
-      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | list }}"
+      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | selectattr('supported_architectures', 'undefined') | list + snap_packages | selectattr('classic', 'defined') | selectattr('classic') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list }}"
       loop_control:
         label: "Installing classic snap: {{ item.name }}"
       tags:
@@ -173,7 +173,7 @@
         name: "{{ item.name }}"
         state: present
       become: yes
-      loop: "{{ snap_packages | rejectattr('classic', 'defined') | list }} + {{ snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
+      loop: "{{ snap_packages | rejectattr('classic', 'defined') | selectattr('supported_architectures', 'undefined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | selectattr('supported_architectures', 'undefined') | list + snap_packages | rejectattr('classic', 'defined') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | list }}"
       loop_control:
         label: "Installing regular snap: {{ item.name }}"
       tags:

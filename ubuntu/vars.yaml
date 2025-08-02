@@ -301,8 +301,10 @@ snap_packages:
   - name: drawio
     classic: true
   # AMD64 only, ARM64 not supported
-  # - name: slack
-  #   classic: true
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
   # Azure Storage Explorer
   - name: storage-explorer
     classic: true
