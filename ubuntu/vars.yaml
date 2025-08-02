@@ -274,7 +274,7 @@ apt_packages:
   # Wine64 - Windows compatibility layer
   - name: wine
   # FEX emulator for running x86/x64 applications on ARM64
-  - name: fex-emu
+  - name: fex-emu-armv8.4
   - name: fex-emu-wine
   # wget
   - name: wget
