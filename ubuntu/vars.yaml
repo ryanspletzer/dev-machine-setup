@@ -46,12 +46,20 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: stable
     architectures: "{{ deb_architecture }}"
+  - name: github-cli
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: google-chrome
     signed_by: https://dl.google.com/linux/linux_signing_key.pub
     uris: https://dl.google.com/linux/chrome/deb
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
   - name: microsoft
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
     uris: "https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod"
@@ -180,6 +188,7 @@ apt_packages:
   - ffmpeg
   - fonts-cascadia-code
   - fzf
+  - gh
   - google-chrome-stable
   # Extra codecs for multimedia support
   - libavcodec-extra
