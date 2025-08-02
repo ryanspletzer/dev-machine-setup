@@ -41,6 +41,7 @@
         - system
         - wsl
 
+    # Set WSL facts based on the WSL check result
     - name: Set WSL facts
       ansible.builtin.set_fact:
         is_wsl: "{{ wsl_check.rc != 0 }}"
@@ -178,7 +179,7 @@
         - snap
         - packages
 
-    # npm global package setup
+    # npm global package checks
     - name: Check if npm packages are already installed
       ansible.builtin.command:
         cmd: npm list -g {{ item }}
@@ -192,6 +193,7 @@
         - npm
         - packages
 
+    # npm global package installs
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
         cmd: npm install -g {{ item.0 }}
@@ -205,7 +207,7 @@
         - npm
         - packages
 
-    # .NET Global Tools setup
+    # .NET Install check
     - name: Check if dotnet is installed
       ansible.builtin.command:
         cmd: dotnet --version
@@ -216,7 +218,8 @@
         - dotnet
         - tools
 
-    - name: Check if .NET tools are already installed
+    # .NET global tools install check
+    - name: Check if .NET global tools are already installed
       ansible.builtin.command:
         cmd: dotnet tool list -g
       register: dotnet_tools_list
@@ -227,6 +230,7 @@
         - dotnet
         - tools
 
+    # Install .NET global tools
     - name: Ensure .NET global tools are installed
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
@@ -244,42 +248,16 @@
         - tools
 
     # Docker setup
-    - name: Install Docker
-      block:
-        - name: Install Docker packages
-          ansible.builtin.apt:
-            name:
-              - docker-ce
-              - docker-ce-cli
-              - containerd.io
-              - docker-buildx-plugin
-              - docker-compose-plugin
-            state: present
-          become: yes
-
-        - name: Add user to docker group
-          ansible.builtin.user:
-            name: "{{ item }}"
-            groups: docker
-            append: yes
-          loop: "{{ docker_users }}"
-          become: yes
-      when: install_docker | bool
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: docker
+        append: yes
+      loop: "{{ docker_users }}"
+      become: yes
+      when: "'docker-ce' in apt_packages"
       tags:
         - docker
-
-    # PowerShell setup
-    - name: Install PowerShell
-      block:
-        - name: Install PowerShell via apt
-          ansible.builtin.apt:
-            name: powershell
-            state: present
-          become: yes
-      when: install_powershell | bool
-      tags:
-        - powershell
-        - install
 
     # PowerShell modules
     - name: Install PowerShell modules
@@ -307,56 +285,6 @@
       tags:
         - pipx
         - modules
-
-    # Ruby setup with rbenv
-    - name: Install Ruby using rbenv
-      block:
-        - name: Clone rbenv
-          ansible.builtin.git:
-            repo: https://github.com/rbenv/rbenv.git
-            dest: "{{ ansible_env.HOME }}/.rbenv"
-            version: master
-
-        - name: Clone ruby-build
-          ansible.builtin.git:
-            repo: https://github.com/rbenv/ruby-build.git
-            dest: "{{ ansible_env.HOME }}/.rbenv/plugins/ruby-build"
-            version: master
-
-        - name: Add rbenv to .bashrc if not already present
-          ansible.builtin.lineinfile:
-            path: "{{ ansible_env.HOME }}/.bashrc"
-            line: 'export PATH="$HOME/.rbenv/bin:$PATH"'
-            state: present
-
-        - name: Add rbenv init to .bashrc if not already present
-          ansible.builtin.lineinfile:
-            path: "{{ ansible_env.HOME }}/.bashrc"
-            line: 'eval "$(rbenv init -)"'
-            state: present
-
-        - name: Install Ruby version
-          ansible.builtin.shell: |
-            export PATH="$HOME/.rbenv/bin:$PATH"
-            eval "$(rbenv init -)"
-            rbenv install {{ ruby_version }} -s
-          args:
-            executable: /bin/bash
-          register: rbenv_install
-          changed_when: rbenv_install.rc == 0
-          failed_when: rbenv_install.rc != 0 and "already installed" not in rbenv_install.stderr
-
-        - name: Set global Ruby version
-          ansible.builtin.shell: |
-            export PATH="$HOME/.rbenv/bin:$PATH"
-            eval "$(rbenv init -)"
-            rbenv global {{ ruby_version }}
-          args:
-            executable: /bin/bash
-      when: install_rbenv | bool
-      tags:
-        - ruby
-        - rbenv
 
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed

@@ -203,6 +203,11 @@ apt_packages:
   - azure-cli
   - azure-functions-core-tools-4
   - chruby
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
   - dotnet-sdk-9.0
   - ffmpeg
   - fonts-cascadia-code
@@ -286,12 +291,8 @@ debian_packages:
     url: "https://dl.google.com/linux/direct/google-chrome-stable_current_{{ deb_architecture }}.deb"
 
 # Docker configuration
-install_docker: true
 docker_users:
   - "{{ ansible_user_id }}"
-
-# PowerShell configuration
-install_powershell: true
 
 # PowerShell modules
 powershell_modules:
@@ -439,10 +440,6 @@ vscode_extensions:
   - vscjava.vscode-gradle
   - vscjava.vscode-java-debug
   # Add more VS Code extensions as needed
-
-# Ruby version manager (rbenv) configuration
-install_rbenv: true
-ruby_version: "3.3.0"  # Check for the latest version
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
