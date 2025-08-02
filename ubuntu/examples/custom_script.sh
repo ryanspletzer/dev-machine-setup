@@ -28,4 +28,16 @@ if command -v brew &> /dev/null; then
     brew install nvm
 fi
 
+# Install pyenv using Homebrew
+if command -v brew &> /dev/null; then
+    echo "Installing pyenv..."
+    brew install pyenv
+fi
+
+# Install pyenv-virtualenv using Homebrew
+if command -v brew &> /dev/null; then
+    echo "Installing pyenv-virtualenv..."
+    brew install pyenv-virtualenv
+fi
+
 echo "Custom script completed successfully."
