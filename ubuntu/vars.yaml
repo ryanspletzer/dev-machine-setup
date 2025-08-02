@@ -250,11 +250,15 @@ apt_packages:
   # FEX emulator for running x86/x64 applications on ARM64
   - fex-emu
   - fex-emu-wine
+  # wget
+  - wget
   # Zoom Workplace for Linux
   # amd64 only, arm64 not supported
   - zoom
   # Zulu OpenJDK
   - zulu21-jdk
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
 
 # Snap packages
 snap_packages:
