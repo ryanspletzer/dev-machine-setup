@@ -302,6 +302,7 @@ powershell_modules:
 pipx_modules:
   - aws-sam-cli
   - cfn-lint
+  - ruff
   - taskcat
   # Add more pipx modules as needed
 
