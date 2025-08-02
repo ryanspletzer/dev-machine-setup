@@ -1,13 +1,13 @@
 # Dev Machine Setup
 
-A collection of automated scripts and configurations to set up consistent development environments across macOS and
-Windows platforms.
+A collection of automated scripts and configurations to set up consistent development environments across macOS,
+Windows, and Ubuntu platforms.
 This repository helps you quickly configure a new development machine with common tools, applications, and settings used
 by developers.
 
 ## 🚀 Features
 
-- **Cross-Platform Support**: Setup scripts for both [macOS](./macOS/README.md) and [Windows](./windows/README.md)
+- **Cross-Platform Support**: Setup scripts for [macOS](./macOS/README.md), [Windows](./windows/README.md), and [Ubuntu](./ubuntu/README.md)
 - **Package Management**: Install common developer tools and applications
 - **Editor Configuration**: Set up Visual Studio Code with essential extensions
 - **Shell Configuration**: Configure PowerShell with useful modules
@@ -18,19 +18,20 @@ by developers.
 
 - [macOS Setup](./macOS/README.md) - Set up a macOS development environment
 - [Windows Setup](./windows/README.md) - Set up a Windows development environment
+- [Ubuntu Setup](./ubuntu/README.md) - Set up an Ubuntu development environment
 
 ## 🔧 Overview
 
 This repository is designed to help developers quickly set up new machines with a consistent development environment.
 It automates the installation of common tools, applications, and configurations that developers use daily.
 
-The setup is platform-specific but provides a similar set of tools across both macOS and Windows:
+The setup is platform-specific but provides a similar set of tools across macOS, Windows, and Ubuntu:
 
 ### Common Tools Installed
 
 - **Version Control**: Git, Git LFS
 - **Editors & IDEs**: Visual Studio Code with extensions
-- **Package Managers**: Homebrew (macOS), Chocolatey (Windows)
+- **Package Managers**: Homebrew (macOS), Chocolatey (Windows), APT (Ubuntu)
 - **Languages & Runtimes**: Python, Node.js, .NET SDK, etc.
 - **Cloud Tools**: AWS CLI, Azure CLI, Terraform, etc.
 - **Containers**: Docker
@@ -91,19 +92,45 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
 [Detailed Windows Setup Instructions](./windows/README.md)
 
+### Ubuntu
+
+1. Clone this repository
+   (or grab a zip download of the repo and copy the contents of the `ubuntu` directory to somewhere like `~/Downloads` if
+   you don't have git installed yet)
+2. Open Terminal
+3. Navigate to the directory with the `ubuntu` script contents
+4. Run the setup script:
+
+```bash
+# Copy the contents of the ubuntu directory to somewhere like Downloads if you don't have git installed yet to clone
+# the repo
+
+# Change to that directory
+cd ~/Downloads
+
+# Allow the setup.sh script to run
+chmod 700 ./setup.sh
+
+# Run the script
+./setup.sh -e your.email@example.com
+```
+
+[Detailed Ubuntu Setup Instructions](./ubuntu/README.md)
+
 ## ⚙️ Customization
 
-Both platforms support customization through their respective configuration files:
+All platforms support customization through their respective configuration files:
 
 - **macOS**: Edit `macOS/vars.yaml` to customize the Ansible playbook
 - **Windows**: Edit `windows/vars.yaml` to customize the PowerShell script
+- **Ubuntu**: Edit `ubuntu/vars.yaml` to customize the Ansible playbook
 
 You can add or remove packages, change system preferences, and even add custom scripts to run at the end of the setup
 process.
 
 ## 🙏 Acknowledgments
 
-- [Ansible](https://www.ansible.com/) for the macOS automation
+- [Ansible](https://www.ansible.com/) for the macOS and Ubuntu automation
 - [PowerShell](https://github.com/PowerShell/PowerShell) for the Windows automation
-- [Homebrew](https://brew.sh/) and [Chocolatey](https://chocolatey.org/) for package management
+- [Homebrew](https://brew.sh/), [Chocolatey](https://chocolatey.org/), and APT and Snap for package management
 - All the developers who maintain the tools and applications installed by these scripts
