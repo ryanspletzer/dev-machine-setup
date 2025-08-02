@@ -219,7 +219,6 @@ apt_packages:
     supported_architectures:
       - amd64
   - name: azure-cli
-  - name: azure-functions-core-tools-4
   - name: chruby
   - name: docker-ce
   - name: docker-ce-cli
@@ -337,6 +336,7 @@ pipx_modules:
 # npm global packages
 npm_global_packages:
   - aws-cdk
+  - azure-functions-core-tools@4
   - npmrc
   - '@vue/cli'
 
