@@ -78,6 +78,13 @@ external_apt_repositories:
     suites: buster
     components: main
     architectures: "{{ deb_architecture }}"
+  # NodeSource repository for Node.js LTS
+  - name: nodesource
+    signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    uris: https://deb.nodesource.com/node_22.x
+    suites: nodistro
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: spotify
     signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
     uris: http://repository.spotify.com
@@ -200,6 +207,8 @@ apt_packages:
   - libavcodec-extra
   - microsoft-edge-stable
   - ngrok
+  # Node.js from NodeSource repository
+  - nodejs
   - packer
   - ruby-install
   # QEMU virtualization packages
