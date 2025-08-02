@@ -248,18 +248,6 @@
         - dotnet
         - tools
 
-    # Docker setup
-    - name: Add user to docker group
-      ansible.builtin.user:
-        name: "{{ item }}"
-        groups: docker
-        append: yes
-      loop: "{{ docker_users }}"
-      become: yes
-      when: "'docker-ce' in apt_packages"
-      tags:
-        - docker
-
     # PowerShell modules
     - name: Install PowerShell modules
       ansible.builtin.command:

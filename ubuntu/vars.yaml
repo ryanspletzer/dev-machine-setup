@@ -296,10 +296,6 @@ snap_packages:
     classic: true
   # Add more snap packages as needed
 
-# Docker configuration
-docker_users:
-  - "{{ ansible_user_id }}"
-
 # PowerShell modules
 powershell_modules:
   - AWS.Tools.Common
@@ -487,6 +483,9 @@ custom_commands_user:
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
+  # Add Docker User
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
   # Connect Azure Storage Explorer to password manager service
   # See:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
