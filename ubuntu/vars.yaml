@@ -236,6 +236,8 @@ apt_packages:
   # Extra codecs for multimedia support
   - name: libavcodec-extra
   - name: microsoft-edge-stable
+    supported_architectures:
+      - amd64
   - name: ngrok
   # Node.js from NodeSource repository
   - name: nodejs
