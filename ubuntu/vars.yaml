@@ -85,6 +85,13 @@ external_apt_repositories:
     suites: nodistro
     components: main
     architectures: "{{ deb_architecture }}"
+  # Ookla Speedtest CLI repository
+  - name: speedtest
+    signed_by: https://packagecloud.io/ookla/speedtest-cli/gpgkey
+    uris: https://packagecloud.io/ookla/speedtest-cli/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: spotify
     signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
     uris: http://repository.spotify.com
@@ -224,6 +231,8 @@ apt_packages:
   - bridge-utils
   - virt-manager
   - snapd
+  # Ookla Speedtest CLI
+  - speedtest
   # amd64 only, arm64 not supported
   - spotify-client
   # amd64 only, arm64 not supported
