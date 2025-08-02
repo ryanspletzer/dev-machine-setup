@@ -16,4 +16,10 @@ if command -v brew &> /dev/null; then
     brew install istioctl
 fi
 
+# Install oh-my-posh using Homebrew
+if command -v brew &> /dev/null; then
+    echo "Installing oh-my-posh..."
+    brew install jandedobbeleer/oh-my-posh/oh-my-posh
+fi
+
 echo "Custom script completed successfully."
