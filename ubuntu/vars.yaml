@@ -244,7 +244,7 @@ apt_packages:
   - name: packer
   - name: pipx
   - name: ruby-full
-  - name: rustup-init
+  - name: rustup
   # QEMU virtualization packages
   - name: qemu-system
   - name: qemu-user-static
