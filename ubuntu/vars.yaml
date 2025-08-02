@@ -428,9 +428,6 @@ vscode_extensions:
 install_rbenv: true
 ruby_version: "3.3.0"  # Check for the latest version
 
-# Rust installation
-install_rust: true
-
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
 git_user_name: "{{ ansible_user_id }}"  # Defaults to the current user's username

@@ -358,24 +358,6 @@
         - ruby
         - rbenv
 
-    # Rust installation
-    - name: Install Rust
-      block:
-        - name: Download rustup installer
-          ansible.builtin.get_url:
-            url: https://sh.rustup.rs
-            dest: /tmp/rustup.sh
-            mode: '0755'
-
-        - name: Install Rust
-          ansible.builtin.shell: |
-            /tmp/rustup.sh -y
-          args:
-            creates: "{{ ansible_env.HOME }}/.cargo/bin/rustc"
-      when: install_rust | bool
-      tags:
-        - rust
-
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
