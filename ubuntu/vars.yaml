@@ -422,13 +422,6 @@ vscode_extensions:
   - vscjava.vscode-java-debug
   # Add more VS Code extensions as needed
 
-# Python version manager (pyenv) configuration
-install_pyenv: true
-pyenv_version: "2.4.0"  # Check for the latest version
-python_versions:
-  - "3.12.2"  # Check for the latest version
-default_python_version: "3.12.2"
-
 # Ruby version manager (rbenv) configuration
 install_rbenv: true
 ruby_version: "3.3.0"  # Check for the latest version
