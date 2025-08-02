@@ -315,6 +315,7 @@ pipx_modules:
   - cfn-lint
   - ruff
   - taskcat
+  - uv
   # Add more pipx modules as needed
 
 # npm global packages
