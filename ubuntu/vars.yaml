@@ -459,11 +459,11 @@ custom_commands_user:
   - command: curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz
     description: Download 1Password tarball
   # Update PowerShell help
-  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue
+  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
     description: Update PowerShell help documentation
   # Install Git LFS
   - command: git lfs install
-    description: "Install Git LFS"
+    description: Install Git LFS
   # Set git configs
   - command: git config --global commit.gpgsign true
     description: Enable GPG signing for commits
