@@ -249,6 +249,17 @@
         - dotnet
         - tools
 
+    # PowerShell installation check
+    - name: Check if PowerShell is installed
+      ansible.builtin.command:
+        cmd: pwsh --version
+      register: pwsh_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - powershell
+        - modules
+
     # PowerShell modules
     - name: Install PowerShell modules
       ansible.builtin.command:
@@ -258,7 +269,7 @@
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
       loop_control:
         label: "Installing PowerShell module: {{ item }}"
-      when: install_powershell | bool
+      when: pwsh_check.rc == 0
       tags:
         - powershell
         - modules
