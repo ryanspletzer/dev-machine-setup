@@ -47,7 +47,7 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
   # FEX emulator for ARM64
   - name: fex-emu
-    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2D043AD19950E6FA4A0E7A72CBA65B2B129EA1C9
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xEDB98BFE8A2310DC9C4A376E76DBFEBEA206F5AC"
     uris: http://ppa.launchpad.net/fex-emu/fex/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
