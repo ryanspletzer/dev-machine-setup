@@ -211,6 +211,7 @@ apt_packages:
   - nodejs
   - packer
   - pipx
+  - ruby-full
   - ruby-install
   - rustup-init
   # QEMU virtualization packages
