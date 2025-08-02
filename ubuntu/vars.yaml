@@ -459,12 +459,10 @@ git_user_name: "{{ ansible_user_id }}"  # Defaults to the current user's usernam
 # These commands will be executed as the current user (non-elevated)
 custom_commands_user:
   # Add commands to execute as the current user
-  - command: rustup-init -y
-    description: Install rustup + default toolchain under ~/.rustup and ~/.cargo
   - command: pipx ensurepath
     description: Ensure pipx is in PATH
   # Update PowerShell help
-  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+  - command: ~/.dotnet/tools/pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
     description: Update PowerShell help documentation
   # Install Git LFS
   - command: git lfs install
@@ -497,8 +495,8 @@ custom_commands_elevated:
   # Connect Azure Storage Explorer to password manager service
   # See:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
-  - command: snap connect storage-explorer:password-manager-service :password-manager-service
-    description: Connect Azure Storage Explorer to password manager service
+  # - command: snap connect storage-explorer:password-manager-service :password-manager-service
+  #   description: Connect Azure Storage Explorer to password manager service
   # Enable and start Tailscale service
   # - command: systemctl enable --now tailscaled
   #   description: Enable and start Tailscale service
