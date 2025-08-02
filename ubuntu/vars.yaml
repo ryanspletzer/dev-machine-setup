@@ -23,7 +23,6 @@ apt_packages_prereqs:
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module
 external_apt_repositories:
-  # Add more repositories as needed
   # 1password only works on amd64 through apt, so we install it via tarball for ARM64 in custom_commands_elevated
   - name: 1password
     signed_by: https://downloads.1password.com/linux/keys/1password.asc
@@ -297,7 +296,6 @@ apt_packages:
 
 # Snap packages
 snap_packages:
-  # Add more snap packages as needed
   - name: drawio
     classic: true
   # AMD64 only, ARM64 not supported
@@ -308,7 +306,6 @@ snap_packages:
   # Azure Storage Explorer
   - name: storage-explorer
     classic: true
-  # Add more snap packages as needed
 
 # PowerShell modules
 powershell_modules:
@@ -329,7 +326,6 @@ powershell_modules:
   - PSScriptAnalyzer
   - PSTcpIp
   - Terminal-Icons
-  # Add more PowerShell modules as needed
 
 # pipx modules
 pipx_modules:
@@ -338,7 +334,6 @@ pipx_modules:
   - ruff
   - taskcat
   - uv
-  # Add more pipx modules as needed
 
 # npm global packages
 npm_global_packages:
@@ -350,7 +345,7 @@ npm_global_packages:
 dotnet_tools:
   - Amazon.Lambda.Tools
   # This is the preferred way to install Git Credential Manager on Linux
-  # since it can be updated via the dotnet cli.
+  # for all architectures since it can be updated via the dotnet cli.
   - git-credential-manager
   # This is the preferred way to install PowerShell on Linux for ARM64
   # since it can be updated via the dotnet cli.
@@ -361,7 +356,6 @@ dotnet_tools:
   # Add dotnet tools to your PATH,
   # this will allow you to run `pwsh` from the terminal.
   - powershell
-  # Add more .NET tools as needed
 
 # VS Code extensions (same as macOS for consistency)
 # You can list your VS Code extensions with the command:
@@ -455,7 +449,6 @@ vscode_extensions:
   - visualstudioexptteam.vscodeintellicode
   - vscjava.vscode-gradle
   - vscjava.vscode-java-debug
-  # Add more VS Code extensions as needed
 
 # Git configuration
 git_user_email: ''  # REQUIRED: Set your email here or pass via command line with -e flag
