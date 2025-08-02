@@ -102,7 +102,7 @@
     # Install prerequisite APT packages
     - name: Install prerequisite APT packages
       ansible.builtin.apt:
-        name: "{{ apt_packages_prereqs }}"
+        name: "{{ apt_packages_prereqs | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages_prereqs | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
         state: present
       become: yes
       tags:
@@ -123,7 +123,7 @@
       loop: "{{ external_apt_repositories }}"
       loop_control:
         label: "Adding repository: {{ item.name }}"
-      when: item.architectures is not defined or item.architectures == deb_architecture
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       become: yes
       tags:
         - apt
@@ -146,7 +146,7 @@
     # Install APT packages
     - name: Install APT packages
       ansible.builtin.apt:
-        name: "{{ apt_packages }}"
+        name: "{{ apt_packages | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
         state: present
       become: yes
       tags:

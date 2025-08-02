@@ -9,16 +9,16 @@ is_wsl: false  # Set to true if running in WSL
 # These are essential packages needed for basic system operations and some specific applications
 apt_packages_prereqs:
   # Basic networking and certificate tools
-  - apt-transport-https
-  - ca-certificates
-  - curl
-  - wget
+  - name: apt-transport-https
+  - name: ca-certificates
+  - name: curl
+  - name: wget
   # PPA support
-  - software-properties-common
+  - name: software-properties-common
   # For Docker Desktop
-  - gnome-terminal
+  - name: gnome-terminal
   # For Cursor
-  - libfuse2
+  - name: libfuse2
 
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module
@@ -182,106 +182,118 @@ ppa_apt_repositories:
 # APT packages
 apt_packages:
   # Development tools
-  - build-essential
-  - cmake
-  - make
-  - pkg-config
-  - autoconf
-  - automake
-  - libtool
-  - unzip
+  - name: build-essential
+  - name: cmake
+  - name: make
+  - name: pkg-config
+  - name: autoconf
+  - name: automake
+  - name: libtool
+  - name: unzip
   # Python dependencies
-  - libssl-dev
-  - zlib1g-dev
-  - libbz2-dev
-  - libreadline-dev
-  - libsqlite3-dev
-  - llvm
-  - libncurses5-dev
-  - libncursesw5-dev
-  - tk-dev
-  - libffi-dev
-  - liblzma-dev
-  - python3-openssl
-  - python3-pip
-  - python3-venv
+  - name: libssl-dev
+  - name: zlib1g-dev
+  - name: libbz2-dev
+  - name: libreadline-dev
+  - name: libsqlite3-dev
+  - name: llvm
+  - name: libncurses5-dev
+  - name: libncursesw5-dev
+  - name: tk-dev
+  - name: libffi-dev
+  - name: liblzma-dev
+  - name: python3-openssl
+  - name: python3-pip
+  - name: python3-venv
   # Git and version control
-  - git
-  - git-lfs
+  - name: git
+  - name: git-lfs
   # Shell tools
-  - zsh
-  - fish
-  - bash-completion
+  - name: zsh
+  - name: fish
+  - name: bash-completion
   # Other tools
-  - jq
-  - maven
-  - direnv
+  - name: jq
+  - name: maven
+  - name: direnv
   # 1password amd64 only, arm64 not supported
-  # - 1password
-  - azure-cli
-  - azure-functions-core-tools-4
-  - chruby
-  - docker-ce
-  - docker-ce-cli
-  - containerd.io
-  - docker-buildx-plugin
-  - docker-compose-plugin
-  - dotnet-sdk-9.0
-  - ffmpeg
-  - fonts-cascadia-code
-  - fzf
-  - gh
-  - golang-go
-  - google-chrome-stable
+  - name: 1password
+    supported_architectures:
+      - amd64
+  - name: azure-cli
+  - name: azure-functions-core-tools-4
+  - name: chruby
+  - name: docker-ce
+  - name: docker-ce-cli
+  - name: containerd.io
+  - name: docker-buildx-plugin
+  - name: docker-compose-plugin
+  - name: dotnet-sdk-9.0
+  - name: ffmpeg
+  - name: fonts-cascadia-code
+  - name: fzf
+  - name: gh
+  - name: golang-go
+  - name: google-chrome-stable
+    supported_architectures:
+      - amd64
   # Extra codecs for multimedia support
-  - libavcodec-extra
-  - microsoft-edge-stable
-  - ngrok
+  - name: libavcodec-extra
+  - name: microsoft-edge-stable
+  - name: ngrok
   # Node.js from NodeSource repository
-  - nodejs
-  - packer
-  - pipx
-  - ruby-full
-  - ruby-install
-  - rustup-init
+  - name: nodejs
+  - name: packer
+  - name: pipx
+  - name: ruby-full
+  - name: ruby-install
+  - name: rustup-init
   # QEMU virtualization packages
-  - qemu-system
-  - qemu-user-static
-  - qemu-utils
-  - qemu-kvm
-  - libvirt-daemon-system
-  - libvirt-clients
-  - bridge-utils
-  - virt-manager
-  - snapd
+  - name: qemu-system
+  - name: qemu-user-static
+  - name: qemu-utils
+  - name: qemu-kvm
+  - name: libvirt-daemon-system
+  - name: libvirt-clients
+  - name: bridge-utils
+  - name: virt-manager
+  - name: snapd
   # Ookla Speedtest CLI
-  - speedtest
+  - name: speedtest
   # amd64 only, arm64 not supported
-  - spotify-client
+  - name: spotify-client
+    supported_architectures:
+      - amd64
   # amd64 only, arm64 not supported
-  - steam-launcher
-  - tailscale
-  - terraform
-  - vault
+  - name: steam-launcher
+    supported_architectures:
+      - amd64
+  - name: tailscale
+  - name: terraform
+  - name: vault
   # Oracle VirtualBox
   # amd64 only, arm64 not supported
-  - virtualbox-7.1
+  - name: virtualbox-7.1
+    supported_architectures:
+      - amd64
   # Visual Studio Code
-  - code
+  - name: code
   # Wine64 - Windows compatibility layer
-  - winehq-stable
+  - name: winehq-stable
   # FEX emulator for running x86/x64 applications on ARM64
-  - fex-emu
-  - fex-emu-wine
+  - name: fex-emu
+  - name: fex-emu-wine
   # wget
-  - wget
+  - name: wget
   # Zoom Workplace for Linux
   # amd64 only, arm64 not supported
-  - zoom
+  - name: zoom
+    supported_architectures:
+      - amd64
   # Zulu OpenJDK
-  - zulu21-jdk
-  - zsh-autosuggestions
-  - zsh-syntax-highlighting
+  - name: zulu21-jdk
+  - name: zsh-autosuggestions
+  - name: zsh-syntax-highlighting
 
 # Snap packages
 snap_packages:
