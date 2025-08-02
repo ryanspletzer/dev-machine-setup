@@ -453,64 +453,58 @@ install_git_credential_manager: true
 custom_commands_user:
   # Add commands to execute as the current user
   - command: rustup-init -y
-    description: "Install rustup + default toolchain under ~/.rustup and ~/.cargo"
+    description: Install rustup + default toolchain under ~/.rustup and ~/.cargo
   - command: pipx ensurepath
-    description: "Ensure pipx is in PATH"
-  - command: "curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz"
-    description: "Download 1Password tarball"
+    description: Ensure pipx is in PATH
+  - command: curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz
+    description: Download 1Password tarball
   # Update PowerShell help
-  - command: echo "Updating PowerShell help documentation..."
-    description: "Display PowerShell help update message"
-  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
-    description: "Update PowerShell help documentation"
+  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue
+    description: Update PowerShell help documentation
   # Install Git LFS
-  - command: echo "Installing Git LFS..."
-    description: "Display Git LFS installation message"
   - command: git lfs install
     description: "Install Git LFS"
   # Set git configs
-  - command: echo "Setting global git configurations..."
-    description: "Display Git configuration message"
   - command: git config --global commit.gpgsign true
-    description: "Enable GPG signing for commits"
+    description: Enable GPG signing for commits
   - command: git config --global init.defaultBranch main
-    description: "Set default branch to main"
+    description: Set default branch to main
   - command: git config --global gpg.program /usr/bin/gpg
-    description: "Set GPG program path for Ubuntu"
+    description: Set GPG program path for Ubuntu
   - command: git config --global push.default current
-    description: "Set push default to current branch"
+    description: Set push default to current branch
   - command: git config --global push.autoSetupRemote true
-    description: "Enable automatic remote setup for push"
+    description: Enable automatic remote setup for push
   - command: git config --global user.signingKey 787AEF0BAE232359
-    description: "Set GPG signing key"
+    description: Set GPG signing key
 
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
   # Steps to install 1Password on ARM64 Ubuntu (doesn't receive updates via apt yet)
   # https://support.1password.com/install-linux/#arm-or-other-distributions-targz
-  - command: "tar -xf 1password-latest.tar.gz"
-    description: "Extract 1Password tarball"
-  - command: "mkdir -p /opt/1Password"
-    description: "Create directory for 1Password"
-  - command: "mv 1password-*/* /opt/1Password"
-    description: "Move 1Password files to /opt/1Password"
-  - command: "/opt/1Password/after-install.sh"
-    description: "Run 1Password post-install script"
-  - command: "rm -rf 1password-latest.tar.gz 1password-*"
-    description: "Clean up 1Password installation files"
+  - command: tar -xf 1password-latest.tar.gz
+    description: Extract 1Password tarball
+  - command: mkdir -p /opt/1Password
+    description: Create directory for 1Password
+  - command: mv 1password-*/* /opt/1Password
+    description: Move 1Password files to /opt/1Password
+  - command: /opt/1Password/after-install.sh
+    description: Run 1Password post-install script
+  - command: rm -rf 1password-latest.tar.gz 1password-*
+    description: Clean up 1Password installation files
   # Connect Azure Storage Explorer to password manager service
   # See:
   # https://techcommunity.microsoft.com/blog/azurepaasblog/storage-explorer-how-to-install-storage-explorer-on-ubuntu-/4125878
   # Install Bicep CLI via Azure CLI
   - command: az bicep install
     description: Install Bicep CLI via Azure CLI
-  - command: "snap connect storage-explorer:password-manager-service :password-manager-service"
-    description: "Connect Azure Storage Explorer to password manager service"
+  - command: snap connect storage-explorer:password-manager-service :password-manager-service
+    description: Connect Azure Storage Explorer to password manager service
   - # keep the Azure CLI itself fresh
   - command: az config set auto-upgrade.enable=yes
-    description: "Enable automatic upgrades for Azure CLI"
+    description: Enable automatic upgrades for Azure CLI
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-custom_script: "./examples/custom_script.sh"
+custom_script: ./examples/custom_script.sh
