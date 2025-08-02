@@ -403,24 +403,6 @@
         - git
         - config
 
-    # Git Credential Manager
-    - name: Install Git Credential Manager
-      block:
-        - name: Download and install Git Credential Manager
-          ansible.builtin.apt:
-            deb: "https://github.com/git-ecosystem/git-credential-manager/releases/latest/download/gcm-linux_{{ deb_architecture }}.deb"
-          become: yes
-
-        - name: Configure Git to use Git Credential Manager
-          ansible.builtin.command:
-            cmd: git config --global credential.helper /usr/bin/git-credential-manager
-          register: git_gcm_result
-          changed_when: git_gcm_result.rc == 0
-      when: install_git_credential_manager | bool
-      tags:
-        - git
-        - git-credential-manager
-
     # Custom user commands
     - name: Execute custom user commands
       ansible.builtin.shell: "{{ item.command }}"

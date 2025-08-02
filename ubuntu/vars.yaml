@@ -298,6 +298,7 @@ powershell_modules:
   - AWS.Tools.Common
   - Az.Accounts
   - Microsoft.Graph.Authentication
+  - MSAL.PS
   - Pester
   - platyPS
   - poetry
@@ -460,6 +461,31 @@ custom_commands_user:
     description: "Ensure pipx is in PATH"
   - command: "curl -sSO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz"
     description: "Download 1Password tarball"
+  # Update PowerShell help
+  - command: echo "Updating PowerShell help documentation..."
+    description: "Display PowerShell help update message"
+  - command: pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+    description: "Update PowerShell help documentation"
+  # Install Git LFS
+  - command: echo "Installing Git LFS..."
+    description: "Display Git LFS installation message"
+  - command: git lfs install
+    description: "Install Git LFS"
+  # Set git configs
+  - command: echo "Setting global git configurations..."
+    description: "Display Git configuration message"
+  - command: git config --global commit.gpgsign true
+    description: "Enable GPG signing for commits"
+  - command: git config --global init.defaultBranch main
+    description: "Set default branch to main"
+  - command: git config --global gpg.program /usr/bin/gpg
+    description: "Set GPG program path for Ubuntu"
+  - command: git config --global push.default current
+    description: "Set push default to current branch"
+  - command: git config --global push.autoSetupRemote true
+    description: "Enable automatic remote setup for push"
+  - command: git config --global user.signingKey 787AEF0BAE232359
+    description: "Set GPG signing key"
 
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
