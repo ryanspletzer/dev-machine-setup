@@ -169,9 +169,24 @@
         - packages
 
     # npm global package checks
+    - name: Configure npm to use user directory for global packages
+      ansible.builtin.shell: |
+        mkdir -p ~/.local
+        npm config set prefix '~/.local'
+        echo 'export PATH=~/.local/bin:$PATH' >> ~/.bashrc
+        source ~/.bashrc
+      args:
+        creates: ~/.local
+      tags:
+        - npm
+        - packages
+
+    # npm global package checks
     - name: Check if npm packages are already installed
       ansible.builtin.command:
         cmd: npm list -g {{ item }}
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -186,6 +201,8 @@
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
         cmd: npm install -g {{ item.0 }}
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
       loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
