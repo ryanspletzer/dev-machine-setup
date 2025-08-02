@@ -180,7 +180,6 @@ apt_packages:
   - jq
   - maven
   - direnv
-  # Add more packages as needed
   - azure-cli
   - azure-functions-core-tools-4
   - chruby
@@ -189,6 +188,7 @@ apt_packages:
   - fonts-cascadia-code
   - fzf
   - gh
+  - golang-go
   - google-chrome-stable
   # Extra codecs for multimedia support
   - libavcodec-extra
