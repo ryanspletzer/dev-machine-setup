@@ -60,6 +60,12 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  - name: hashicorp
+    signed_by: https://apt.releases.hashicorp.com/gpg
+    uris: https://apt.releases.hashicorp.com
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: microsoft
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
     uris: "https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod"
@@ -194,6 +200,7 @@ apt_packages:
   - libavcodec-extra
   - microsoft-edge-stable
   - ngrok
+  - packer
   - ruby-install
   # QEMU virtualization packages
   - qemu-system
