@@ -46,6 +46,27 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: stable
     architectures: "{{ deb_architecture }}"
+  # FEX emulator for ARM64
+  - name: fex-emu
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2D043AD19950E6FA4A0E7A72CBA65B2B129EA1C9
+    uris: http://ppa.launchpad.net/fex-emu/fex/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Fish shell latest stable releases
+  - name: fish-shell
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x59FDA1CE1B84B3FAD89366C027557F056DC33CA5
+    uris: http://ppa.launchpad.net/fish-shell/release-4/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Git latest stable releases
+  - name: git-core
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE1DD270288B4E6030699E45FA1715D88E1DF1F24
+    uris: http://ppa.launchpad.net/git-core/ppa/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: github-cli
     signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
     uris: https://cli.github.com/packages
@@ -151,17 +172,12 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
 
 # External package repositories
+# Keep only the dotnet/backports PPA as it's Ubuntu-specific
 ppa_apt_repositories:
   # For dotnet-sdk-9.0 for Ubuntu 24.04
   # Not required on Ubuntu 24.10 and later
+  # This PPA doesn't have a direct deb822 equivalent
   - ppa:dotnet/backports
-  # Add more PPA APT repositories as needed
-  # Git PPA for latest Git version
-  - ppa:git-core/ppa
-  # FEX emulator for running x86/x64 applications on ARM64
-  - ppa:fex-emu/fex
-  # Fish shell release PPA for latest stable version
-  - ppa:fish-shell/release-4
 
 # APT packages
 apt_packages:
