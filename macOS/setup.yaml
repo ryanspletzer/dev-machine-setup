@@ -59,6 +59,7 @@
       community.general.homebrew_tap:
         name: "{{ item }}"
         state: present
+      ignore_errors: yes
       loop: "{{ homebrew_taps }}"
       loop_control:
         label: "Adding tap: {{ item }}"
@@ -69,6 +70,7 @@
     - name: Ensure Homebrew casks are installed
       ansible.builtin.shell:
         cmd: "brew install --cask {{ item }}"
+      ignore_errors: yes
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
         HOMEBREW_SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
@@ -86,6 +88,7 @@
         name: "{{ item }}"
         state: present
         update_homebrew: yes
+      ignore_errors: yes
       loop: "{{ homebrew_formulae }}"
       loop_control:
         label: "Installing formula: {{ item }}"
@@ -101,6 +104,7 @@
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
         cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+      ignore_errors: yes
       loop: "{{ powershell_modules }}"
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
@@ -114,6 +118,7 @@
     - name: Ensure pipx modules are installed
       ansible.builtin.command:
         cmd: pipx install {{ item }}
+      ignore_errors: yes
       loop: "{{ pipx_modules }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
@@ -140,6 +145,7 @@
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
         cmd: npm install -g {{ item.0 }}
+      ignore_errors: yes
       loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
@@ -175,6 +181,7 @@
     - name: Ensure .NET global tools are installed
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
+      ignore_errors: yes
       loop: "{{ dotnet_tools | default([]) }}"
       register: dotnet_tool_install_result
       changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
@@ -192,6 +199,7 @@
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
         cmd: code --install-extension {{ item }}
+      ignore_errors: yes
       loop: "{{ vscode_extensions }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
