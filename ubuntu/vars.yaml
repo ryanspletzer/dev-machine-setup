@@ -143,6 +143,12 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: yubico
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x32CBA1A9"
+    uris: http://ppa.launchpad.net/yubico/stable/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
   # Visual Studio Code repository
   - name: vscode
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
@@ -280,6 +286,7 @@ apt_packages:
   - name: wget
   # Zoom Workplace for Linux
   # amd64 only, arm64 not supported
+  - name: yubikey-manager
   - name: zoom
     supported_architectures:
       - amd64

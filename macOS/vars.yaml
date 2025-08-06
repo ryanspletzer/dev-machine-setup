@@ -92,6 +92,7 @@ homebrew_formulae:
   - serverless
   - teamookla/speedtest/speedtest
   - uv
+  - ykman
   - wget2
   - zsh-autocomplete
   - zsh-autosuggestions

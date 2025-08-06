@@ -117,6 +117,7 @@ pipx_packages:
   - cfn-lint
   - poetry
   - taskcat
+  - yubikey-manager
   # Add more pipx modules as needed
 
 npm_global_packages:
