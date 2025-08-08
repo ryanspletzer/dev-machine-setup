@@ -63,6 +63,12 @@ if command -v brew &> /dev/null; then
   brew install nvm
 fi
 
+# Install oh-my-posh using Homebrew
+if command -v brew &> /dev/null; then
+  echo "Installing oh-my-posh..."
+  brew install jandedobbeleer/oh-my-posh/oh-my-posh
+fi
+
 # Install pyenv using Homebrew
 if command -v brew &> /dev/null; then
   echo "Installing pyenv..."

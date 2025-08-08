@@ -25,6 +25,15 @@ apt_packages_prereqs:
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module
 external_apt_repositories:
+  # 1password only works on amd64 through apt, so we install it via tarball for ARM64 in custom_commands_elevated
+  - name: 1password
+    signed_by: https://downloads.1password.com/linux/keys/1password.asc
+    uris: https://downloads.1password.com/linux/debian
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
   # Azure CLI repository
   - name: azure-cli
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
@@ -92,11 +101,46 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: ngrok
+    signed_by: https://ngrok-agent.s3.amazonaws.com/ngrok.asc
+    uris: https://ngrok-agent.s3.amazonaws.com
+    suites: buster
+    components: main
+    architectures: "{{ deb_architecture }}"
   # NodeSource repository for Node.js LTS
   - name: nodesource
     signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
     uris: https://deb.nodesource.com/node_22.x
     suites: nodistro
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # Ookla Speedtest CLI repository
+  - name: speedtest
+    signed_by: https://packagecloud.io/ookla/speedtest-cli/gpgkey
+    uris: https://packagecloud.io/ookla/speedtest-cli/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  - name: spotify
+    signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
+    uris: http://repository.spotify.com
+    suites: stable
+    components: non-free
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: steam
+    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
+    uris: https://repo.steampowered.com/steam
+    suites: stable
+    components: steam
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
+  - name: tailscale
+    signed_by: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+    uris: https://pkgs.tailscale.com/stable/ubuntu
+    suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
   - name: yubico
@@ -172,6 +216,10 @@ apt_packages:
   - name: jq
   - name: maven
   - name: direnv
+  # 1password amd64 only, arm64 not supported
+  - name: 1password
+    supported_architectures:
+      - amd64
   - name: azure-cli
   - name: docker-ce
   - name: docker-ce-cli
@@ -180,6 +228,7 @@ apt_packages:
   - name: docker-compose-plugin
   - name: dotnet-sdk-9.0
   - name: ffmpeg
+  - name: fonts-cascadia-code
   - name: fzf
   - name: gh
   - name: golang-go
@@ -208,10 +257,17 @@ apt_packages:
   - name: bridge-utils
   - name: virt-manager
   - name: snapd
+  # Ookla Speedtest CLI - correct package name
+  - name: speedtest-cli
+  # amd64 only, arm64 not supported
+  - name: spotify-client
+    supported_architectures:
+      - amd64
   # amd64 only, arm64 not supported
   - name: steam-launcher
     supported_architectures:
       - amd64
+  - name: tailscale
   - name: terraform
   - name: vault
   # Oracle VirtualBox
@@ -418,6 +474,19 @@ custom_commands_user:
   # Install Git LFS
   - command: git lfs install
     description: Install Git LFS
+  # Set git configs
+  - command: git config --global commit.gpgsign true
+    description: Enable GPG signing for commits
+  - command: git config --global init.defaultBranch main
+    description: Set default branch to main
+  - command: git config --global gpg.program /usr/bin/gpg
+    description: Set GPG program path for Ubuntu
+  - command: git config --global push.default current
+    description: Set push default to current branch
+  - command: git config --global push.autoSetupRemote true
+    description: Enable automatic remote setup for push
+  - command: git config --global user.signingKey 787AEF0BAE232359
+    description: Set GPG signing key
   # Azure CLI configuration
   - command: az bicep install
     description: Install Bicep CLI via Azure CLI

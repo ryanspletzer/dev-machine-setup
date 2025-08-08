@@ -15,11 +15,16 @@ homebrew_taps:
   # Add more taps as needed
 
 homebrew_casks:
+  - 1password
+  - appcleaner
+  - chatgpt
   - citrix-workspace
   - docker-desktop
   - dotnet-sdk
   - drawio
+  - elgato-camera-hub
   - firefox
+  - font-caskaydia-cove-nerd-font
   - git-credential-manager
   - google-chrome
   - iterm2
@@ -28,7 +33,16 @@ homebrew_casks:
   - microsoft-office
   - microsoft-remote-desktop
   - microsoft-teams
+  - netspot
+  - ngrok
+  # Doesn't work without Rosetta 2
+  # - parallels
   - powershell
+  - rectangle-pro
+  - spotify
+  - steam
+  - synologyassistant
+  - tailscale-app
   - utm
   - virtualbox
   - visual-studio-code
@@ -76,6 +90,7 @@ homebrew_formulae:
   - ruff
   - rustup
   - serverless
+  - teamookla/speedtest/speedtest
   - uv
   - ykman
   - wget2
@@ -100,6 +115,7 @@ powershell_modules:
   - PSReadLine
   - PSScriptAnalyzer
   - PSTcpIp
+  - Terminal-Icons
   # Add more PowerShell modules as needed
 
 # pipx modules
@@ -254,6 +270,40 @@ custom_commands_user:
   - defaults write com.apple.dock autohide -bool true
   - defaults write com.apple.dock autohide-delay -float 0
   - defaults write com.apple.dock autohide-time-modifier -float 0
+  # Turn off "Show suggested and recent apps in Dock"
+  - echo "Turning off suggested and recent apps in Dock..."
+  - defaults write com.apple.dock show-recents -bool false
+  - defaults write com.apple.dock show-suggested-and-recent-apps -int 0
+  # Configure TextEdit to use plain text by default
+  - echo "Setting TextEdit to use plain text by default..."
+  - defaults write com.apple.TextEdit RichText -int 0
+  # Trackpad gesture settings
+  - echo "Configuring trackpad settings..."
+  # Set tracking speed (just past middle, value around 1.5)
+  - defaults write -g com.apple.trackpad.scaling -float 1
+  # Turn off natural scrolling
+  - defaults write -g com.apple.swipescrolldirection -bool false
+  # Turn off swipe between pages
+  - defaults write -g AppleEnableSwipeNavigateWithScrolls -bool false
+  # Set App Expose to swipe down with three fingers
+  - defaults write com.apple.dock showAppExposeGestureEnabled -bool true
+  - defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int 2
+  - defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture -int 2
+  # Hide desktop icons
+  - echo "Hiding desktop icons..."
+  - defaults write com.apple.finder CreateDesktop -bool false
+  # Keep folders on top when sorting by name in Finder
+  - echo "Setting Finder to keep folders on top when sorting by name..."
+  - defaults write com.apple.finder _FXSortFoldersFirst -bool true
+  # Disable natural scrolling
+  - echo "Disabling natural scrolling..."
+  - defaults write -g com.apple.swipescrolldirection -bool false
+  # Disable swipe between pages
+  - echo "Disabling swipe between pages..."
+  - defaults write -g AppleEnableSwipeNavigateWithScrolls -bool false
+  # Set app expose to swipe down with three fingers
+  - echo "Setting App Expose to swipe down with three fingers..."
+  - defaults write com.apple.dock showAppExposeGestureEnabled -bool true
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
@@ -266,6 +316,14 @@ custom_commands_user:
   # Install Git LFS
   - echo "Installing Git LFS..."
   - git lfs install
+  # Set git configs
+  - echo "Setting global git configurations..."
+  - git config --global commit.gpgsign true
+  - git config --global init.defaultBranch main
+  - git config --global gpg.program /opt/homebrew/bin/gpg
+  - git config --global push.default current
+  - git config --global push.autoSetupRemote true
+  - git config --global user.signingKey 787AEF0BAE232359
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
@@ -278,6 +336,9 @@ custom_commands_elevated:
   # Add fish to /etc/shells if not already present
   - echo "Adding fish shell to /etc/shells..."
   - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
+  # Change default shell to PowerShell
+  # TODO: FIGURE OUT AN APPROCH TO CHANGE THE DEFAULT SHELL
+  # - chsh -s /usr/local/bin/pwsh
   # Add more commands requiring sudo as needed
 
 # Custom script path (optional)

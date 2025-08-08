@@ -7,11 +7,13 @@
 # But also _sometimes you_ want to override install parameters -- ex. see Git below.
 # You may want to allow for prerelease versions of packages, in which case you can set prerelease: true
 choco_packages:
+  - name: 1password
   - name: awscli
   - name: awssamcli
   - name: azure-cli
   - name: azure-functions-core-tools
   - name: bicep
+  - name: cascadiacode
   - name: citrix-workspace
   - name: docker
   - name: dotnet-sdk
@@ -37,10 +39,12 @@ choco_packages:
   - name: jq
   - name: maven
   - name: microsoftazurestorageexplorer
+  - name: ngrok
   - name: nodejs
   - name: notepadplusplus
   - name: nvm
   - name: office365business
+  - name: oh-my-posh
   - name: packer
   # Required to for pipx_packages
   - name: python
@@ -53,6 +57,7 @@ choco_packages:
   - name: servicebusexplorer
   - name: slack
   - name: sql-server-management-studio
+  - name: tailscale
   - name: terraform
   - name: uv
   - name: vault
@@ -85,6 +90,7 @@ powershell_modules:
   - PSReadLine
   - PSScriptAnalyzer
   - PSTcpIp
+  - Terminal-Icons
 
 # PowerShell modules to install via Install-Module in Windows PowerShell (powershell.exe)
 # Note: Only use this if you need to install modules in old Windows PowerShell (powershell.exe)
