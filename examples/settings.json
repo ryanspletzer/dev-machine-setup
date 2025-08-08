@@ -1,17 +1,43 @@
 {
     "[css]": {
+        "editor.autoIndent": "advanced",
         "editor.formatOnPaste": false,
         "editor.formatOnSave": false,
-        "editor.formatOnType": false
+        "editor.formatOnType": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+    },
+    "[dockerfile]": {
+        "editor.tabSize": 2
+    },
+    "[hcl]": {
+        "editor.tabSize": 2
     },
     "[html]": {
-        "editor.defaultFormatter": "vscode.html-language-features"
+        "editor.defaultFormatter": "vscode.html-language-features",
+        "editor.tabSize": 2
     },
-    "[javascript, javascriptreact, typescript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
+    "[javascript, javascriptreact, typescript, typescriptreact]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.tabSize": 2
     },
     "[json, jsonc]": {
-        "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.autoIndent": "advanced",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace",
+        // "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.tabSize": 2
+    },
+    "[less]": {
+        "editor.tabSize": 2
+    },
+    "[lua]": {
+        "editor.tabSize": 2
+    },
+    "[markdown]": {
         "editor.tabSize": 2
     },
     "[powershell]": {
@@ -22,10 +48,31 @@
     "[python]": {
         "editor.formatOnType": true
     },
+    "[ruby]": {
+        "editor.tabSize": 2
+    },
     "[scss]": {
         "editor.formatOnPaste": false,
         "editor.formatOnSave": false,
-        "editor.formatOnType": false
+        "editor.formatOnType": false,
+        "editor.tabSize": 2
+    },
+    "[shellscript]": {
+        "editor.detectIndentation": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+    },
+    "[terraform]": {
+        "editor.tabSize": 2
+    },
+    "[toml]": {
+        "editor.tabSize": 2
+    },
+    "[vue]": {
+        "editor.tabSize": 2
+    },
+    "[xml]": {
+        "editor.tabSize": 2
     },
     "[yaml]": {
         "editor.autoIndent": "full",
@@ -37,6 +84,7 @@
         },
         "editor.tabSize": 2
     },
+    "@azure.argTenant": "",
     "csharp.semanticHighlighting.enabled": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "diffEditor.maxComputationTime": 0,
@@ -64,12 +112,45 @@
     "extensions.ignoreRecommendations": false,
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
+    "git.enableCommitSigning": true,
     "git.openRepositoryInParentFolders": "never",
+    "github.copilot.chat.codeGeneration.instructions": [
+        {
+            "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Code Gen Best Practices: When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Deployment Best Practices: When deploying to Azure or preparing applications for deployment to Azure, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Functions Code Gen Best Practices: When generating code for Azure Functions or performing operations related to Azure Functions, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure Functions; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure Functions Deployment Best Practices: When deploying Azure Functions apps to Azure or preparing for the deployment, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Use Azure SWA Best Practices: When working with static web apps, invoke your `bestpractices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
+        },
+        {
+            "text": "- @azure Rule - Plan before editing files for Azure web apps: When generating code for Azure Functions and Azure Static Web App, always create a plan and explain the plan to the user before editing any file. Proceed with editing the files after getting consent from the user."
+        },
+        {
+            "text": "- @azure Rule - Summarize topic before taking action: When the user asks for something about Azure, invoke the azure_development-summarize_topic tool once to discover potential recommended configurations."
+        }
+    ],
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:claude-sonnet-4",
     "gitlens.remotes": [
         {
             "domain": "git.autodesk.com",
             "type": "GitHub"
         }
+    ],
+    "indentRainbow.ignoreErrorLanguages": [
+        "shellscript"
     ],
     "json.schemas": [
         {
