@@ -322,7 +322,6 @@ powershell_modules:
   - MSAL.PS
   - Pester
   - platyPS
-  - poetry
   - posh-git
   - powershell-yaml
   - PowerShellBuild
@@ -335,9 +334,10 @@ powershell_modules:
   - Terminal-Icons
 
 # pipx modules
-pipx_modules:
+pipx_packages:
   - aws-sam-cli
   - cfn-lint
+  - poetry
   - ruff
   - taskcat
   - uv

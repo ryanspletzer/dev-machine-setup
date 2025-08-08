@@ -103,7 +103,7 @@ Edit `vars.yaml` to customize which packages get installed:
 - `apt_packages`: Command-line tools and libraries to install via APT
 - `snap_packages`: GUI applications to install via Snap
 - `powershell_modules`: PowerShell modules to install
-- `pipx_modules`: Python packages to install via pipx
+- `pipx_packages`: Python packages to install via pipx
 - `vscode_extensions`: VS Code extensions to install
 
 ### WSL Specific Settings

@@ -106,7 +106,6 @@ powershell_modules:
   - Microsoft.Graph.Authentication
   - Pester
   - platyPS
-  - poetry
   - posh-git
   - powershell-yaml
   - PowerShellBuild
@@ -120,7 +119,8 @@ powershell_modules:
   # Add more PowerShell modules as needed
 
 # pipx modules
-pipx_modules:
+pipx_packages:
+  - poetry
   - taskcat
   # Add more pipx modules as needed
 

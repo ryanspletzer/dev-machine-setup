@@ -102,7 +102,7 @@ Edit `vars.yaml` to customize which packages get installed:
 - `homebrew_casks`: GUI applications to install
 - `homebrew_formulae`: Command-line tools to install
 - `powershell_modules`: PowerShell modules to install
-- `pipx_modules`: Python packages to install via pipx
+- `pipx_packages`: Python packages to install via pipx
 - `npm_global_packages`: Node.js packages to install globally via npm
 - `dotnet_tools`: .NET global tools to install (requires .NET SDK)
 - `vscode_extensions`: VS Code extensions to install

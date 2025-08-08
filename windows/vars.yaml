@@ -46,7 +46,7 @@ choco_packages:
   - name: office365business
   - name: oh-my-posh
   - name: packer
-  # Required to for pipx_modules
+  # Required to for pipx_packages
   - name: python
   - name: pwsh
   - name: qemu
