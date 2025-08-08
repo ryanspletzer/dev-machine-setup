@@ -67,18 +67,33 @@
         - homebrew
         - taps
 
-    - name: Ensure Homebrew casks are installed
-      ansible.builtin.shell:
-        cmd: "brew install --cask {{ item }}"
+    - name: Check if Homebrew casks are already installed
+      ansible.builtin.command:
+        cmd: "brew list --cask {{ item }}"
       ignore_errors: yes
+      loop: "{{ homebrew_casks }}"
+      register: brew_cask_check
+      changed_when: false
+      failed_when: false
+      loop_control:
+        label: "Checking cask: {{ item }}"
+      tags:
+        - homebrew
+        - casks
+
+    - name: Install missing Homebrew casks
+      ansible.builtin.shell:
+        cmd: "brew install --cask {{ item.0 }}"
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
         HOMEBREW_SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
-      loop: "{{ homebrew_casks }}"
-      register: brew_cask_result
-      changed_when: "'already installed' not in brew_cask_result.stdout"
+      loop: "{{ homebrew_casks | zip(brew_cask_check.results) | list }}"
+      when: item.1.rc != 0
+      register: brew_cask_install_result
+      changed_when: brew_cask_install_result.rc == 0
+      failed_when: false
       loop_control:
-        label: "Installing cask: {{ item }}"
+        label: "Installing cask: {{ item.0 }}"
       tags:
         - homebrew
         - casks
