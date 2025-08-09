@@ -16,9 +16,19 @@ by developers.
 
 ## 📋 Quick Links
 
+### Platform Setup Guides
 - [macOS Setup](./macOS/README.md) - Set up a macOS development environment
 - [Windows Setup](./windows/README.md) - Set up a Windows development environment
 - [Ubuntu Setup](./ubuntu/README.md) - Set up an Ubuntu development environment
+
+### Comprehensive Documentation
+- [📚 Complete Documentation](./docs/README.md) - Comprehensive documentation and guides
+- [🎯 Design Principles](./docs/design-principles.md) - Core principles behind this project
+- [🏗️ Architecture Overview](./docs/architecture.md) - How everything fits together
+- [⚙️ Customization Guide](./docs/customization.md) - How to tailor the setup for your needs
+- [📦 Package Management](./docs/package-management.md) - Understanding the package strategy
+- [❓ FAQ](./docs/faq.md) - Frequently asked questions
+- [🛠️ Troubleshooting](./docs/troubleshooting.md) - Common issues and solutions
 
 ## 🔧 Overview
 
@@ -119,14 +129,28 @@ chmod 700 ./setup.sh
 
 ## ⚙️ Customization
 
-All platforms support customization through their respective configuration files:
+All platforms support extensive customization through their respective configuration files:
 
 - **macOS**: Edit `macOS/vars.yaml` to customize the Ansible playbook
 - **Windows**: Edit `windows/vars.yaml` to customize the PowerShell script
 - **Ubuntu**: Edit `ubuntu/vars.yaml` to customize the Ansible playbook
 
 You can add or remove packages, change system preferences, and even add custom scripts to run at the end of the setup
-process.
+process. For detailed customization instructions, see the [Customization Guide](./docs/customization.md).
+
+## 📚 Documentation
+
+This project includes comprehensive documentation covering all aspects of setup and customization:
+
+- **[Complete Documentation](./docs/README.md)** - Start here for full documentation
+- **[Design Principles](./docs/design-principles.md)** - Understand the philosophy behind this project
+- **[Architecture Overview](./docs/architecture.md)** - How all the pieces fit together
+- **[Package Management Strategy](./docs/package-management.md)** - Our approach to managing packages
+- **[Configuration Reference](./docs/configuration-reference.md)** - Complete reference for all options
+- **[Examples](./docs/examples/README.md)** - Real-world configuration examples
+- **[Troubleshooting Guide](./docs/troubleshooting.md)** - Solutions to common problems
+- **[Contributing Guide](./docs/contributing.md)** - How to contribute to this project
+- **[FAQ](./docs/faq.md)** - Frequently asked questions
 
 ## 🙏 Acknowledgments
 
