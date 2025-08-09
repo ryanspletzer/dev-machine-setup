@@ -5,6 +5,7 @@ This directory contains real-world examples and use cases for customizing the de
 ## Available Examples
 
 ### Workflow-Based Configurations
+
 - [**Web Development Setup**](web-development.md) - Frontend and backend web development
 - [**Mobile Development Setup**](mobile-development.md) - iOS, Android, and cross-platform mobile development
 - [**DevOps Engineering Setup**](devops-engineering.md) - Infrastructure, containers, and automation tools
@@ -12,12 +13,14 @@ This directory contains real-world examples and use cases for customizing the de
 - [**Game Development Setup**](game-development.md) - Unity, Unreal, and indie game development tools
 
 ### Environment-Based Configurations
+
 - [**Corporate/Enterprise Setup**](corporate-setup.md) - Enterprise tools and security requirements
 - [**Freelancer/Consultant Setup**](freelancer-setup.md) - Multi-client development environment
 - [**Student/Learning Setup**](student-setup.md) - Educational tools and learning resources
 - [**Open Source Contributor Setup**](open-source-setup.md) - Contributing to open source projects
 
 ### Platform-Specific Examples
+
 - [**Apple Silicon Mac Setup**](apple-silicon-mac.md) - Optimized for M1/M2/M3 Macs
 - [**WSL Development Setup**](wsl-development.md) - Windows Subsystem for Linux development
 - [**Minimal Setup**](minimal-setup.md) - Lightweight configuration with essential tools only
@@ -77,24 +80,28 @@ homebrew_casks:
 ### By Development Focus
 
 **Web Development**
+
 - Frontend frameworks (React, Vue, Angular)
 - Backend tools (Node.js, databases)
 - Design tools (Figma, browsers for testing)
 - Performance and debugging tools
 
 **Mobile Development**
+
 - Platform-specific SDKs (Xcode, Android Studio)
 - Cross-platform frameworks (Flutter, React Native)
 - Simulators and device testing tools
 - App store deployment tools
 
 **DevOps Engineering**
+
 - Container orchestration (Docker, Kubernetes)
 - Infrastructure as Code (Terraform, Ansible)
 - Cloud platform tools (AWS, Azure, GCP)
 - Monitoring and logging tools
 
 **Data Science**
+
 - Statistical computing languages (Python, R)
 - Jupyter notebooks and IDEs
 - Machine learning libraries
@@ -103,18 +110,21 @@ homebrew_casks:
 ### By Environment Type
 
 **Corporate/Enterprise**
+
 - Security and compliance tools
 - Enterprise communication platforms
 - VPN and remote access tools
 - Company-specific development tools
 
 **Freelancer/Consultant**
+
 - Multiple client management tools
 - Time tracking and invoicing
 - Diverse technology stacks
 - Presentation and proposal tools
 
 **Student/Learning**
+
 - Educational IDEs and tools
 - Free alternatives to paid software
 - Tutorial and documentation tools
@@ -123,12 +133,14 @@ homebrew_casks:
 ### By Setup Philosophy
 
 **Minimal Setup**
+
 - Only essential tools
 - Lightweight applications
 - Focus on core functionality
 - Optimized for performance
 
 **Maximum Setup**
+
 - Comprehensive tool collection
 - Multiple alternatives for each function
 - Latest and experimental tools
@@ -195,6 +207,7 @@ custom_script: './examples/custom_setup_script.sh'
 ### Example Guidelines
 
 **Good examples:**
+
 - Solve specific, common problems
 - Include explanatory comments
 - Are well-tested and working
@@ -202,6 +215,7 @@ custom_script: './examples/custom_setup_script.sh'
 - Include customization suggestions
 
 **Avoid:**
+
 - Highly personal/niche configurations
 - Untested or experimental setups
 - Configurations with proprietary/paid-only tools
@@ -247,6 +261,7 @@ Any platform-specific considerations or alternatives.
 ### Decision Tree
 
 **What's your primary development focus?**
+
 - Web applications → Web Development Setup
 - Mobile apps → Mobile Development Setup
 - Infrastructure/DevOps → DevOps Engineering Setup
@@ -254,12 +269,14 @@ Any platform-specific considerations or alternatives.
 - Games → Game Development Setup
 
 **What's your environment type?**
+
 - Corporate job → Corporate/Enterprise Setup
 - Freelance work → Freelancer/Consultant Setup
 - Learning/education → Student/Learning Setup
 - Open source projects → Open Source Contributor Setup
 
 **What's your preference for setup complexity?**
+
 - Just the essentials → Minimal Setup
 - Everything I might need → Maximum Setup
 - Balanced approach → Workflow-specific examples
