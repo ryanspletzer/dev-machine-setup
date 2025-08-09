@@ -26,19 +26,18 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 
 ## Quick Start
 
-1. Clone this repository
-   (or grab a zip download of the repo and copy the contents of the `macOS` directory to somewhere like `~/Downloads` if
-   you don't have git installed yet)
+1. Clone this repository or download the repository contents
 2. Open Windows PowerShell as Administrator
 3. Navigate to the `windows` directory
 4. Run the setup script:
 
 ```powershell
-# Copy the contents of the macOS directory to somewhere like ~/Downloads if you don't have git installed yet to clone
-# the repo
+# Clone the repository if you haven't already
+git clone https://github.com/ryanspletzer/dev-machine-setup.git
+cd dev-machine-setup/windows
 
-# Change to that directory
-cd ~/Downloads
+# Or copy the contents of the windows directory to somewhere like ~/Downloads if you don't have git installed yet
+# cd ~/Downloads
 
 # Change the PowerShell Execution Policy
 # Note this is _not_ a security boundary, so don't worry...
@@ -212,6 +211,17 @@ An optional script to run at the end of setup:
 ```yaml
 custom_script: "./examples/custom_script.ps1"
 ```
+
+## 📚 Additional Resources
+
+For comprehensive documentation and examples:
+
+- [Complete Documentation](../docs/README.md) - Full project documentation
+- [Design Principles](../docs/design-principles.md) - Understanding the philosophy
+- [Configuration Examples](../docs/examples/README.md) - Real-world use cases
+- [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
+- [Architecture Overview](../docs/architecture.md) - How all the pieces fit together
+- [Package Management Strategy](../docs/package-management.md) - Our approach to managing packages
 
 ## Advanced Usage
 

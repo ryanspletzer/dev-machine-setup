@@ -41,8 +41,8 @@ This setup has been tested and confirmed to work on:
 
     ```bash
     # Clone the repository if you haven't already
-    git clone https://github.com/yourusername/ansible-devmachinesetup.git
-    cd ansible-devmachinesetup/ubuntu
+    git clone https://github.com/ryanspletzer/dev-machine-setup.git
+    cd dev-machine-setup/ubuntu
 
     # Allow the setup.sh script to run
     chmod +x ./setup.sh
@@ -100,11 +100,41 @@ Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
 
 Edit `vars.yaml` to customize which packages get installed:
 
-- `apt_packages`: Command-line tools and libraries to install via APT
-- `snap_packages`: GUI applications to install via Snap
-- `powershell_modules`: PowerShell modules to install
-- `pipx_packages`: Python packages to install via pipx
-- `vscode_extensions`: VS Code extensions to install
+#### System Packages
+
+```yaml
+# Command-line tools and libraries via APT
+apt_packages:
+  - git
+  - curl
+  - build-essential
+  - python3-dev
+
+# GUI applications via Snap
+snap_packages:
+  - code
+  - discord
+  - spotify
+```
+
+#### Development Tools
+
+```yaml
+# PowerShell modules
+powershell_modules:
+  - AWS.Tools.Common
+  - Terminal-Icons
+
+# Python packages via pipx
+pipx_packages:
+  - poetry
+  - black
+
+# VS Code extensions
+vscode_extensions:
+  - ms-vscode.powershell
+  - github.copilot
+```
 
 ### WSL Specific Settings
 
@@ -128,6 +158,17 @@ To add additional setup steps:
 - `setup.yaml`: Ansible playbook that performs the installation and configuration
 - `vars.yaml`: Configuration variables defining what gets installed
 - `examples/`: Directory containing example custom scripts
+
+## 📚 Additional Resources
+
+For comprehensive documentation and examples:
+
+- [Complete Documentation](../docs/README.md) - Full project documentation
+- [Design Principles](../docs/design-principles.md) - Understanding the philosophy
+- [Configuration Examples](../docs/examples/README.md) - Real-world use cases
+- [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
+- [Architecture Overview](../docs/architecture.md) - How all the pieces fit together
+- [Package Management Strategy](../docs/package-management.md) - Our approach to managing packages
 
 ## Notable Default Packages
 

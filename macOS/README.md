@@ -36,11 +36,12 @@ Some applications may require Rosetta 2, which can be installed automatically by
 1. Get the script:
 
     ```zsh
-    # Copy the contents of the macOS directory to somewhere like Downloads if you don't have git installed yet to clone
-    # the repo
+    # Clone the repository if you haven't already
+    git clone https://github.com/ryanspletzer/dev-machine-setup.git
+    cd dev-machine-setup/macOS
 
-    # Change to that directory
-    cd ~/Downloads
+    # Or copy the contents of the macOS directory to somewhere like Downloads if you don't have git installed yet
+    # cd ~/Downloads
 
     # Allow the setup.sh script to run
     chmod 700 ./setup.sh
@@ -98,14 +99,57 @@ Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
 
 Edit `vars.yaml` to customize which packages get installed:
 
-- `homebrew_taps`: List of Homebrew taps to add
-- `homebrew_casks`: GUI applications to install
-- `homebrew_formulae`: Command-line tools to install
-- `powershell_modules`: PowerShell modules to install
-- `pipx_packages`: Python packages to install via pipx
-- `npm_global_packages`: Node.js packages to install globally via npm
-- `dotnet_tools`: .NET global tools to install (requires .NET SDK)
-- `vscode_extensions`: VS Code extensions to install
+#### Homebrew Packages
+
+```yaml
+# Homebrew taps (repositories)
+homebrew_taps:
+  - aws/tap
+  - azure/bicep
+  - azure/functions
+  - hashicorp/tap
+  - microsoft/git
+
+# GUI applications
+homebrew_casks:
+  - visual-studio-code
+  - docker-desktop
+  - iterm2
+
+# Command-line tools
+homebrew_formulae:
+  - git
+  - docker
+  - python
+```
+
+#### Development Tools
+
+```yaml
+# PowerShell modules
+powershell_modules:
+  - AWS.Tools.Common
+  - Terminal-Icons
+
+# Python packages via pipx
+pipx_packages:
+  - poetry
+  - black
+
+# Node.js global packages
+npm_global_packages:
+  - aws-cdk
+  - npmrc
+
+# .NET global tools (requires .NET SDK)
+dotnet_tools:
+  - Amazon.Lambda.Tools
+
+# VS Code extensions
+vscode_extensions:
+  - ms-vscode.powershell
+  - github.copilot
+```
 
 ### macOS System Preferences
 
@@ -137,6 +181,17 @@ To add additional setup steps:
 - `setup.yaml`: Ansible playbook that performs the installation and configuration
 - `vars.yaml`: Configuration variables defining what gets installed
 - `examples/`: Directory containing example custom scripts
+
+## 📚 Additional Resources
+
+For comprehensive documentation and examples:
+
+- [Complete Documentation](../docs/README.md) - Full project documentation
+- [Design Principles](../docs/design-principles.md) - Understanding the philosophy
+- [Configuration Examples](../docs/examples/README.md) - Real-world use cases
+- [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
+- [Architecture Overview](../docs/architecture.md) - How all the pieces fit together
+- [Package Management Strategy](../docs/package-management.md) - Our approach to managing packages
 
 ## Notable Default Packages
 
