@@ -23,39 +23,48 @@ This directory contains detailed guides for each supported platform.
 ## Choosing a Platform
 
 ### macOS
+
 **Best for:**
+
 - iOS/macOS development
 - Unix-based development workflows
 - Apple ecosystem integration
 - Design and creative work
 
 **Key strengths:**
+
 - Excellent hardware optimization
 - Strong Unix foundation
 - Premium development tools
 - Consistent user experience
 
 ### Windows
+
 **Best for:**
+
 - .NET development
 - Enterprise environments
 - Gaming development
 - Mixed platform teams
 
 **Key strengths:**
+
 - Native .NET ecosystem
 - Excellent Visual Studio integration
 - WSL for Linux compatibility
 - Strong enterprise tooling
 
 ### Ubuntu
+
 **Best for:**
+
 - Server-side development
 - Open source projects
 - DevOps and cloud development
 - Cost-conscious environments
 
 **Key strengths:**
+
 - Free and open source
 - Excellent package management
 - Strong community support
@@ -66,6 +75,7 @@ This directory contains detailed guides for each supported platform.
 All platforms provide:
 
 ### Development Tools
+
 - Git with LFS support
 - Visual Studio Code with extensions
 - Docker for containerization
@@ -73,12 +83,14 @@ All platforms provide:
 - Cloud CLI tools (AWS, Azure)
 
 ### Package Management
+
 - Declarative configuration via YAML files
 - Idempotent installation (safe to run multiple times)
 - Comprehensive logging and error handling
 - Custom command and script support
 
 ### Customization
+
 - Easy package list modification
 - System preference configuration
 - Custom script execution
@@ -95,18 +107,22 @@ All platforms provide:
 ## Cross-Platform Considerations
 
 ### File Paths
+
 - **macOS/Ubuntu**: Use forward slashes (`/`)
 - **Windows**: Use backslashes (`\`) or forward slashes in PowerShell
 
 ### Line Endings
+
 - **macOS/Ubuntu**: LF (`\n`)
 - **Windows**: CRLF (`\r\n`)
 
 ### Shell Differences
+
 - **macOS/Ubuntu**: Bash/Zsh with Unix commands
 - **Windows**: PowerShell with .NET cmdlets
 
 ### Package Names
+
 Package names may differ between platforms. Consult the platform-specific documentation for equivalent packages.
 
 ## Support Matrix
