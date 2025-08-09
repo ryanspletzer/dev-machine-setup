@@ -17,11 +17,13 @@ by developers.
 ## 📋 Quick Links
 
 ### Platform Setup Guides
+
 - [macOS Setup](./macOS/README.md) - Set up a macOS development environment
 - [Windows Setup](./windows/README.md) - Set up a Windows development environment
 - [Ubuntu Setup](./ubuntu/README.md) - Set up an Ubuntu development environment
 
 ### Comprehensive Documentation
+
 - [📚 Complete Documentation](./docs/README.md) - Comprehensive documentation and guides
 - [🎯 Design Principles](./docs/design-principles.md) - Core principles behind this project
 - [🏗️ Architecture Overview](./docs/architecture.md) - How everything fits together
