@@ -56,22 +56,26 @@ Ensure your system meets the minimum requirements:
 #### Homebrew Installation Issues
 
 **Problem**: Homebrew installation fails with permission errors
+
 ```bash
 Error: Cannot write to /usr/local/Cellar
 ```
 
 **Solution**:
+
 ```bash
 # Fix Homebrew permissions
 sudo chown -R $(whoami) /usr/local/Cellar /usr/local/bin /usr/local/share
 ```
 
 **Problem**: Command Line Tools not installed
+
 ```bash
 xcode-select: error: tool 'git' requires Xcode
 ```
 
 **Solution**:
+
 ```bash
 # Install Xcode Command Line Tools
 xcode-select --install
@@ -80,22 +84,26 @@ xcode-select --install
 #### Apple Silicon Compatibility
 
 **Problem**: Packages fail on Apple Silicon Macs
+
 ```bash
 Error: Cannot install under Rosetta 2 in ARM default prefix
 ```
 
 **Solution**:
+
 ```yaml
 # In vars.yaml, enable Rosetta 2
 install_rosetta: true
 ```
 
 **Problem**: Some packages require Rosetta 2
+
 ```bash
 Error: Package requires Intel architecture
 ```
 
 **Solution**: Install affected packages manually with Rosetta:
+
 ```bash
 arch -x86_64 brew install package-name
 ```
@@ -105,6 +113,7 @@ arch -x86_64 brew install package-name
 **Problem**: Sudo password prompts interfere with automation
 
 **Solution**: The setup script handles this automatically, but if you encounter issues:
+
 ```bash
 # Clear any cached sudo credentials
 sudo -k
@@ -117,11 +126,13 @@ sudo -k
 #### PowerShell Execution Policy
 
 **Problem**: Scripts cannot run due to execution policy
+
 ```powershell
 execution of scripts is disabled on this system
 ```
 
 **Solution**:
+
 ```powershell
 # Allow scripts for current user
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -130,11 +141,13 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 #### Chocolatey Installation Issues
 
 **Problem**: Chocolatey fails to install
+
 ```powershell
 Exception calling "DownloadString" with "1" argument(s)
 ```
 
 **Solution**:
+
 ```powershell
 # Enable TLS 1.2
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -149,6 +162,7 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/in
 **Problem**: Windows Defender blocks package installations
 
 **Solution**:
+
 1. Add exclusion for Chocolatey directory: `C:\ProgramData\chocolatey`
 2. Temporarily disable real-time protection during setup
 3. Whitelist the setup script in Windows Defender
@@ -158,6 +172,7 @@ iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/in
 **Problem**: VS Code cannot connect to WSL
 
 **Solution**:
+
 ```bash
 # In WSL terminal
 code --install-extension ms-vscode-remote.remote-wsl
@@ -168,21 +183,25 @@ code --install-extension ms-vscode-remote.remote-wsl
 #### APT Package Issues
 
 **Problem**: Package lists are outdated
+
 ```bash
 E: Unable to locate package
 ```
 
 **Solution**:
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
 **Problem**: Broken package dependencies
+
 ```bash
 E: Unmet dependencies
 ```
 
 **Solution**:
+
 ```bash
 # Fix broken packages
 sudo apt --fix-broken install
@@ -194,11 +213,13 @@ sudo apt autoremove && sudo apt autoclean
 #### Snap Package Issues
 
 **Problem**: Snap packages fail to install
+
 ```bash
 error: cannot communicate with server
 ```
 
 **Solution**:
+
 ```bash
 # Restart snapd service
 sudo systemctl restart snapd
@@ -212,6 +233,7 @@ sudo systemctl status snapd
 **Problem**: Docker requires sudo
 
 **Solution**:
+
 ```bash
 # Add user to docker group
 sudo usermod -aG docker $USER
@@ -223,6 +245,7 @@ newgrp docker
 **Problem**: VS Code cannot write to directories
 
 **Solution**:
+
 ```bash
 # Fix VS Code directory permissions
 sudo chown -R $USER:$USER ~/.vscode
@@ -237,6 +260,7 @@ sudo chown -R $USER:$USER ~/.vscode
 **Solutions**:
 
 1. **Check package name spelling**:
+
    ```bash
    # macOS
    brew search package-name
@@ -249,6 +273,7 @@ sudo chown -R $USER:$USER ~/.vscode
    ```
 
 2. **Add required repositories**:
+
    ```yaml
    # macOS: Add tap in vars.yaml
    homebrew_taps:
@@ -260,6 +285,7 @@ sudo chown -R $USER:$USER ~/.vscode
    ```
 
 3. **Use alternative package names**:
+
    ```yaml
    # Try different variations
    homebrew_formulae:
@@ -274,6 +300,7 @@ sudo chown -R $USER:$USER ~/.vscode
 **Solutions**:
 
 1. **Uninstall conflicting packages**:
+
    ```bash
    # macOS
    brew uninstall conflicting-package
@@ -286,6 +313,7 @@ sudo chown -R $USER:$USER ~/.vscode
    ```
 
 2. **Use specific versions**:
+
    ```yaml
    # macOS: Pin to specific version
    homebrew_formulae:
@@ -299,6 +327,7 @@ sudo chown -R $USER:$USER ~/.vscode
 **Solutions**:
 
 1. **Check internet connection**:
+
    ```bash
    # Test connectivity
    ping google.com
@@ -306,6 +335,7 @@ sudo chown -R $USER:$USER ~/.vscode
    ```
 
 2. **Retry with different mirrors**:
+
    ```bash
    # macOS: Use different Homebrew mirror
    export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
@@ -315,6 +345,7 @@ sudo chown -R $USER:$USER ~/.vscode
    ```
 
 3. **Increase timeout values**:
+
    ```bash
    # Set longer timeout for downloads
    export HOMEBREW_CURL_TIMEOUT=300
@@ -325,6 +356,7 @@ sudo chown -R $USER:$USER ~/.vscode
 ### Extension Installation Failures
 
 **Problem**: Extensions fail to install
+
 ```bash
 Error: Extension 'publisher.extension' not found
 ```
@@ -336,11 +368,13 @@ Error: Extension 'publisher.extension' not found
    - Ensure proper format: `publisher.extension-name`
 
 2. **Install manually**:
+
    ```bash
    code --install-extension publisher.extension-name
    ```
 
 3. **Clear extension cache**:
+
    ```bash
    # Remove VS Code extensions directory
    rm -rf ~/.vscode/extensions
@@ -351,6 +385,7 @@ Error: Extension 'publisher.extension' not found
 **Problem**: Extensions conflict with each other
 
 **Solution**:
+
 1. Disable conflicting extensions temporarily
 2. Check extension documentation for known conflicts
 3. Use workspace-specific extension settings
@@ -364,6 +399,7 @@ Error: Extension 'publisher.extension' not found
 **Solutions**:
 
 1. **Configure Git credentials**:
+
    ```bash
    # Set up credential helper (macOS)
    git config --global credential.helper osxkeychain
@@ -376,6 +412,7 @@ Error: Extension 'publisher.extension' not found
    ```
 
 2. **Generate SSH keys**:
+
    ```bash
    ssh-keygen -t ed25519 -C "your@email.com"
    ssh-add ~/.ssh/id_ed25519
@@ -386,6 +423,7 @@ Error: Extension 'publisher.extension' not found
 **Problem**: Git user settings not configured properly
 
 **Solution**:
+
 ```bash
 # Verify current configuration
 git config --global user.email
@@ -405,12 +443,14 @@ git config --global user.name "Your Name"
 **Solutions**:
 
 1. **Use parallel installation**:
+
    ```bash
    # macOS: Enable parallel downloads
    echo 'export HOMEBREW_PARALLEL=4' >> ~/.zshrc
    ```
 
 2. **Clean package caches**:
+
    ```bash
    # macOS
    brew cleanup
@@ -423,6 +463,7 @@ git config --global user.name "Your Name"
    ```
 
 3. **Check available disk space**:
+
    ```bash
    df -h  # Unix
    Get-WmiObject -Class Win32_LogicalDisk  # Windows
@@ -443,22 +484,26 @@ git config --global user.name "Your Name"
 ### Script Execution Failures
 
 **Problem**: Custom scripts fail to execute
+
 ```bash
 Permission denied: ./custom_script.sh
 ```
 
 **Solution**:
+
 ```bash
 # Make script executable
 chmod +x custom_script.sh
 ```
 
 **Problem**: Script has wrong interpreter
+
 ```bash
 bad interpreter: No such file or directory
 ```
 
 **Solution**:
+
 ```bash
 # Fix shebang line at top of script
 #!/bin/bash  # For bash scripts
@@ -470,6 +515,7 @@ bad interpreter: No such file or directory
 **Problem**: Environment variables not available in custom scripts
 
 **Solution**:
+
 ```bash
 # Source environment files in script
 #!/bin/bash
@@ -486,6 +532,7 @@ source ~/.profile
 When reporting issues, collect this information:
 
 1. **System Information**:
+
    ```bash
    # macOS
    sw_vers && uname -m
@@ -498,6 +545,7 @@ When reporting issues, collect this information:
    ```
 
 2. **Package Manager Versions**:
+
    ```bash
    # macOS
    brew --version
@@ -524,6 +572,7 @@ When reporting issues, collect this information:
 If the setup has partially completed and left your system in an inconsistent state:
 
 1. **Review installed packages**:
+
    ```bash
    # macOS
    brew list
@@ -536,6 +585,7 @@ If the setup has partially completed and left your system in an inconsistent sta
    ```
 
 2. **Uninstall problematic packages**:
+
    ```bash
    # Use package manager uninstall commands
    brew uninstall package-name
@@ -544,6 +594,7 @@ If the setup has partially completed and left your system in an inconsistent sta
    ```
 
 3. **Reset package managers**:
+
    ```bash
    # macOS: Reinstall Homebrew
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"

@@ -14,6 +14,7 @@ This document outlines the core design principles that guide the development and
 - **Clear Naming**: Variables, files, and functions use descriptive, self-documenting names
 
 **Example:**
+
 ```yaml
 homebrew_formulae:
   - git
@@ -32,6 +33,7 @@ homebrew_formulae:
 - **No Runtime Discovery**: Avoid dynamic package discovery or runtime configuration generation
 
 **Why this matters:**
+
 - Easy to review changes via Git diffs
 - Can be shared and versioned across teams
 - Predictable outcomes - what you see in the file is what gets installed
@@ -44,6 +46,7 @@ homebrew_formulae:
 Every package, tool, or application must be installed through a recognized package manager:
 
 #### macOS
+
 - **Homebrew** for CLI tools (`homebrew_formulae`)
 - **Homebrew Casks** for GUI applications (`homebrew_casks`)
 - **pipx** for Python tools (`pipx_packages`)
@@ -52,18 +55,21 @@ Every package, tool, or application must be installed through a recognized packa
 - **.NET CLI** for .NET tools (`dotnet_tools`)
 
 #### Windows
+
 - **Chocolatey** for applications and tools (`choco_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **npm** for Node.js packages (`npm_global_packages`)
 - **pipx** for Python tools (`pipx_packages`)
 
 #### Ubuntu
+
 - **APT** for system packages (`apt_packages`)
 - **Snap** for applications (`snap_packages`)
 - **pipx** for Python tools (`pipx_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 
 **Benefits:**
+
 - Automatic dependency resolution
 - Consistent update mechanisms
 - Security through trusted repositories
@@ -80,6 +86,7 @@ Each platform uses its native tools and conventions:
 - **Ubuntu**: Bash + Ansible playbooks
 
 But all platforms provide:
+
 - Similar command-line interface (`-e` for email, `-v` for verbose, etc.)
 - Comparable package categories and functionality
 - Consistent logging and error handling
@@ -95,6 +102,7 @@ But all platforms provide:
 - **PowerShell scripts** use conditional logic to check existing state before making changes
 
 **Example of declarative approach:**
+
 ```yaml
 vscode_extensions:
   - github.copilot
@@ -157,6 +165,7 @@ The setup process should require minimal manual intervention:
 ## Anti-Patterns We Avoid
 
 ### ❌ Complex Configuration Hierarchies
+
 ```yaml
 # DON'T DO THIS
 packages:
@@ -171,6 +180,7 @@ packages:
 ```
 
 ### ❌ Runtime Package Discovery
+
 ```bash
 # DON'T DO THIS
 for package in $(curl -s api.example.com/recommended-packages); do
@@ -179,6 +189,7 @@ done
 ```
 
 ### ❌ Manual Installation Steps
+
 ```bash
 # DON'T DO THIS
 echo "Please manually download and install XYZ from https://example.com"
@@ -187,6 +198,7 @@ read
 ```
 
 ### ❌ Platform-Specific Packages in Shared Config
+
 ```yaml
 # DON'T DO THIS - mixing platform-specific packages
 packages:

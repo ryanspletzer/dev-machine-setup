@@ -4,7 +4,7 @@ This document provides a high-level view of how the dev-machine-setup project is
 
 ## Repository Structure
 
-```
+```text
 dev-machine-setup/
 ├── README.md                    # Project overview and quick start
 ├── LICENSE                      # MIT license

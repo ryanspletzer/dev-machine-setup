@@ -11,6 +11,7 @@ Dev-machine-setup is a collection of automated scripts and configurations that h
 ### Why should I use this instead of manual installation?
 
 **Benefits of automated setup:**
+
 - **Speed**: Set up a complete development environment in minutes instead of hours
 - **Consistency**: Same tools and configurations across different machines and team members
 - **Reproducibility**: Version-controlled configurations that can be shared and replicated
@@ -20,6 +21,7 @@ Dev-machine-setup is a collection of automated scripts and configurations that h
 ### Which platforms are supported?
 
 Currently supported platforms:
+
 - **macOS**: 10.15 (Catalina) and later, including Apple Silicon Macs
 - **Windows**: Windows 10 and 11 with PowerShell 5.1 or later
 - **Ubuntu**: 20.04 LTS and later, including WSL (Windows Subsystem for Linux)
@@ -27,6 +29,7 @@ Currently supported platforms:
 ### Do I need to be a developer to use this?
 
 While designed for developers, anyone who wants to automate software installation can benefit. The project includes configurations for:
+
 - Development tools and programming languages
 - Productivity applications
 - Creative software
@@ -46,6 +49,7 @@ While designed for developers, anyone who wants to automate software installatio
 Each platform has a curated selection of popular development tools:
 
 **Common across platforms:**
+
 - Git and Git LFS
 - Visual Studio Code with extensions
 - Docker
@@ -54,6 +58,7 @@ Each platform has a curated selection of popular development tools:
 - PowerShell modules for automation
 
 **Platform-specific highlights:**
+
 - **macOS**: Homebrew packages, iTerm2, Rectangle Pro
 - **Windows**: Chocolatey packages, Windows Terminal enhancements
 - **Ubuntu**: APT and Snap packages, development libraries
@@ -61,6 +66,7 @@ Each platform has a curated selection of popular development tools:
 ### How long does the setup take?
 
 Setup time varies by platform and internet speed:
+
 - **Prerequisites only**: 2-5 minutes
 - **Full setup**: 15-45 minutes depending on package count and download speeds
 - **Subsequent runs**: Much faster due to caching and idempotent operations
@@ -143,6 +149,7 @@ This approach leverages each platform's strengths rather than forcing a one-size
 Yes, with normal precautions:
 
 **Security measures:**
+
 - Only installs from official package repositories
 - Uses cryptographically signed packages where available
 - Minimal privilege escalation (only when necessary)
@@ -150,6 +157,7 @@ Yes, with normal precautions:
 - Comprehensive logging of all operations
 
 **Best practices:**
+
 - Review the configuration files before running
 - Test on virtual machines or non-critical systems first
 - Keep backups of important data
@@ -159,12 +167,14 @@ Yes, with normal precautions:
 The setup is designed to be resilient:
 
 **Recovery features:**
+
 - **Idempotent operations**: Safe to run multiple times
 - **Detailed logging**: All operations logged for troubleshooting
 - **Continue on error**: Most failures don't stop the entire setup
 - **State checking**: Skips already-completed installations
 
 **Recovery process:**
+
 1. Check the log file for specific errors
 2. Fix any identified issues
 3. Re-run the setup script (it will skip completed items)
@@ -174,12 +184,14 @@ The setup is designed to be resilient:
 Yes, but consider your organization's policies:
 
 **Enterprise considerations:**
+
 - **Security policies**: Ensure compliance with software installation policies
 - **Network restrictions**: Some packages may be blocked by corporate firewalls
 - **Approval processes**: You may need IT approval for certain tools
 - **Custom repositories**: May need to use internal package repositories
 
 **Enterprise customization:**
+
 - Create enterprise-specific configurations
 - Add corporate security tools and certificates
 - Include company-specific development tools
@@ -247,16 +259,19 @@ custom_commands_user:
 Long setup times can be normal, but check for:
 
 **Normal delays:**
+
 - First-time package downloads
 - Compilation of packages from source
 - Network speed limitations
 
 **Possible issues:**
+
 - Network connectivity problems
 - Package repository timeouts
 - Stuck processes (check with verbose mode `-v`)
 
 **Solutions:**
+
 - Use verbose mode to see current progress
 - Check network connectivity
 - Consider running prerequisites only first (`-p` flag)
@@ -266,11 +281,13 @@ Long setup times can be normal, but check for:
 Permission errors usually indicate:
 
 **Common causes:**
+
 - Script not run with appropriate privileges
 - Package manager permissions not set correctly
 - File system restrictions
 
 **Solutions:**
+
 ```bash
 # macOS: Fix Homebrew permissions
 sudo chown -R $(whoami) /usr/local/Cellar
@@ -286,16 +303,19 @@ sudo usermod -aG docker $USER
 It depends on the failures:
 
 **Usually not concerning:**
+
 - Optional packages that aren't critical
 - Packages with known compatibility issues
 - Network-related temporary failures (will retry)
 
 **More concerning:**
+
 - Core development tools (Git, editors)
 - Package manager failures
 - System configuration failures
 
 **What to do:**
+
 1. Check the log files for specific error messages
 2. Try re-running the setup (may resolve temporary issues)
 3. Remove problematic packages from configuration if not essential
@@ -308,14 +328,17 @@ It depends on the failures:
 Several optimization strategies:
 
 **Reduce package count:**
+
 - Remove unused packages from configuration
 - Use minimal configurations for faster setups
 
 **Improve caching:**
+
 - Keep package manager caches between runs
 - Use local mirrors when available
 
 **Parallel processing:**
+
 - Most modern package managers install packages in parallel automatically
 - Avoid running multiple setup instances simultaneously
 
@@ -324,11 +347,13 @@ Several optimization strategies:
 Disk space requirements vary significantly:
 
 **Typical ranges:**
+
 - **Minimal setup**: 2-5 GB
 - **Standard development setup**: 10-20 GB
 - **Comprehensive setup**: 30-50 GB or more
 
 **Major space consumers:**
+
 - IDEs and development environments
 - Language runtimes and SDKs
 - Container images and virtualization
@@ -356,11 +381,13 @@ sudo apt clean && sudo apt autoremove
 Yes! The configurations integrate well with:
 
 **Configuration Management:**
+
 - **Ansible**: Use the YAML configurations as variables
 - **Puppet/Chef**: Adapt package lists for other tools
 - **Salt**: Convert configurations to Salt states
 
 **Container Integration:**
+
 - Create Dockerfiles based on package lists
 - Use configurations in container build processes
 - Generate dev containers for VS Code
@@ -387,6 +414,7 @@ Absolutely! The MIT license allows:
 - **Modification** to meet specific requirements
 
 **Best practices for organizational forks:**
+
 - Maintain compatibility with upstream updates
 - Document organization-specific changes
 - Consider contributing general improvements back
@@ -408,11 +436,13 @@ Several resources available:
 Use GitHub issues:
 
 **For bugs:**
+
 - Include system information and log files
 - Provide steps to reproduce the issue
 - Describe expected vs. actual behavior
 
 **For feature requests:**
+
 - Explain the use case and benefits
 - Provide examples if possible
 - Consider contributing the feature yourself
@@ -422,17 +452,20 @@ Use GitHub issues:
 Helpful information includes:
 
 **System details:**
+
 - Operating system and version
 - Architecture (Intel/ARM/x86_64)
 - Package manager versions
 
 **Problem details:**
+
 - Exact error messages
 - Relevant log file excerpts
 - Steps to reproduce
 - What you were trying to accomplish
 
 **Configuration:**
+
 - Your `vars.yaml` configuration (remove sensitive info)
 - Any custom scripts or modifications
 - Command-line options used
