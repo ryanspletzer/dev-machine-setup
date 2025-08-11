@@ -391,4 +391,4 @@ custom_commands:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-custom_script: "./examples/custom_script.ps1"
+custom_script: "./custom_script.ps1"

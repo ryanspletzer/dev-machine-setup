@@ -370,4 +370,4 @@ custom_commands_elevated:
 
 # Custom script path (optional)
 # Provide the path to a custom script that will be executed at the end of the setup
-custom_script: "./examples/custom_script.sh"
+custom_script: "./custom_script.sh"
