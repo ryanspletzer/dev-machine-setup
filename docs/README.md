@@ -6,7 +6,6 @@ This directory contains comprehensive documentation for the dev-machine-setup pr
 
 - [**Design Principles**](design-principles.md) - The core principles that guide the design of this repository
 - [**Architecture Overview**](architecture.md) - High-level architecture and component relationships
-- [**Platform Guides**](platform-guides/) - Platform-specific setup guides and details
 - [**Customization Guide**](customization.md) - How to customize the setup for your needs
 - [**Package Management**](package-management.md) - Understanding the package management strategy
 - [**Configuration Reference**](configuration-reference.md) - Complete reference for all configuration options
@@ -20,11 +19,7 @@ If you're new to this project, start with:
 
 1. [Design Principles](design-principles.md) - Understand the "why" behind the architecture
 2. [Architecture Overview](architecture.md) - Get a high-level view of how everything fits together
-3. The appropriate platform guide:
-   - [macOS Setup Guide](platform-guides/macos.md)
-   - [Windows Setup Guide](platform-guides/windows.md)
-   - [Ubuntu Setup Guide](platform-guides/ubuntu.md)
-4. [Customization Guide](customization.md) - Learn how to tailor the setup to your needs
+3. [Customization Guide](customization.md) - Learn how to tailor the setup to your needs
 
 ## Project Goals
 

@@ -40,7 +40,7 @@ dev-machine-setup/
 
 ```mermaid
 graph TB
-    A[User] --> B[Platform Detection]
+    A[User] --> B[Platform]
     B --> C[macOS Setup]
     B --> D[Windows Setup]
     B --> E[Ubuntu Setup]
@@ -55,7 +55,8 @@ graph TB
 ```
 
 Each platform provides:
-- **Entry Point**: Consistent command-line interface across platforms
+
+- **Entry Point**: Consistent script parameter interface across platforms
 - **Package Management**: Platform-native package managers
 - **Configuration**: Platform-specific variable files
 - **Automation**: Platform-appropriate automation tools
@@ -78,13 +79,14 @@ graph LR
 
     subgraph "Package Managers"
         G --> L[brew install]
-        H --> M[Install-Module]
+        H --> M[Install-PSResource]
         I --> N[pipx install]
         J --> O[code --install-extension]
     end
 ```
 
 **Key Components:**
+
 - `setup.sh`: Bash script that handles prerequisites and launches Ansible
 - `setup.yaml`: Ansible playbook with tagged tasks for different components
 - `vars.yaml`: YAML configuration file with package lists and settings
@@ -108,13 +110,14 @@ graph LR
 
     subgraph "Package Managers"
         F --> K[choco install]
-        G --> L[Install-Module]
+        G --> L[Install-PSResource]
         H --> M[pipx install]
         I --> N[code --install-extension]
     end
 ```
 
 **Key Components:**
+
 - `setup.ps1`: PowerShell script that handles the entire setup process
 - `vars.yaml`: YAML configuration file (parsed by PowerShell-Yaml module)
 - **Chocolatey**: Primary package manager for applications and tools
@@ -139,7 +142,7 @@ graph LR
     subgraph "Package Managers"
         G --> L[apt install]
         H --> M[snap install]
-        I --> N[Install-Module]
+        I --> N[Install-PSResource]
         J --> O[pipx install]
         K --> P[code --install-extension]
     end
@@ -201,8 +204,8 @@ Each platform organizes packages into logical categories:
 | VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
 | PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` |
 | Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` |
-| Node.js Packages | `npm_global_packages` | `npm_global_packages` | N/A |
-| .NET Tools | `dotnet_tools` | N/A | N/A |
+| Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
+| .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
 
 ### Package Manager Integration
 

@@ -212,11 +212,7 @@ The default setup includes a curated selection of popular development tools and 
 ### Applications
 
 - iTerm2
-- Microsoft Office
-- Microsoft Edge
-- Microsoft Teams
-- Rectangle Pro (window management)
-- 1Password
+- git-credential-manager
 - Docker Desktop
 
 See `vars.yaml` for the complete list of installed packages.

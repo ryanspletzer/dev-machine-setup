@@ -8,7 +8,7 @@ This document outlines the core design principles that guide the development and
 
 **"Simple is better than complex"**
 
-- **Flat Configuration Structure**: All package lists are simple, flat arrays in YAML/PowerShell files
+- **Flat Configuration Structure**: All package lists are simple, flat arrays in YAML files
 - **No Complex Dependencies**: Avoid nested configurations or complex dependency graphs
 - **Readable Code**: Scripts and playbooks should be easily understood by anyone
 - **Clear Naming**: Variables, files, and functions use descriptive, self-documenting names
@@ -41,7 +41,7 @@ homebrew_formulae:
 
 ### 3. Package Manager Integration
 
-**"Use what the operating system provides"**
+**"Leverage native and community package managers for reliable installations"**
 
 Every package, tool, or application must be installed through a recognized package manager:
 

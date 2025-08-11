@@ -4,7 +4,10 @@ This document explains the comprehensive package management strategy used across
 
 ## Philosophy
 
-The package management strategy is built on the principle of **"Use what the operating system provides"** - leveraging the most appropriate and well-supported package managers for each platform while maintaining consistency in the user experience.
+The package management strategy is built on the principle of
+**"Leverage native and community package managers for reliable installations"** -
+leveraging the most appropriate and well-supported package managers for each platform
+while maintaining consistency in the user experience.
 
 ## Package Manager Selection Criteria
 
@@ -122,6 +125,7 @@ apt_packages:
 ```
 
 **Snap Packages**:
+
 - GUI applications
 - Self-contained applications
 - Cross-distribution packages
