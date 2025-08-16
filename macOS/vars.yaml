@@ -72,7 +72,6 @@ homebrew_formulae:
   - ruby-install
   - ruff
   - rustup
-  - serverless
   - uv
   - ykman
   - wget2
@@ -103,9 +102,10 @@ pipx_packages:
   - taskcat
 
 npm_global_packages:
+  - '@vue/cli'
   - aws-cdk
   - npmrc
-  - '@vue/cli'
+  - serverless
 
 # .NET Global Tools
 dotnet_tools:

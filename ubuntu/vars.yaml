@@ -288,10 +288,11 @@ pipx_packages:
 
 # npm global packages
 npm_global_packages:
+  - '@vue/cli'
   - aws-cdk
   - azure-functions-core-tools@4
   - npmrc
-  - '@vue/cli'
+  - serverless
 
 # .NET Global Tools
 dotnet_tools:

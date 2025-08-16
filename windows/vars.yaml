@@ -49,7 +49,6 @@ choco_packages:
   - name: ruff
   - name: rsat
   - name: rustup.install
-  - name: serverless
   - name: servicebusexplorer
   - name: slack
   - name: sql-server-management-studio
@@ -114,9 +113,10 @@ pipx_packages:
   - yubikey-manager
 
 npm_global_packages:
+  - '@vue.cli'
   - aws-cdk
   - npmrc
-  - '@vue.cli'
+  - serverless
 
 # .NET Global Tools
 dotnet_tools:
