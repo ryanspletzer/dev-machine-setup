@@ -159,7 +159,6 @@ snap_packages:
   - code --classic               # VS Code with classic confinement
   - discord                      # Communication app
   - slack --classic              # Team communication
-  - spotify                      # Music streaming
 ```
 
 ### WSL Configuration

@@ -121,14 +121,6 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
-  - name: spotify
-    signed_by: https://download.spotify.com/debian/pubkey_6224F9941A8AA6D1.gpg
-    uris: http://repository.spotify.com
-    suites: stable
-    components: non-free
-    architectures: "{{ deb_architecture }}"
-    supported_architectures:
-      - amd64
   - name: steam
     signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
     uris: https://repo.steampowered.com/steam
@@ -259,10 +251,6 @@ apt_packages:
   - name: snapd
   # Ookla Speedtest CLI - correct package name
   - name: speedtest-cli
-  # amd64 only, arm64 not supported
-  - name: spotify-client
-    supported_architectures:
-      - amd64
   # amd64 only, arm64 not supported
   - name: steam-launcher
     supported_architectures:

@@ -114,7 +114,6 @@ apt_packages:
 snap_packages:
   - code
   - discord
-  - spotify
 ```
 
 #### Development Tools
@@ -188,7 +187,6 @@ The default setup includes a curated selection of popular development tools and 
 ### Applications
 
 - Visual Studio Code
-- Spotify
 - Slack
 - Docker Desktop
 
