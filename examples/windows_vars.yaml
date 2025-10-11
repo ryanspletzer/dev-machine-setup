@@ -119,6 +119,7 @@ pipx_packages:
   - yubikey-manager
 
 npm_global_packages:
+  - '@github/copilot'
   - '@vue.cli'
   - aws-cdk
   - npmrc

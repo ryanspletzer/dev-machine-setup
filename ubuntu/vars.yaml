@@ -288,6 +288,7 @@ pipx_packages:
 
 # npm global packages
 npm_global_packages:
+  - '@github/copilot'
   - '@vue/cli'
   - aws-cdk
   - azure-functions-core-tools@4
