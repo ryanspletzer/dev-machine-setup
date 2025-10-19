@@ -75,6 +75,7 @@ homebrew_formulae:
   - hashicorp/tap/vault
   - istioctl
   - jq
+  - mas
   - maven
   - node
   - nvm
@@ -415,6 +416,15 @@ custom_commands_user:
   - git config --global push.default current
   - git config --global push.autoSetupRemote true
   - git config --global user.signingKey 787AEF0BAE232359
+  # Rustup init
+  - echo "Initializing Rust toolchain..."
+  - rustup-init -y
+  # Ruby Install for Jekyll
+  - echo "Installing Ruby 3.4.1 via ruby-install..."
+  - ruby-install ruby 3.4.1
+  # Install Amazon Kindle via mas
+  - echo "Installing Amazon Kindle via mas..."
+  - mas install 302584613
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
