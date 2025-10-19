@@ -396,6 +396,9 @@ custom_commands_user:
   # Set app expose to swipe down with three fingers
   - echo "Setting App Expose to swipe down with three fingers..."
   - defaults write com.apple.dock showAppExposeGestureEnabled -bool true
+  # Turn off Auto Capitalization
+  - echo "Turning off Auto Capitalization..."
+  - defaults write -g NSAutomaticCapitalizationEnabled -bool false
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
