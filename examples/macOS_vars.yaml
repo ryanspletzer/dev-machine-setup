@@ -18,7 +18,10 @@ homebrew_casks:
   - appcleaner
   - brave-browser
   - chatgpt
+  - claude-code
   - citrix-workspace
+  - cursor
+  - cursor-cli
   - docker-desktop
   - dotnet-sdk
   - drawio
@@ -26,25 +29,30 @@ homebrew_casks:
   - firefox
   - font-caskaydia-cove-nerd-font
   - git-credential-manager
+  - ghostty
   - google-chrome
   - iterm2
   - microsoft-azure-storage-explorer
   - microsoft-edge
   - microsoft-office
-  - microsoft-remote-desktop
   - microsoft-teams
+  - netnewswire
   - netspot
   - ngrok
   # Doesn't work without Rosetta 2
   # - parallels
+  - obsidian
   - powershell
   - rectangle-pro
   - steam
   - synologyassistant
   - tailscale-app
+  - taskexplorer
   - utm
   - virtualbox
   - visual-studio-code
+  - vlc
+  - windows-app
   - wine-stable
   # Doesn't work without Rosetta 2
   # - yubico-yubikey-manager
@@ -432,6 +440,9 @@ custom_commands_user:
   # Install Amazon Kindle via mas
   - echo "Installing Amazon Kindle via mas..."
   - mas install 302584613
+  # Install Xcode via mas
+  - echo "Installing Xcode via mas..."
+  - mas install 497799835
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
