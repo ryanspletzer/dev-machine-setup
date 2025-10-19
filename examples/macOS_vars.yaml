@@ -16,6 +16,7 @@ homebrew_taps:
 homebrew_casks:
   - 1password
   - appcleaner
+  - brave-browser
   - chatgpt
   - citrix-workspace
   - docker-desktop
