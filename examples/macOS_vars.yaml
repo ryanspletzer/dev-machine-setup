@@ -458,6 +458,9 @@ custom_commands_elevated:
   # Add fish to /etc/shells if not already present
   - echo "Adding fish shell to /etc/shells..."
   - "if ! grep -q \"/opt/homebrew/bin/fish\" /etc/shells; then echo \"/opt/homebrew/bin/fish\" | sudo tee -a /etc/shells; fi"
+  # Set "Prevent automatic sleeping on power adapter when the display is off"
+  - echo "Setting system to prevent automatic sleeping on power adapter when display is off..."
+  - pmset -c sleep 0
   # Change default shell to PowerShell
   # TODO: FIGURE OUT AN APPROCH TO CHANGE THE DEFAULT SHELL
   # - chsh -s /usr/local/bin/pwsh
