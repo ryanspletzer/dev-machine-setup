@@ -408,6 +408,10 @@ custom_commands_user:
   # Turn off Auto Capitalization
   - echo "Turning off Auto Capitalization..."
   - defaults write -g NSAutomaticCapitalizationEnabled -bool false
+  # Turn off Hot Corners
+  - echo "Disabling Hot Corners..."
+  - defaults write com.apple.dock wvous-br-corner -int 0
+  - defaults write com.apple.dock wvous-br-modifier -int 0
   # Restart affected applications
   - echo "Restarting affected applications..."
   - killall Finder
