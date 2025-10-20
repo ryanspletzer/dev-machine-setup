@@ -447,6 +447,9 @@ custom_commands_user:
   # Install Xcode via mas
   - echo "Installing Xcode via mas..."
   - mas install 497799835
+  # Install Microsoft To Do via mas
+  - echo "Installing Microsoft To Do via mas..."
+  - mas install 1274495053
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
