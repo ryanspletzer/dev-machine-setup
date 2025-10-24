@@ -79,6 +79,7 @@ homebrew_formulae:
   - fish
   - fzf
   - gh
+  - ghostty
   - git
   - git-lfs
   - go
