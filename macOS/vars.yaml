@@ -357,6 +357,9 @@ custom_commands_user:
   # Install Git LFS
   - echo "Installing Git LFS..."
   - git lfs install
+  # Make nvm's working directory
+  - echo "Creating nvm working directory..."
+  - mkdir -p ~/.nvm
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
