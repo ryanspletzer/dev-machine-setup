@@ -427,6 +427,9 @@ custom_commands_user:
   # Update PowerShell help
   - echo "Updating PowerShell help documentation..."
   - pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+  # Set PSResource Repository PSGallery as trusted repository
+  - echo "Setting PSResource Repository PSGallery as trusted repository..."
+  - pwsh -Command "Set-PSRepository -Name PSGallery -Trusted"
   # Install Git LFS
   - echo "Installing Git LFS..."
   - git lfs install

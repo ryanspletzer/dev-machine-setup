@@ -277,7 +277,7 @@
     # PowerShell modules
     - name: Install PowerShell modules
       ansible.builtin.command:
-        cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+        cmd: pwsh -Command "Install-PSResource -Name {{ item }} -TrustRepository"
       environment:
         PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
       loop: "{{ powershell_modules }}"

@@ -569,6 +569,9 @@ custom_commands_user:
   # Update PowerShell help
   - command: ~/.dotnet/tools/pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
     description: Update PowerShell help documentation
+  # Set PSResource Repository PSGallery as trusted repository
+  - command: ~/.dotnet/tools/pwsh -Command "Set-PSRepository -Name PSGallery -Trusted"
+    description: Set PSResource Repository PSGallery as trusted repository
   # Install Git LFS
   - command: git lfs install
     description: Install Git LFS

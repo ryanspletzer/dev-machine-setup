@@ -118,7 +118,7 @@
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
-        cmd: pwsh -Command "Install-Module -Name {{ item }} -Force -Scope CurrentUser"
+        cmd: pwsh -Command "Install-PSResource -Name {{ item }} -TrustRepository"
       ignore_errors: yes
       loop: "{{ powershell_modules }}"
       register: pwsh_install_result
