@@ -86,7 +86,7 @@ chmod 700 ./setup.sh
 4. Run the setup script
 
 ```powershell
-# Copy the contents of the macOS directory to somewhere like ~/Downloads if you don't have git installed yet to clone
+# Copy the contents of the windows directory to somewhere like ~/Downloads if you don't have git installed yet to clone
 # the repo
 
 # Change to that directory
