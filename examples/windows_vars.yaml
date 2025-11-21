@@ -76,6 +76,7 @@ choco_packages:
 powershell_modules:
   - AWS.Tools.Common
   - Az.Accounts
+  - ExchangeOnlineManagement
   - Microsoft.Graph.Authentication
   - Pester
   - platyPS
