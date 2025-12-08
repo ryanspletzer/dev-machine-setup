@@ -73,6 +73,7 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
+  - elixir
   - eza
   - fd
   - ffmpeg
@@ -89,6 +90,7 @@ homebrew_formulae:
   - jq
   - mas
   - maven
+  - mcp-inspector
   - node
   - nvm
   - oh-my-posh
