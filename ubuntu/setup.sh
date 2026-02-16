@@ -146,13 +146,6 @@ fi
 if [ "$PREREQS_ONLY" = true ]; then
   echo "Prerequisites installation complete." | tee -a "$LOG_FILE"
   echo "Skipping Ansible playbook execution as requested (-p flag)." | tee -a "$LOG_FILE"
-
-  # Clean up
-  if [ "$CI_MODE" != true ]; then
-    kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-  fi
-  unset ANSIBLE_SUDO_PASS
-
   exit 0
 fi
 
@@ -196,19 +189,6 @@ if [ -n "$EXTRA_VARS" ]; then
 else
   ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
 fi
-
-# Clean up
-echo "Cleaning up..." | tee -a "$LOG_FILE"
-
-if [ "$CI_MODE" != true ]; then
-  # Kill the sudo refresh process
-  if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
-    kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-  fi
-fi
-
-# Unset environment variables
-unset ANSIBLE_SUDO_PASS
 
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"

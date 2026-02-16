@@ -116,149 +116,6 @@ EOF
   SUDO_KEEP_ALIVE_PID=$!
 fi
 
-# Install Homebrew if not already installed
-if [ -x "/opt/homebrew/bin/brew" ]; then
-  echo "Homebrew already installed." | tee -a "$LOG_FILE"
-else
-  echo "Installing Homebrew..." | tee -a "$LOG_FILE"
-  # Use NONINTERACTIVE to avoid prompts during Homebrew installation
-  NONINTERACTIVE=1 /bin/bash \
-    -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "$LOG_FILE"
-  # shellcheck disable=SC2016
-  (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
-  # shellcheck disable=SC2016
-  (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
-fi
-
-# Ensure Homebrew is on the PATH
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# Install Ansible using Homebrew
-echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
-run_and_log brew install ansible
-
-# Check if we're in "prereqs only" mode
-if [ "$PREREQS_ONLY" = true ]; then
-  echo "Prerequisites installation complete." | tee -a "$LOG_FILE"
-  echo "Skipping Ansible playbook execution as requested (-p flag)." | tee -a "$LOG_FILE"
-  exit 0
-fi
-
-echo "Using provided sudo password for privileged operations" | tee -a "$LOG_FILE"
-
-# Export the sudo password as an environment variable for Ansible
-export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
-
-# Create Ansible configuration directory if it doesn't exist
-mkdir -p ~/.ansible/
-
-# Configure Ansible logging
-cat > ~/.ansible/ansible.cfg << EOF
-[defaults]
-log_path = $PWD/$LOG_FILE
-stdout_callback = yaml
-display_skipped_hosts = True
-display_ok_hosts = True
-callbacks_enabled = profile_tasks
-localhost_warning = False
-deprecation_warnings = False
-
-[callback_profile_tasks]
-task_output_limit = 100
-EOF
-
-echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
-
-# Run the playbook with increased verbosity for better progress tracking
-echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
-if [ -n "$VERBOSITY" ]; then
-  echo "Using verbosity level: $VERBOSITY" | tee -a "$LOG_FILE"
-fi
-
-# Check vars.yaml for git_user_email if not provided via command line
-if [ -z "$GIT_EMAIL" ]; then
-  # Check if git_user_email is defined in vars.yaml
-  if grep -q "^git_user_email:" vars.yaml; then
-    # Check if git_user_email is empty in vars.yaml
-    EMAIL_VALUE=$(grep "^git_user_email:" vars.yaml | awk -F': ' '{print $2}' | xargs)
-    if [ -z "$EMAIL_VALUE" ] || [ "$EMAIL_VALUE" = '""' ] || [ "$EMAIL_VALUE" = "''" ]; then
-      echo "Note: Git email is not provided via command line and is empty in vars.yaml" | tee -a "$LOG_FILE"
-      echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
-    fi
-  else
-    echo "Note: Git email is not provided via command line and not found in vars.yaml" | tee -a "$LOG_FILE"
-    echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
-  fi
-fi
-
-# Prepare extra vars for Git email if provided
-EXTRA_VARS=""
-
-# Build extra vars string for Git email and name if provided
-if [ -n "$GIT_EMAIL" ] || [ -n "$GIT_NAME" ]; then
-  EXTRA_VARS="--extra-vars=\""
-
-  if [ -n "$GIT_EMAIL" ]; then
-    echo "Using provided Git email: $GIT_EMAIL" | tee -a "$LOG_FILE"
-    EXTRA_VARS="${EXTRA_VARS}git_user_email='$GIT_EMAIL'"
-  fi
-
-  if [ -n "$GIT_NAME" ]; then
-    echo "Using provided Git name: $GIT_NAME" | tee -a "$LOG_FILE"
-    if [ -n "$GIT_EMAIL" ]; then
-      # Add space if we already have email in the extra vars
-      EXTRA_VARS="${EXTRA_VARS} "
-    fi
-    EXTRA_VARS="${EXTRA_VARS}git_user_name='$GIT_NAME'"
-  fi
-
-  EXTRA_VARS="${EXTRA_VARS}\""
-  # Use eval to properly handle the quotes in the extra vars
-  eval "/opt/homebrew/bin/ansible-playbook $VERBOSITY $EXTRA_VARS \"$PLAYBOOK_FILE\""
-else
-  /opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
-fi
-
-# Cleanup
-echo "Cleaning up temporary files and environment variables..." | tee -a "$LOG_FILE"
-
-if [ "$CI_MODE" = true ]; then
-  unset ANSIBLE_SUDO_PASS
-else
-  # Kill the sudo refresh process
-  if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
-    echo "Killing sudo keep alive process (PID: $SUDO_KEEP_ALIVE_PID)" | tee -a "$LOG_FILE"
-    kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-  fi
-
-  # Unset environment variables
-  unset SUDO_ASKPASS
-  unset ANSIBLE_SUDO_PASS
-  unset HOMEBREW_SUDO_ASKPASS
-
-  # Remove the temporary askpass script
-  echo "Removing temporary askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
-  if [ -f "$ASKPASS_SCRIPT" ]; then
-    rm -f "$ASKPASS_SCRIPT"
-    if [ -f "$ASKPASS_SCRIPT" ]; then
-      echo "Warning: Failed to remove askpass script: $ASKPASS_SCRIPT" | tee -a "$LOG_FILE"
-    else
-      echo "Successfully removed askpass script" | tee -a "$LOG_FILE"
-    fi
-  fi
-
-  # Remove password from keychain
-  echo "Removing password from keychain..." | tee -a "$LOG_FILE"
-  if security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1; then
-    echo "Successfully removed password from keychain" | tee -a "$LOG_FILE"
-  else
-    echo "Warning: Failed to remove password from keychain" | tee -a "$LOG_FILE"
-  fi
-fi
-
-echo "Setup complete." | tee -a "$LOG_FILE"
-echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
-
 # Function to clean up before exit
 cleanup() {
   echo "Performing cleanup..." | tee -a "$LOG_FILE"
@@ -302,3 +159,94 @@ cleanup() {
 
 # Set up trap to ensure cleanup on exit
 trap cleanup EXIT INT TERM
+
+# Install Homebrew if not already installed
+if [ -x "/opt/homebrew/bin/brew" ]; then
+  echo "Homebrew already installed." | tee -a "$LOG_FILE"
+else
+  echo "Installing Homebrew..." | tee -a "$LOG_FILE"
+  # Use NONINTERACTIVE to avoid prompts during Homebrew installation
+  NONINTERACTIVE=1 /bin/bash \
+    -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "$LOG_FILE"
+  # shellcheck disable=SC2016
+  (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+  # shellcheck disable=SC2016
+  (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
+fi
+
+# Ensure Homebrew is on the PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Install Ansible using Homebrew
+echo "Installing Ansible via Homebrew..." | tee -a "$LOG_FILE"
+run_and_log brew install ansible
+
+# Check if we're in "prereqs only" mode
+if [ "$PREREQS_ONLY" = true ]; then
+  echo "Prerequisites installation complete." | tee -a "$LOG_FILE"
+  echo "Skipping Ansible playbook execution as requested (-p flag)." | tee -a "$LOG_FILE"
+  exit 0
+fi
+
+# Create Ansible configuration directory if it doesn't exist
+mkdir -p ~/.ansible/
+
+# Configure Ansible logging
+cat > ~/.ansible/ansible.cfg << EOF
+[defaults]
+log_path = $PWD/$LOG_FILE
+stdout_callback = yaml
+display_skipped_hosts = True
+display_ok_hosts = True
+callbacks_enabled = profile_tasks
+localhost_warning = False
+deprecation_warnings = False
+
+[callback_profile_tasks]
+task_output_limit = 100
+EOF
+
+echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
+
+# Run the playbook with increased verbosity for better progress tracking
+echo "Running Ansible playbook: $PLAYBOOK_FILE" | tee -a "$LOG_FILE"
+if [ -n "$VERBOSITY" ]; then
+  echo "Using verbosity level: $VERBOSITY" | tee -a "$LOG_FILE"
+fi
+
+# Check vars.yaml for git_user_email if not provided via command line
+if [ -z "$GIT_EMAIL" ]; then
+  # Check if git_user_email is defined in vars.yaml
+  if grep -q "^git_user_email:" vars.yaml; then
+    # Check if git_user_email is empty in vars.yaml
+    EMAIL_VALUE=$(grep "^git_user_email:" vars.yaml | awk -F': ' '{print $2}' | xargs)
+    if [ -z "$EMAIL_VALUE" ] || [ "$EMAIL_VALUE" = '""' ] || [ "$EMAIL_VALUE" = "''" ]; then
+      echo "Note: Git email is not provided via command line and is empty in vars.yaml" | tee -a "$LOG_FILE"
+      echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
+    fi
+  else
+    echo "Note: Git email is not provided via command line and not found in vars.yaml" | tee -a "$LOG_FILE"
+    echo "Git email configuration will be skipped during setup" | tee -a "$LOG_FILE"
+  fi
+fi
+
+# Build extra vars for Git email and name if provided
+EXTRA_VARS=""
+if [ -n "$GIT_EMAIL" ]; then
+  echo "Using provided Git email: $GIT_EMAIL" | tee -a "$LOG_FILE"
+  EXTRA_VARS="$EXTRA_VARS git_user_email='$GIT_EMAIL'"
+fi
+if [ -n "$GIT_NAME" ]; then
+  echo "Using provided Git name: $GIT_NAME" | tee -a "$LOG_FILE"
+  EXTRA_VARS="$EXTRA_VARS git_user_name='$GIT_NAME'"
+fi
+
+if [ -n "$EXTRA_VARS" ]; then
+  /opt/homebrew/bin/ansible-playbook $VERBOSITY \
+    --extra-vars "$EXTRA_VARS" "$PLAYBOOK_FILE"
+else
+  /opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
+fi
+
+echo "Setup complete." | tee -a "$LOG_FILE"
+echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
