@@ -1,0 +1,32 @@
+install_rosetta: false
+
+homebrew_taps: []
+
+homebrew_casks:
+  - iterm2
+
+homebrew_formulae:
+  - git-lfs
+  - jq
+
+powershell_modules: []
+
+pipx_packages:
+  - ruff
+
+npm_global_packages: []
+
+dotnet_tools: []
+
+vscode_extensions: []
+
+git_user_email: "ci-test@example.com"
+git_user_name: "CI Test User"
+
+custom_commands_user:
+  - echo "CI test user command"
+
+custom_commands_elevated:
+  - echo "CI test elevated command"
+
+custom_script: ""

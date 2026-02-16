@@ -2,11 +2,12 @@
 # setup.sh
 # Installs prerequisites and runs the Ansible playbook for Ubuntu
 #
-# Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+# Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [-c] [playbook_file]
 #   -v              Enable verbose output (can be repeated for more verbosity)
 #   -e git_email    Specify Git user email
 #   -n git_name     Specify Git user name
 #   -p              Install prerequisites only (Ansible), don't run Ansible playbook
+#   -c              CI mode: skip interactive sudo prompts (assumes passwordless sudo)
 #   playbook_file   Optional playbook file name (defaults to setup.yaml)
 
 # Exit on error
@@ -17,9 +18,10 @@ VERBOSITY=""
 GIT_EMAIL=""
 GIT_NAME=""
 PREREQS_ONLY=false
+CI_MODE=false
 
 # Parse command line arguments
-while getopts "ve:n:p" opt; do
+while getopts "ve:n:pc" opt; do
   case $opt in
     v)
       # Increment verbosity level with each -v flag
@@ -37,6 +39,10 @@ while getopts "ve:n:p" opt; do
       ;;
     p)
       PREREQS_ONLY=true
+      ;;
+    c)
+      # CI mode: skip interactive sudo prompts
+      CI_MODE=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -67,19 +73,44 @@ echo "Setup started at $(date)" | tee -a "$LOG_FILE"
 run_and_log() {
   echo "$ $*" | tee -a "$LOG_FILE"
   "$@" 2>&1 | tee -a "$LOG_FILE"
-  return ${PIPESTATUS[0]}
+  return "${PIPESTATUS[0]}"
 }
 
-# Prompt for sudo password once and store it securely
-read -s -p "Enter sudo password: " SUDO_PASSWORD
-echo
+if [ "$CI_MODE" = true ]; then
+  echo "CI mode: using passwordless sudo" | tee -a "$LOG_FILE"
+  if ! sudo -n true 2>/dev/null; then
+    echo "Error: CI mode requires passwordless sudo" | tee -a "$LOG_FILE"
+    exit 1
+  fi
+  export ANSIBLE_SUDO_PASS=""
+else
+  # Prompt for sudo password once and store it securely
+  read -rs -p "Enter sudo password: " SUDO_PASSWORD
+  echo
 
-# Start background process to keep sudo alive and store its PID
-( while true; do sudo -k; echo "$SUDO_PASSWORD" | sudo -S -v >/dev/null 2>&1; sleep 15; done ) &
-SUDO_KEEP_ALIVE_PID=$!
+  # Start background process to keep sudo alive and store its PID
+  ( while true; do sudo -k; echo "$SUDO_PASSWORD" | sudo -S -v >/dev/null 2>&1; sleep 15; done ) &
+  SUDO_KEEP_ALIVE_PID=$!
 
-# Export the sudo password as an environment variable for Ansible
-export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+  # Export the sudo password as an environment variable for Ansible
+  export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+fi
+
+# Function to clean up before exit
+cleanup() {
+  if [ "$CI_MODE" != true ]; then
+    # Kill the sudo refresh process if it exists
+    if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
+      kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  # Unset environment variables
+  unset ANSIBLE_SUDO_PASS
+}
+
+# Set up trap to ensure cleanup on exit
+trap cleanup EXIT INT TERM
 
 # Check if apt-get is available
 if ! command -v apt-get >/dev/null 2>&1; then
@@ -89,25 +120,32 @@ fi
 
 # Update package lists
 echo "Updating package lists..." | tee -a "$LOG_FILE"
-echo "$SUDO_PASSWORD" | sudo -S apt-get update -y 2>&1 | tee -a "$LOG_FILE"
+if [ "$CI_MODE" = true ]; then
+  sudo -n apt-get update -y 2>&1 | tee -a "$LOG_FILE"
+else
+  echo "$SUDO_PASSWORD" | sudo -S apt-get update -y 2>&1 | tee -a "$LOG_FILE"
+fi
 
 # Install dependencies
 echo "Installing required dependencies..." | tee -a "$LOG_FILE"
-echo "$SUDO_PASSWORD" | sudo -S apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
+if [ "$CI_MODE" = true ]; then
+  sudo -n apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
+else
+  echo "$SUDO_PASSWORD" | sudo -S apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
+fi
 
 # Install Ansible
 echo "Installing Ansible..." | tee -a "$LOG_FILE"
-echo "$SUDO_PASSWORD" | sudo -S apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+if [ "$CI_MODE" = true ]; then
+  sudo -n apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+else
+  echo "$SUDO_PASSWORD" | sudo -S apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+fi
 
 # Check if we're in "prereqs only" mode
 if [ "$PREREQS_ONLY" = true ]; then
   echo "Prerequisites installation complete." | tee -a "$LOG_FILE"
   echo "Skipping Ansible playbook execution as requested (-p flag)." | tee -a "$LOG_FILE"
-
-  # Clean up
-  kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-  unset ANSIBLE_SUDO_PASS
-
   exit 0
 fi
 
@@ -152,31 +190,6 @@ else
   ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
 fi
 
-# Clean up
-echo "Cleaning up..." | tee -a "$LOG_FILE"
-
-# Kill the sudo refresh process
-if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
-  kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-fi
-
-# Unset environment variables
-unset ANSIBLE_SUDO_PASS
-
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
 echo "You may need to restart your shell or source your .bashrc to apply all changes."
-
-# Function to clean up before exit
-cleanup() {
-  # Kill the sudo refresh process if it exists
-  if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
-    kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-  fi
-
-  # Unset environment variables
-  unset ANSIBLE_SUDO_PASS
-}
-
-# Set up trap to ensure cleanup on exit
-trap cleanup EXIT INT TERM

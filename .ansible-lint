@@ -1,0 +1,11 @@
+warn_list:
+  - command-instead-of-module
+  - command-instead-of-shell
+  - fqcn[action-core]
+  - ignore-errors
+  - name[missing]
+  - no-changed-when
+  - schema[playbook]
+  - yaml[empty-lines]
+  - yaml[line-length]
+  - yaml[truthy]
