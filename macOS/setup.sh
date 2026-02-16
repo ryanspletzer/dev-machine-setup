@@ -79,6 +79,7 @@ run_and_log() {
 
 if [ "$CI_MODE" = true ]; then
   echo "CI mode: using passwordless sudo" | tee -a "$LOG_FILE"
+  SUDO_PASSWORD=""
   export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely

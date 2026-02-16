@@ -78,6 +78,10 @@ run_and_log() {
 
 if [ "$CI_MODE" = true ]; then
   echo "CI mode: using passwordless sudo" | tee -a "$LOG_FILE"
+  if ! sudo -n true 2>/dev/null; then
+    echo "Error: CI mode requires passwordless sudo" | tee -a "$LOG_FILE"
+    exit 1
+  fi
   export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely
@@ -92,6 +96,22 @@ else
   export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 fi
 
+# Function to clean up before exit
+cleanup() {
+  if [ "$CI_MODE" != true ]; then
+    # Kill the sudo refresh process if it exists
+    if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
+      kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
+    fi
+  fi
+
+  # Unset environment variables
+  unset ANSIBLE_SUDO_PASS
+}
+
+# Set up trap to ensure cleanup on exit
+trap cleanup EXIT INT TERM
+
 # Check if apt-get is available
 if ! command -v apt-get >/dev/null 2>&1; then
   echo "Error: apt-get not found. This script is intended for Ubuntu systems." | tee -a "$LOG_FILE"
@@ -101,7 +121,7 @@ fi
 # Update package lists
 echo "Updating package lists..." | tee -a "$LOG_FILE"
 if [ "$CI_MODE" = true ]; then
-  sudo apt-get update -y 2>&1 | tee -a "$LOG_FILE"
+  sudo -n apt-get update -y 2>&1 | tee -a "$LOG_FILE"
 else
   echo "$SUDO_PASSWORD" | sudo -S apt-get update -y 2>&1 | tee -a "$LOG_FILE"
 fi
@@ -109,7 +129,7 @@ fi
 # Install dependencies
 echo "Installing required dependencies..." | tee -a "$LOG_FILE"
 if [ "$CI_MODE" = true ]; then
-  sudo apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
+  sudo -n apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
 else
   echo "$SUDO_PASSWORD" | sudo -S apt-get install -y software-properties-common python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
 fi
@@ -117,7 +137,7 @@ fi
 # Install Ansible
 echo "Installing Ansible..." | tee -a "$LOG_FILE"
 if [ "$CI_MODE" = true ]; then
-  sudo apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+  sudo -n apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
 else
   echo "$SUDO_PASSWORD" | sudo -S apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
 fi
@@ -193,19 +213,3 @@ unset ANSIBLE_SUDO_PASS
 echo "Setup complete." | tee -a "$LOG_FILE"
 echo "Full log available at: $LOG_FILE" | tee -a "$LOG_FILE"
 echo "You may need to restart your shell or source your .bashrc to apply all changes."
-
-# Function to clean up before exit
-cleanup() {
-  if [ "$CI_MODE" != true ]; then
-    # Kill the sudo refresh process if it exists
-    if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
-      kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
-    fi
-  fi
-
-  # Unset environment variables
-  unset ANSIBLE_SUDO_PASS
-}
-
-# Set up trap to ensure cleanup on exit
-trap cleanup EXIT INT TERM

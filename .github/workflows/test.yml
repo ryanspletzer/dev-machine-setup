@@ -9,6 +9,7 @@ on:
       - "windows/**"
       - "tests/**"
       - ".github/workflows/**"
+      - ".yamllint.yaml"
   pull_request:
     paths:
       - "macOS/**"
@@ -16,6 +17,7 @@ on:
       - "windows/**"
       - "tests/**"
       - ".github/workflows/**"
+      - ".yamllint.yaml"
 
 jobs:
   detect-changes:
@@ -69,6 +71,9 @@ jobs:
         run: |
           pwsh -Command "Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository"
           pwsh -Command "Invoke-ScriptAnalyzer -Path windows/setup.ps1 -Recurse -ReportSummary"
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install community.general
 
       - name: ansible-lint
         run: |

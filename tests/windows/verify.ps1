@@ -9,8 +9,9 @@ function Test-Check {
         [scriptblock]$Test
     )
     try {
+        $global:LASTEXITCODE = 0
         $null = & $Test
-        if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "non-zero exit code" }
+        if ($LASTEXITCODE -ne 0) { throw "non-zero exit code" }
         Write-Output "PASS: $Description"
     }
     catch {
