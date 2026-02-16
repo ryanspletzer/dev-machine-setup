@@ -73,7 +73,7 @@ echo "Setup started at $(date)" | tee -a "$LOG_FILE"
 run_and_log() {
   echo "$ $*" | tee -a "$LOG_FILE"
   "$@" 2>&1 | tee -a "$LOG_FILE"
-  return ${PIPESTATUS[0]}
+  return "${PIPESTATUS[0]}"
 }
 
 if [ "$CI_MODE" = true ]; then
@@ -81,7 +81,7 @@ if [ "$CI_MODE" = true ]; then
   export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely
-  read -s -p "Enter sudo password: " SUDO_PASSWORD
+  read -rs -p "Enter sudo password: " SUDO_PASSWORD
   echo
 
   # Start background process to keep sudo alive and store its PID

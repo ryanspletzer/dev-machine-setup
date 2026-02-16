@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # setup.sh
 # Installs prerequisites and runs the Ansible playbook
 #
@@ -74,7 +74,7 @@ echo "Setup started at $(date)" | tee -a "$LOG_FILE"
 run_and_log() {
   echo "$ $*" | tee -a "$LOG_FILE"
   "$@" 2>&1 | tee -a "$LOG_FILE"
-  return ${PIPESTATUS[0]}
+  return "${PIPESTATUS[0]}"
 }
 
 if [ "$CI_MODE" = true ]; then
@@ -82,7 +82,7 @@ if [ "$CI_MODE" = true ]; then
   export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely
-  read -s -p "Enter sudo password: " SUDO_PASSWORD
+  read -rs -p "Enter sudo password: " SUDO_PASSWORD
   echo
 
   # Store password in keychain with a unique service name
@@ -90,7 +90,7 @@ else
   KEYCHAIN_ACCOUNT="sudo-password"
 
   # Store password in keychain (overwrite if exists)
-  security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null || true
+  security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1 || true
   security add-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w "$SUDO_PASSWORD"
 
   # Create a temporary askpass script that retrieves the password from keychain
@@ -123,7 +123,9 @@ else
   # Use NONINTERACTIVE to avoid prompts during Homebrew installation
   NONINTERACTIVE=1 /bin/bash \
     -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "$LOG_FILE"
+  # shellcheck disable=SC2016
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.zprofile
+  # shellcheck disable=SC2016
   (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> ~/.bash_profile
 fi
 
@@ -246,8 +248,7 @@ else
 
   # Remove password from keychain
   echo "Removing password from keychain..." | tee -a "$LOG_FILE"
-  security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null
-  if [ $? -eq 0 ]; then
+  if security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1; then
     echo "Successfully removed password from keychain" | tee -a "$LOG_FILE"
   else
     echo "Warning: Failed to remove password from keychain" | tee -a "$LOG_FILE"
@@ -289,8 +290,7 @@ cleanup() {
     # Remove password from keychain
     if [ -n "$KEYCHAIN_SERVICE" ] && [ -n "$KEYCHAIN_ACCOUNT" ]; then
       echo "Removing password from keychain..." | tee -a "$LOG_FILE"
-      security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" &>/dev/null
-      if [ $? -eq 0 ]; then
+      if security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1; then
         echo "Successfully removed password from keychain" | tee -a "$LOG_FILE"
       else
         echo "Warning: Failed to remove password from keychain" | tee -a "$LOG_FILE"
