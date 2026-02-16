@@ -485,6 +485,15 @@ custom_commands_user:
   # Make nvm's working directory
   - echo "Creating nvm working directory..."
   - mkdir -p ~/.nvm
+  # Install TPM (tmux Plugin Manager)
+  - echo "Installing tmux Plugin Manager (TPM)..."
+  - "if [ ! -d ~/.tmux/plugins/tpm ]; then git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; fi"
+  # Install LazyVim starter (if Neovim config doesn't exist)
+  - echo "Installing LazyVim starter config..."
+  - "if [ ! -d ~/.config/nvim ]; then git clone https://github.com/LazyVim/starter ~/.config/nvim && rm -rf ~/.config/nvim/.git; fi"
+  # Install TPM plugins (non-interactive)
+  - echo "Installing tmux plugins via TPM..."
+  - "~/.tmux/plugins/tpm/bin/install_plugins 2>/dev/null || true"
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
