@@ -10,6 +10,7 @@ on:
       - "tests/**"
       - ".github/workflows/**"
       - ".yamllint.yaml"
+      - ".ansible-lint"
   pull_request:
     paths:
       - "macOS/**"
@@ -18,6 +19,7 @@ on:
       - "tests/**"
       - ".github/workflows/**"
       - ".yamllint.yaml"
+      - ".ansible-lint"
 
 jobs:
   detect-changes:
