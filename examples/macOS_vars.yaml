@@ -11,6 +11,7 @@ homebrew_taps:
   - azure/functions
   - hashicorp/tap
   - microsoft/git
+  - oven-sh/bun
   - teamookla/speedtest
 
 homebrew_casks:
@@ -20,6 +21,7 @@ homebrew_casks:
   - chatgpt
   - claude-code
   - citrix-workspace
+  - comet
   - cursor
   - cursor-cli
   - docker-desktop
@@ -31,7 +33,12 @@ homebrew_casks:
   - git-credential-manager
   - ghostty
   - google-chrome
+  - gstreamer-runtime
+  - handy
   - iterm2
+  - keybase
+  - kitty
+  - krita
   - microsoft-azure-storage-explorer
   - microsoft-edge
   - microsoft-office
@@ -74,6 +81,7 @@ homebrew_formulae:
   - cmake
   - direnv
   - elixir
+  - emacs
   - eza
   - fd
   - ffmpeg
@@ -81,6 +89,7 @@ homebrew_formulae:
   - fzf
   - gh
   - git
+  - git-delta
   - git-lfs
   - go
   - hashicorp/tap/packer
@@ -88,13 +97,20 @@ homebrew_formulae:
   - hashicorp/tap/vault
   - istioctl
   - jq
+  - lazygit
+  - markdownlint-cli
+  - markdownlint-cli2
   - mas
   - maven
   - mcp-inspector
+  - mtr
+  - neovim
   - node
   - nvm
   - oh-my-posh
+  - oven-sh/bun/bun
   - pipx
+  - pnpm
   - pyenv-virtualenv
   - python
   - qemu
@@ -103,9 +119,13 @@ homebrew_formulae:
   - ruby-install
   - ruff
   - rustup
+  - tdd-guard
   - teamookla/speedtest/speedtest
+  - tmux
+  - tree-sitter-cli
   - uv
   - ykman
+  - yq
   - wget2
   - xh
   - zsh-autocomplete
