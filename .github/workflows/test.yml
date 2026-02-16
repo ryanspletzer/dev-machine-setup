@@ -1,0 +1,140 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "macOS/**"
+      - "ubuntu/**"
+      - "windows/**"
+      - "tests/**"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "macOS/**"
+      - "ubuntu/**"
+      - "windows/**"
+      - "tests/**"
+      - ".github/workflows/**"
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      macos: ${{ steps.filter.outputs.macos }}
+      ubuntu: ${{ steps.filter.outputs.ubuntu }}
+      windows: ${{ steps.filter.outputs.windows }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            macos:
+              - "macOS/**"
+              - "tests/macOS/**"
+              - ".github/workflows/**"
+            ubuntu:
+              - "ubuntu/**"
+              - "tests/ubuntu/**"
+              - ".github/workflows/**"
+            windows:
+              - "windows/**"
+              - "tests/windows/**"
+              - ".github/workflows/**"
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          pip install yamllint ansible-lint
+
+      - name: YAML lint
+        run: yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml
+
+      - name: YAML lint (test fixtures)
+        run: yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml
+
+      - name: shellcheck
+        run: |
+          shellcheck macOS/setup.sh
+          shellcheck ubuntu/setup.sh
+
+      - name: PSScriptAnalyzer
+        run: |
+          pwsh -Command "Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository"
+          pwsh -Command "Invoke-ScriptAnalyzer -Path windows/setup.ps1 -Recurse -ReportSummary"
+
+      - name: ansible-lint
+        run: |
+          ansible-lint macOS/setup.yaml
+          ansible-lint ubuntu/setup.yaml
+
+      - name: Ansible syntax check
+        run: |
+          ansible-playbook --syntax-check macOS/setup.yaml
+          ansible-playbook --syntax-check ubuntu/setup.yaml
+
+  integration-macos:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.macos == 'true'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy test fixtures
+        run: cp tests/macOS/vars.yaml macOS/vars.yaml
+
+      - name: Run setup
+        working-directory: macOS
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/macOS/verify.sh
+          tests/macOS/verify.sh
+
+  integration-ubuntu:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.ubuntu == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy test fixtures
+        run: cp tests/ubuntu/vars.yaml ubuntu/vars.yaml
+
+      - name: Run setup
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/ubuntu/verify.sh
+          tests/ubuntu/verify.sh
+
+  integration-windows:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.windows == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy test fixtures
+        run: Copy-Item tests/windows/vars.yaml windows/vars.yaml
+
+      - name: Run setup
+        working-directory: windows
+        run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: .\tests\windows\verify.ps1

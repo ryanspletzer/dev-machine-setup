@@ -1,0 +1,37 @@
+is_wsl: false
+
+apt_packages_prereqs:
+  - name: ca-certificates
+  - name: curl
+
+external_apt_repositories: []
+
+apt_packages:
+  - name: git
+  - name: git-lfs
+  - name: jq
+
+snap_packages: []
+
+powershell_modules: []
+
+pipx_packages: []
+
+npm_global_packages: []
+
+dotnet_tools: []
+
+vscode_extensions: []
+
+git_user_email: "ci-test@example.com"
+git_user_name: "CI Test User"
+
+custom_commands_user:
+  - command: echo "CI test user command"
+    description: CI test user command
+
+custom_commands_elevated:
+  - command: echo "CI test elevated command"
+    description: CI test elevated command
+
+custom_script: ""

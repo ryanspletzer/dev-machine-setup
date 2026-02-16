@@ -1,0 +1,25 @@
+choco_packages:
+  - name: git
+    parameters: /WindowsTerminal /NoShellIntegration
+  - name: jq
+
+powershell_modules:
+  - Pester
+
+windows_powershell_modules: []
+
+pipx_packages: []
+
+npm_global_packages: []
+
+dotnet_tools: []
+
+vscode_extensions: []
+
+git_user_email: "ci-test@example.com"
+git_user_name: "CI Test User"
+
+custom_commands:
+  - Write-Output "CI test custom command"
+
+custom_script: ""
