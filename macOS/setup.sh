@@ -200,7 +200,7 @@ if [ -n "$GIT_EMAIL" ] || [ -n "$GIT_NAME" ]; then
 
   if [ -n "$GIT_EMAIL" ]; then
     echo "Using provided Git email: $GIT_EMAIL" | tee -a "$LOG_FILE"
-    EXTRA_VARS="${EXTRA_VARS}git_user_email=$GIT_EMAIL"
+    EXTRA_VARS="${EXTRA_VARS}git_user_email='$GIT_EMAIL'"
   fi
 
   if [ -n "$GIT_NAME" ]; then
@@ -209,7 +209,7 @@ if [ -n "$GIT_EMAIL" ] || [ -n "$GIT_NAME" ]; then
       # Add space if we already have email in the extra vars
       EXTRA_VARS="${EXTRA_VARS} "
     fi
-    EXTRA_VARS="${EXTRA_VARS}git_user_name=$GIT_NAME"
+    EXTRA_VARS="${EXTRA_VARS}git_user_name='$GIT_NAME'"
   fi
 
   EXTRA_VARS="${EXTRA_VARS}\""

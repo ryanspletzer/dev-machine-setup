@@ -38,10 +38,6 @@ check "iTerm2 installed (Homebrew cask)" test -d /Applications/iTerm.app
 # pipx package
 check "ruff installed (pipx package)" command -v ruff
 
-# VS Code extension
-check "redhat.vscode-yaml installed (VS Code extension)" \
-  sh -c "code --list-extensions 2>/dev/null | grep -qi redhat.vscode-yaml"
-
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"

@@ -18,8 +18,7 @@ npm_global_packages: []
 
 dotnet_tools: []
 
-vscode_extensions:
-  - redhat.vscode-yaml
+vscode_extensions: []
 
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"

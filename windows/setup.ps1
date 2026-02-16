@@ -181,6 +181,11 @@ if ($null -eq $choco) {
     Write-Information -MessageData 'Chocolatey is already installed.'
 }
 
+# Ensure Chocolatey profile module is loaded (needed for Update-SessionEnvironment)
+if ($env:ChocolateyInstall -and (Test-Path "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1")) {
+    Import-Module -Name "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1" -ErrorAction SilentlyContinue
+}
+
 #endregion Chocolatey Install
 
 #region Install PowerShell (pwsh)
