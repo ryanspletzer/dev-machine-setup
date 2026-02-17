@@ -73,6 +73,7 @@ homebrew_formulae:
   - azure-functions-core-tools@4
   - bash
   - bash-git-prompt
+  - bash-completion
   - bat
   - bicep
   - cfn-lint
@@ -80,6 +81,7 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
+  - docker-completion
   - elixir
   - emacs
   - eza
@@ -97,6 +99,7 @@ homebrew_formulae:
   - hashicorp/tap/vault
   - istioctl
   - jq
+  - kubernetes-cli
   - lazygit
   - markdownlint-cli
   - markdownlint-cli2
@@ -162,6 +165,7 @@ npm_global_packages:
   - aws-cdk
   - npmrc
   - serverless
+  - typescript
 
 # .NET Global Tools
 dotnet_tools:
