@@ -112,6 +112,7 @@ homebrew_formulae:
   - nvm
   - oh-my-posh
   - oven-sh/bun/bun
+  - pinentry-mac
   - pipx
   - pnpm
   - pyenv-virtualenv
