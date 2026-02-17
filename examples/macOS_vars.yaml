@@ -469,6 +469,11 @@ custom_commands_user:
   - git config --global push.default current
   - git config --global push.autoSetupRemote true
   - git config --global user.signingKey 787AEF0BAE232359
+  # Configure GPG agent to use pinentry-mac (native macOS dialog for YubiKey PIN)
+  - echo "Configuring GPG agent to use pinentry-mac..."
+  - mkdir -p ~/.gnupg
+  - "echo 'pinentry-program /opt/homebrew/bin/pinentry-mac' > ~/.gnupg/gpg-agent.conf"
+  - gpgconf --kill gpg-agent
   # Rustup init
   - echo "Initializing Rust toolchain..."
   - rustup-init -y
@@ -499,6 +504,11 @@ custom_commands_user:
   # Install TPM plugins (non-interactive)
   - echo "Installing tmux plugins via TPM..."
   - "~/.tmux/plugins/tpm/bin/install_plugins 2>/dev/null || true"
+  # Install Ghostty terminfo (needed for curses-based tools like pinentry-curses)
+  - echo "Installing Ghostty terminfo..."
+  - mkdir -p ~/.terminfo/67 ~/.terminfo/78
+  - 'cp "$(brew --prefix)/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty" ~/.terminfo/78/'
+  - 'cp "$(brew --prefix)/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/67/ghostty" ~/.terminfo/67/'
   # Clone powershell-style skill repo
   - echo "Cloning powershell-style Claude Code skill..."
   - "if [ ! -d ~/git/powershell-style ]; then mkdir -p ~/git && git clone https://github.com/ryanspletzer/powershell-style.git ~/git/powershell-style; fi"
