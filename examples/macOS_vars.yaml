@@ -507,8 +507,8 @@ custom_commands_user:
   # Install Ghostty terminfo (needed for curses-based tools like pinentry-curses)
   - echo "Installing Ghostty terminfo..."
   - mkdir -p ~/.terminfo/67 ~/.terminfo/78
-  - 'cp "$(brew --prefix)/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty" ~/.terminfo/78/'
-  - 'cp "$(brew --prefix)/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/67/ghostty" ~/.terminfo/67/'
+  - 'cp "$(brew --prefix)"/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/78/xterm-ghostty ~/.terminfo/78/'
+  - 'cp "$(brew --prefix)"/Caskroom/ghostty/*/Ghostty.app/Contents/Resources/terminfo/67/ghostty ~/.terminfo/67/'
   # Clone powershell-style skill repo
   - echo "Cloning powershell-style Claude Code skill..."
   - "if [ ! -d ~/git/powershell-style ]; then mkdir -p ~/git && git clone https://github.com/ryanspletzer/powershell-style.git ~/git/powershell-style; fi"
