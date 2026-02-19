@@ -515,6 +515,39 @@ custom_commands_user:
   # Symlink powershell-style skill into Claude Code skills
   - echo "Linking powershell-style skill..."
   - "mkdir -p ~/.claude/skills && ln -sfn ~/git/powershell-style ~/.claude/skills/powershell-style"
+  # iTerm2 global preferences (non-default)
+  - echo "Configuring iTerm2 preferences..."
+  # Disable press-and-hold accent menu (enables key repeat)
+  - defaults write com.googlecode.iterm2 ApplePressAndHoldEnabled -bool false
+  # Manual window tabbing
+  - defaults write com.googlecode.iterm2 AppleWindowTabbingMode -string manual
+  # Disable haptic/sound/visual feedback for Esc
+  - defaults write com.googlecode.iterm2 HapticFeedbackForEsc -bool false
+  - defaults write com.googlecode.iterm2 SoundForEsc -bool false
+  - defaults write com.googlecode.iterm2 VisualIndicatorForEsc -bool false
+  # Hide full-screen tab bar
+  - defaults write com.googlecode.iterm2 ShowFullScreenTabBar -bool false
+  # Hide secure keyboard entry indicator
+  - defaults write com.googlecode.iterm2 ShowSecureKeyboardEntryIndicator -bool false
+  # Ignore system window restoration
+  - defaults write com.googlecode.iterm2 NoSyncIgnoreSystemWindowRestoration -bool true
+  # Suppress paste warning
+  - defaults write com.googlecode.iterm2 NoSyncNeverAllowPaste -bool true
+  # Disable tip of the day
+  - defaults write com.googlecode.iterm2 NoSyncPermissionToShowTip -bool false
+  # Don't restore workspace on launch
+  - defaults write com.googlecode.iterm2 NoSyncWindowRestoresWorkspaceAtLaunch -bool false
+  # Suppress clipboard access denied warning
+  - defaults write com.googlecode.iterm2 NoSyncSuppressClipboardAccessDeniedWarning -bool true
+  # Allow escape sequences to clear history
+  - defaults write com.googlecode.iterm2 PreventEscapeSequenceFromClearingHistory -bool false
+  # Don't send profile info with update checks
+  - defaults write com.googlecode.iterm2 SUSendProfileInfo -bool false
+  # Symlink Dynamic Profile (font, colors, bell, etc.) into iTerm2
+  - mkdir -p ~/Library/Application\ Support/iTerm2/DynamicProfiles
+  - ln -sfn ~/.config/iterm2/DynamicProfiles/Default.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/Default.json
+  # Set the Dynamic Profile as the default
+  - defaults write com.googlecode.iterm2 "Default Bookmark Guid" -string "73B7EAE3-0AF4-467E-9B9C-BDFA2185DAB3"
   # Example: Dark mode
   # - defaults write -g AppleInterfaceStyle Dark
   # Example: Key repeat settings
