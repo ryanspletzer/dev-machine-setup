@@ -33,7 +33,7 @@ This project aims to:
 
 ## Key Features
 
-- ✅ **Cross-platform support**: macOS, Windows, and Ubuntu
+- ✅ **Cross-platform support**: macOS, Windows, Ubuntu, and Fedora
 - ✅ **Package manager integration**: Uses the best package manager for each platform
 - ✅ **Declarative configuration**: Simple YAML/PowerShell configuration files
 - ✅ **Idempotent execution**: Safe to run multiple times

@@ -1,0 +1,37 @@
+is_wsl: false
+
+dnf_packages_prereqs:
+  - name: ca-certificates
+  - name: curl
+
+external_dnf_repositories: []
+
+dnf_packages:
+  - name: git
+  - name: git-lfs
+  - name: jq
+
+flatpak_packages: []
+
+powershell_modules: []
+
+pipx_packages: []
+
+npm_global_packages: []
+
+dotnet_tools: []
+
+vscode_extensions: []
+
+git_user_email: "ci-test@example.com"
+git_user_name: "CI Test User"
+
+custom_commands_user:
+  - command: echo "CI test user command"
+    description: CI test user command
+
+custom_commands_elevated:
+  - command: echo "CI test elevated command"
+    description: CI test elevated command
+
+custom_script: ""

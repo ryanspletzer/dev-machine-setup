@@ -149,6 +149,52 @@ snap_packages:
 - Snap provides modern applications with automatic updates
 - Covers the broadest range of software needs
 
+### Fedora Package Management
+
+#### Primary Package Managers
+
+Fedora uses a dual approach with complementary package managers:
+
+**DNF (Dandified YUM)**:
+
+- System packages and libraries
+- Command-line tools
+- Development dependencies
+
+```yaml
+dnf_packages:
+  - git
+  - docker-ce
+  - gcc
+  - curl
+  - wget
+```
+
+**Flatpak Packages**:
+
+- GUI applications
+- Sandboxed applications
+- Cross-distribution packages
+
+```yaml
+flatpak_packages:
+  - com.visualstudio.code
+  - com.discordapp.Discord
+  - com.slack.Slack
+```
+
+#### Specialized Package Managers
+
+- **pipx**: Python applications
+- **PowerShell Gallery**: PowerShell modules (after PowerShell installation)
+- **VS Code Marketplace**: Editor extensions
+
+**Why the dual approach:**
+
+- DNF provides system integration and dependencies
+- Flatpak provides sandboxed applications from Flathub
+- Covers the broadest range of software needs on Fedora
+
 ## Package Categories and Organization
 
 ### Category Classification
@@ -170,13 +216,13 @@ We organize packages into logical categories across all platforms:
 
 Where possible, we use equivalent packages across platforms:
 
-| Tool | macOS | Windows | Ubuntu |
-|------|-------|---------|--------|
-| Git | `git` (brew) | `git` (choco) | `git` (apt) |
-| VS Code | `visual-studio-code` (cask) | `vscode` (choco) | `code` (snap) |
-| Docker | `docker-desktop` (cask) | `docker-desktop` (choco) | `docker.io` (apt) |
-| Node.js | `node` (brew) | `nodejs` (choco) | `nodejs` (apt) |
-| Python | `python` (brew) | `python` (choco) | `python3` (apt) |
+| Tool | macOS | Windows | Ubuntu | Fedora |
+|------|-------|---------|--------|--------|
+| Git | `git` (brew) | `git` (choco) | `git` (apt) | `git` (dnf) |
+| VS Code | `visual-studio-code` (cask) | `vscode` (choco) | `code` (snap) | `com.visualstudio.code` (flatpak) |
+| Docker | `docker-desktop` (cask) | `docker-desktop` (choco) | `docker.io` (apt) | `docker-ce` (dnf) |
+| Node.js | `node` (brew) | `nodejs` (choco) | `nodejs` (apt) | `nodejs` (dnf) |
+| Python | `python` (brew) | `python` (choco) | `python3` (apt) | `python3` (dnf) |
 
 ## Package List Management
 
@@ -191,6 +237,8 @@ homebrew_casks: []       # macOS GUI applications
 choco_packages: []       # Windows packages
 apt_packages: []         # Ubuntu system packages
 snap_packages: []        # Ubuntu applications
+dnf_packages: []         # Fedora system packages
+flatpak_packages: []     # Fedora applications
 
 # Cross-platform sections (consistent naming)
 vscode_extensions: []    # VS Code extensions

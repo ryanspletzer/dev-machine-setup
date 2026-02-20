@@ -6,7 +6,9 @@ This document answers common questions about the dev-machine-setup project, its 
 
 ### What is dev-machine-setup?
 
-Dev-machine-setup is a collection of automated scripts and configurations that help developers quickly set up consistent development environments across macOS, Windows, and Ubuntu platforms. It uses platform-native package managers and automation tools to install and configure development tools, applications, and system preferences.
+Dev-machine-setup is a collection of automated scripts and configurations
+that help developers quickly set up consistent development environments
+across macOS, Windows, Ubuntu, and Fedora platforms. It uses platform-native package managers and automation tools to install and configure development tools, applications, and system preferences.
 
 ### Why should I use this instead of manual installation?
 
@@ -25,6 +27,7 @@ Currently supported platforms:
 - **macOS**: 10.15 (Catalina) and later, including Apple Silicon Macs
 - **Windows**: Windows 10 and 11 with PowerShell 5.1 or later
 - **Ubuntu**: 20.04 LTS and later, including WSL (Windows Subsystem for Linux)
+- **Fedora**: 39 and later
 
 ### Do I need to be a developer to use this?
 
@@ -40,7 +43,7 @@ While designed for developers, anyone who wants to automate software installatio
 ### How do I get started?
 
 1. **Clone or download** the repository
-2. **Navigate to your platform directory** (macOS, windows, or ubuntu)
+2. **Navigate to your platform directory** (macOS, windows, ubuntu, or fedora)
 3. **Review the configuration** in `vars.yaml`
 4. **Run the setup script** with your Git email: `./setup.sh -e "your@email.com"`
 
@@ -62,6 +65,7 @@ Each platform has a curated selection of popular development tools:
 - **macOS**: Homebrew packages, iTerm2, Rectangle Pro
 - **Windows**: Chocolatey packages, Windows Terminal enhancements
 - **Ubuntu**: APT and Snap packages, development libraries
+- **Fedora**: DNF and Flatpak packages, development libraries
 
 ### How long does the setup take?
 
@@ -141,6 +145,7 @@ We use the best tool for each platform:
 - **macOS**: Ansible + Homebrew (excellent macOS integration)
 - **Windows**: PowerShell (native Windows automation)
 - **Ubuntu**: Ansible + APT/Snap (mature Linux automation)
+- **Fedora**: Ansible + DNF/Flatpak (modern RPM-based automation)
 
 This approach leverages each platform's strengths rather than forcing a one-size-fits-all solution.
 
@@ -223,6 +228,12 @@ apt search package-name
 
 # Ubuntu (Snap)
 snap find package-name
+
+# Fedora (DNF)
+dnf search package-name
+
+# Fedora (Flatpak)
+flatpak search package-name
 ```
 
 ### What if a package I need isn't available?
@@ -372,6 +383,9 @@ choco cleancache
 
 # Ubuntu
 sudo apt clean && sudo apt autoremove
+
+# Fedora
+sudo dnf clean all && sudo dnf autoremove
 ```
 
 ## Advanced Usage
