@@ -75,6 +75,7 @@ homebrew_formulae:
   - bash-git-prompt
   - bash-completion
   - bat
+  - beads
   - bicep
   - cfn-lint
   - chruby
@@ -112,6 +113,7 @@ homebrew_formulae:
   - nvm
   - oh-my-posh
   - oven-sh/bun/bun
+  - pandoc
   - pinentry-mac
   - pipx
   - pnpm
