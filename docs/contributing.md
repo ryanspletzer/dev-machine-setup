@@ -1,12 +1,16 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to the dev-machine-setup project! This guide will help you understand how to contribute effectively to this cross-platform development environment automation project.
+Thank you for your interest in contributing to the dev-machine-setup project!
+This guide will help you understand how to contribute effectively
+to this cross-platform development environment automation project.
 
 ## Project Overview
 
 The dev-machine-setup project provides automated scripts and configurations
 to set up consistent development environments across macOS, Windows, Ubuntu,
-and Fedora platforms. The project emphasizes simplicity, reliability, and customizability through declarative configuration files.
+and Fedora platforms.
+The project emphasizes simplicity, reliability,
+and customizability through declarative configuration files.
 
 ## Ways to Contribute
 
@@ -15,11 +19,13 @@ and Fedora platforms. The project emphasizes simplicity, reliability, and custom
 Help us improve by reporting issues you encounter:
 
 **Before submitting a bug report:**
+
 - Check existing issues to avoid duplicates
 - Test with the latest version
 - Gather relevant system information and logs
 
 **Creating a good bug report:**
+
 - Use the issue template provided
 - Include system information (OS version, architecture)
 - Provide steps to reproduce the issue
@@ -31,6 +37,7 @@ Help us improve by reporting issues you encounter:
 Suggest improvements or new features:
 
 **Good feature requests include:**
+
 - Clear description of the problem being solved
 - Proposed solution or approach
 - Use cases and benefits
@@ -61,21 +68,25 @@ Contribute directly to the codebase:
 ### Prerequisites
 
 **For macOS development:**
+
 - macOS 10.15+ (Catalina or later)
 - Xcode Command Line Tools
 - Homebrew (for testing)
 
 **For Windows development:**
+
 - Windows 10/11
 - PowerShell 5.1 or later
 - Chocolatey (for testing)
 
 **For Ubuntu development:**
+
 - Ubuntu 20.04 LTS or later
 - APT package manager
 - Snap package manager
 
 **For Fedora development:**
+
 - Fedora 39 or later
 - DNF package manager
 - Flatpak package manager
@@ -84,15 +95,20 @@ Contribute directly to the codebase:
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork locally:**
+
    ```bash
    git clone https://github.com/yourusername/dev-machine-setup.git
    cd dev-machine-setup
    ```
+
 3. **Create a development branch:**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
+
 4. **Test the existing setup** on your platform:
+
    ```bash
    # Navigate to your platform directory
    cd macOS  # or windows, ubuntu, or fedora
@@ -107,7 +123,7 @@ Contribute directly to the codebase:
 
 Understanding the project organization:
 
-```
+```text
 dev-machine-setup/
 ├── README.md              # Project overview
 ├── LICENSE                # MIT license
@@ -206,6 +222,7 @@ vscode_extensions:
 #### Testing Package Additions
 
 1. **Test package availability:**
+
    ```bash
    # macOS
    brew search new-package
@@ -221,6 +238,7 @@ vscode_extensions:
    ```
 
 2. **Test installation in isolation:**
+
    ```bash
    # Create minimal test configuration
    cp vars.yaml test_vars.yaml
@@ -233,6 +251,7 @@ vscode_extensions:
 #### Testing Script Changes
 
 1. **Syntax validation:**
+
    ```bash
    # Bash scripts
    bash -n setup.sh
@@ -242,11 +261,13 @@ vscode_extensions:
    ```
 
 2. **Test with prerequisites only:**
+
    ```bash
    ./setup.sh -p
    ```
 
 3. **Test with verbose output:**
+
    ```bash
    ./setup.sh -vv -e "test@example.com"
    ```
@@ -274,7 +295,7 @@ When contributing code changes:
 
 Use clear, descriptive commit messages following this format:
 
-```
+```text
 type(scope): brief description
 
 Detailed explanation if necessary
@@ -284,6 +305,7 @@ Detailed explanation if necessary
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -293,6 +315,7 @@ Detailed explanation if necessary
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 feat(macOS): add Terraform and Vault packages
 
@@ -327,6 +350,7 @@ Before adding packages, research:
 ### Package Addition Process
 
 1. **Update configuration files:**
+
    ```yaml
    # Add to appropriate section in vars.yaml
    homebrew_formulae:     # macOS
@@ -353,6 +377,7 @@ Before adding packages, research:
    - Update any related documentation
 
 4. **Consider cross-platform equivalents:**
+
    ```yaml
    # Document platform differences
    # macOS
@@ -386,7 +411,8 @@ New platforms should meet these criteria:
 ### Implementation Steps
 
 1. **Create platform directory structure:**
-   ```
+
+   ```text
    newplatform/
    ├── README.md
    ├── setup.sh (or appropriate entry script)
@@ -429,6 +455,7 @@ All contributions undergo security review:
 **Do not open public issues for security vulnerabilities.**
 
 Instead:
+
 1. Email security concerns to the maintainers privately
 2. Provide detailed description of the issue
 3. Include steps to reproduce if applicable
@@ -535,4 +562,5 @@ Before releases:
 3. **Update changelog** with all changes
 4. **Tag release** with appropriate version number
 
-Thank you for contributing to dev-machine-setup! Your efforts help developers worldwide set up better development environments more easily.
+Thank you for contributing to dev-machine-setup!
+Your efforts help developers worldwide set up better development environments more easily.

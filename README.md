@@ -178,7 +178,6 @@ This project includes comprehensive documentation covering all aspects of setup 
 - **[Architecture Overview](./docs/architecture.md)** - How all the pieces fit together
 - **[Package Management Strategy](./docs/package-management.md)** - Our approach to managing packages
 - **[Configuration Reference](./docs/configuration-reference.md)** - Complete reference for all options
-- **[Examples](./docs/examples/README.md)** - Real-world configuration examples
 - **[Troubleshooting Guide](./docs/troubleshooting.md)** - Solutions to common problems
 - **[Contributing Guide](./docs/contributing.md)** - How to contribute to this project
 - **[FAQ](./docs/faq.md)** - Frequently asked questions

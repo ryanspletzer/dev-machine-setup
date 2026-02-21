@@ -4,7 +4,9 @@ This guide explains how to customize the dev-machine-setup to fit your specific 
 
 ## Overview
 
-The dev-machine-setup project is designed to be easily customizable without requiring you to modify the core scripts or fork the repository. All customization is done through configuration files and optional custom scripts.
+The dev-machine-setup project is designed to be easily customizable without requiring you to modify the core scripts or
+fork the repository.
+All customization is done through configuration files and optional custom scripts.
 
 ## Customization Approaches
 
@@ -240,7 +242,7 @@ vscode_extensions:
   - company.internal-extension
 ```
 
-2. **Share via version control**:
+1. **Share via version control**:
 
 ```bash
 # Team members can use the shared config
@@ -268,7 +270,7 @@ sudo security add-trusted-cert -d -r trustRoot -k /System/Library/Keychains/Syst
 echo "Company-specific setup complete!"
 ```
 
-2. **Reference it in vars.yaml**:
+1. **Reference it in vars.yaml**:
 
 ```yaml
 custom_script: "./custom_company_setup.sh"
@@ -485,4 +487,6 @@ bash -n your_custom_script.sh
 3. **Minimize elevation**: Avoid using `sudo` unless absolutely necessary
 4. **Keep credentials secure**: Don't hardcode secrets in configuration files
 
-By following this guide, you can create a personalized development environment that meets your specific needs while maintaining the reliability and automation benefits of the dev-machine-setup project.
+By following this guide,
+you can create a personalized development environment that meets your specific needs while maintaining the reliability
+and automation benefits of the dev-machine-setup project.

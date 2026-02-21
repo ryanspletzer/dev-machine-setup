@@ -1,12 +1,15 @@
 # Design Principles
 
-This document outlines the core design principles that guide the development and architecture of the dev-machine-setup project. These principles ensure consistency, maintainability, and usability across all platforms.
+This document outlines the core design principles that guide the development
+and architecture of the dev-machine-setup project.
+These principles ensure consistency, maintainability,
+and usability across all platforms.
 
 ## Core Principles
 
 ### 1. Simplicity First
 
-**"Simple is better than complex"**
+> *"Simple is better than complex"*
 
 - **Flat Configuration Structure**: All package lists are simple, flat arrays in YAML files
 - **No Complex Dependencies**: Avoid nested configurations or complex dependency graphs
@@ -25,7 +28,7 @@ homebrew_formulae:
 
 ### 2. File-Based Configuration
 
-**"Configuration as code, stored in files"**
+> *"Configuration as code, stored in files"*
 
 - **Version Controllable**: All configuration is stored in files that can be tracked in Git
 - **Human Readable**: Use YAML (Unix) and PowerShell data structures (Windows) for configuration
@@ -41,7 +44,7 @@ homebrew_formulae:
 
 ### 3. Package Manager Integration
 
-**"Leverage native and community package managers for reliable installations"**
+> *"Leverage native and community package managers for reliable installations"*
 
 Every package, tool, or application must be installed through a recognized package manager:
 
@@ -84,7 +87,7 @@ Every package, tool, or application must be installed through a recognized packa
 
 ### 4. Platform-Specific Implementation, Unified Experience
 
-**"Use the best tool for each platform while maintaining consistency"**
+> *"Use the best tool for each platform while maintaining consistency"*
 
 Each platform uses its native tools and conventions:
 
@@ -102,7 +105,7 @@ But all platforms provide:
 
 ### 5. Declarative Over Imperative
 
-**"Describe what you want, not how to get it"**
+> *"Describe what you want, not how to get it"*
 
 - **Configuration files describe the desired end state**, not the steps to achieve it
 - **Idempotent execution**: Running the setup multiple times produces the same result
@@ -122,7 +125,7 @@ The system figures out which extensions are already installed and only installs 
 
 ### 6. Customization Through Configuration
 
-**"Extend through data, not code"**
+> *"Extend through data, not code"*
 
 - **No forking required**: Customize by editing configuration files
 - **Multiple customization points**:
@@ -134,7 +137,7 @@ The system figures out which extensions are already installed and only installs 
 
 ### 7. Zero Manual Dependencies
 
-**"Everything needed should be installable automatically"**
+> *"Everything needed should be installable automatically"*
 
 The setup process should require minimal manual intervention:
 
@@ -145,7 +148,7 @@ The setup process should require minimal manual intervention:
 
 ### 8. Logging and Transparency
 
-**"Always know what's happening"**
+> *"Always know what's happening"*
 
 - **Comprehensive logging**: All operations logged to timestamped files
 - **Verbose modes**: Multiple levels of verbosity (`-v`, `-vv`, `-vvv`)
@@ -154,7 +157,7 @@ The setup process should require minimal manual intervention:
 
 ### 9. Security-Conscious Design
 
-**"Secure by default, transparent about privileges"**
+> *"Secure by default, transparent about privileges"*
 
 - **Minimal privilege escalation**: Only elevate permissions when necessary
 - **Credential cleanup**: Temporary credentials are properly cleaned up
@@ -163,7 +166,7 @@ The setup process should require minimal manual intervention:
 
 ### 10. Documentation-Driven Development
 
-**"Code without documentation doesn't exist"**
+> *"Code without documentation doesn't exist"*
 
 - **Self-documenting configuration**: Extensive comments in all configuration files
 - **Comprehensive README files**: Each platform has detailed setup and customization documentation
@@ -237,4 +240,7 @@ We know these principles are working when:
 - ✅ Users can easily share and version their configurations
 - ✅ The setup remains fast and reliable as package lists grow
 
-These principles guide every decision in the project, from the choice of automation tools to the structure of configuration files. They ensure that the project remains maintainable, usable, and reliable as it evolves.
+These principles guide every decision in the project,
+from the choice of automation tools to the structure of configuration files.
+They ensure that the project remains maintainable, usable,
+and reliable as it evolves.

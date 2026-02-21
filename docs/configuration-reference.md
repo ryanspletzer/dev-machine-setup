@@ -1,6 +1,7 @@
 # Configuration Reference
 
-This document provides a complete reference for all configuration options available across all platforms in the dev-machine-setup project.
+This document provides a complete reference for all configuration options
+available across all platforms in the dev-machine-setup project.
 
 ## Overview
 
@@ -443,7 +444,7 @@ homebrew_formulae:
 The same software may have different package names:
 
 | Software | macOS (Homebrew) | Windows (Chocolatey) | Ubuntu (APT/Snap) | Fedora (DNF/Flatpak) |
-|----------|------------------|---------------------|-------------------|---------------------|
+| -------- | ---------------- | ------------------- | ----------------- | ------------------- |
 | VS Code | `visual-studio-code` | `vscode` | `code` (snap) | `com.visualstudio.code` (flatpak) |
 | Node.js | `node` | `nodejs` | `nodejs` (apt) | `nodejs` (dnf) |
 | Docker | `docker-desktop` | `docker-desktop` | `docker.io` (apt) | `docker-ce` (dnf) |
@@ -528,4 +529,6 @@ custom_commands_user:
   - echo "Please configure AWS credentials manually: aws configure"
 ```
 
-This configuration reference provides all the details needed to customize your development environment setup across all supported platforms. Use this as a comprehensive guide when creating or modifying your `vars.yaml` files.
+This configuration reference provides all the details needed
+to customize your development environment setup across all supported platforms.
+Use this as a comprehensive guide when creating or modifying your `vars.yaml` files.

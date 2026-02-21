@@ -141,7 +141,8 @@ If you're running in WSL, set `is_wsl: true` in `vars.yaml` to enable WSL-specif
 
 ### Adding Custom Commands
 
-You can add custom commands to be executed during setup by adding entries to `custom_commands_user` and `custom_commands_elevated` in `vars.yaml`.
+You can add custom commands to be executed during setup by adding entries to
+`custom_commands_user` and `custom_commands_elevated` in `vars.yaml`.
 
 ### Adding Custom Scripts
 
@@ -164,7 +165,6 @@ For comprehensive documentation and examples:
 
 - [Complete Documentation](../docs/README.md) - Full project documentation
 - [Design Principles](../docs/design-principles.md) - Understanding the philosophy
-- [Configuration Examples](../docs/examples/README.md) - Real-world use cases
 - [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
 - [Architecture Overview](../docs/architecture.md) - How all the pieces fit together
 - [Package Management Strategy](../docs/package-management.md) - Our approach to managing packages
@@ -226,7 +226,9 @@ ansible-playbook -t apt,git setup.yaml
 - **Logs**: All installation logs are saved to a timestamped log file in the current directory.
 - **Verbosity**: Use the `-v` flag (can be repeated for more detail) to see more information during setup.
 - **Failed Tasks**: You can safely rerun the setup script - it will skip already completed tasks.
-- **Dependencies**: If you encounter errors about missing dependencies, try running with the `-p` flag first to install prerequisites, then run the script again normally.
+- **Dependencies**: If you encounter errors about missing dependencies,
+  try running with the `-p` flag first to install prerequisites,
+  then run the script again normally.
 
 ## Security Notes
 
