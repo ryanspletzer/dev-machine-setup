@@ -12,6 +12,7 @@ dev-machine-setup/
 │   ├── macOS_vars.yaml         # Example macOS configuration
 │   ├── windows_vars.yaml       # Example Windows configuration
 │   ├── ubuntu_vars.yaml        # Example Ubuntu configuration
+│   ├── fedora_vars.yaml        # Example Fedora configuration
 │   └── *_custom_script.*       # Example custom scripts
 ├── docs/                       # Comprehensive documentation
 │   ├── README.md               # Documentation index
@@ -27,11 +28,16 @@ dev-machine-setup/
 │   ├── setup.ps1              # PowerShell setup script
 │   ├── vars.yaml              # Configuration variables
 │   └── examples/              # Windows-specific examples
-└── ubuntu/                     # Ubuntu-specific implementation
+├── ubuntu/                     # Ubuntu-specific implementation
+│   ├── setup.sh               # Entry point script
+│   ├── setup.yaml             # Ansible playbook
+│   ├── vars.yaml              # Configuration variables
+│   └── examples/              # Ubuntu-specific examples
+└── fedora/                     # Fedora-specific implementation
     ├── setup.sh               # Entry point script
     ├── setup.yaml             # Ansible playbook
     ├── vars.yaml              # Configuration variables
-    └── examples/              # Ubuntu-specific examples
+    └── examples/              # Fedora-specific examples
 ```
 
 ## Component Architecture
@@ -44,14 +50,17 @@ graph TB
     B --> C[macOS Setup]
     B --> D[Windows Setup]
     B --> E[Ubuntu Setup]
+    B --> F2[Fedora Setup]
 
     C --> F[Homebrew + Ansible]
     D --> G[Chocolatey + PowerShell]
     E --> H[APT/Snap + Ansible]
+    F2 --> H2[DNF/Flatpak + Ansible]
 
     F --> I[Configured Development Environment]
     G --> I
     H --> I
+    H2 --> I
 ```
 
 Each platform provides:
@@ -156,6 +165,40 @@ graph LR
 - **Snap**: Application package manager for GUI applications
 - **Ansible**: Automation engine providing idempotent configuration
 
+### Fedora Architecture
+
+```mermaid
+graph LR
+    A[setup.sh] --> B[Install Prerequisites]
+    B --> C[DNF Packages]
+    B --> D[Ansible]
+    D --> E[setup.yaml Playbook]
+    E --> F[vars.yaml Config]
+
+    F --> G[DNF Packages]
+    F --> H[Flatpak Packages]
+    F --> I[PowerShell Modules]
+    F --> J[Python Packages]
+    F --> K[VS Code Extensions]
+
+    subgraph "Package Managers"
+        G --> L[dnf install]
+        H --> M[flatpak install]
+        I --> N[Install-PSResource]
+        J --> O[pipx install]
+        K --> P[code --install-extension]
+    end
+```
+
+**Key Components:**
+
+- `setup.sh`: Bash script that handles prerequisites and launches Ansible
+- `setup.yaml`: Ansible playbook with tagged tasks for different components
+- `vars.yaml`: YAML configuration file with package lists and settings
+- **DNF**: System package manager for CLI tools and libraries
+- **Flatpak**: Application package manager for GUI applications
+- **Ansible**: Automation engine providing idempotent configuration
+
 ## Data Flow
 
 ### Configuration Processing
@@ -197,15 +240,15 @@ sequenceDiagram
 
 Each platform organizes packages into logical categories:
 
-| Category | macOS | Windows | Ubuntu |
-|----------|-------|---------|--------|
-| CLI Tools | `homebrew_formulae` | `choco_packages` | `apt_packages` |
-| Applications | `homebrew_casks` | `choco_packages` | `snap_packages` |
-| VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
-| PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` |
-| Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` |
-| Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
-| .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
+| Category | macOS | Windows | Ubuntu | Fedora |
+|----------|-------|---------|--------|--------|
+| CLI Tools | `homebrew_formulae` | `choco_packages` | `apt_packages` | `dnf_packages` |
+| Applications | `homebrew_casks` | `choco_packages` | `snap_packages` | `flatpak_packages` |
+| VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
+| PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` |
+| Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` |
+| Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
+| .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
 
 ### Package Manager Integration
 
@@ -215,10 +258,12 @@ graph TD
     B -->|macOS| C[Homebrew]
     B -->|Windows| D[Chocolatey]
     B -->|Ubuntu| E[APT/Snap]
+    B -->|Fedora| E2[DNF/Flatpak]
 
     C --> F{Package Type?}
     D --> G{Package Type?}
     E --> H{Package Type?}
+    E2 --> H2{Package Type?}
 
     F -->|CLI| I[brew install formula]
     F -->|GUI| J[brew install --cask app]
@@ -228,11 +273,16 @@ graph TD
     H -->|System| L[apt install package]
     H -->|Application| M[snap install app]
 
+    H2 -->|System| L2[dnf install package]
+    H2 -->|Application| M2[flatpak install app]
+
     I --> N[Installed]
     J --> N
     K --> N
     L --> N
     M --> N
+    L2 --> N
+    M2 --> N
 ```
 
 ## Security Model
@@ -263,15 +313,19 @@ graph TB
         G[Homebrew Repository]
         H[Chocolatey Community]
         I[Ubuntu Archives]
+        I2[Fedora Repositories]
         J[PowerShell Gallery]
         K[VS Code Marketplace]
+        K2[Flathub]
     end
 
     D --> G
     D --> H
     D --> I
+    D --> I2
     D --> J
     D --> K
+    D --> K2
 ```
 
 ## Extensibility Points
@@ -347,7 +401,7 @@ Where possible, the setup performs operations in parallel:
 
 ### Caching Strategy
 
-- **Package managers**: Leverage built-in caching (Homebrew, Chocolatey, APT)
+- **Package managers**: Leverage built-in caching (Homebrew, Chocolatey, APT, DNF)
 - **Download caching**: Avoid re-downloading already cached packages
 - **State caching**: Remember completed operations to avoid repetition
 

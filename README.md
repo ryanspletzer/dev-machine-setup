@@ -7,7 +7,9 @@ by developers.
 
 ## 🚀 Features
 
-- **Cross-Platform Support**: Setup scripts for [macOS](./macOS/README.md), [Windows](./windows/README.md), and [Ubuntu](./ubuntu/README.md)
+- **Cross-Platform Support**: Setup scripts for [macOS](./macOS/README.md),
+  [Windows](./windows/README.md), [Ubuntu](./ubuntu/README.md),
+  and [Fedora](./fedora/README.md)
 - **Package Management**: Install common developer tools and applications
 - **Editor Configuration**: Set up Visual Studio Code with essential extensions
 - **Shell Configuration**: Configure PowerShell with useful modules
@@ -21,6 +23,7 @@ by developers.
 - [macOS Setup](./macOS/README.md) - Set up a macOS development environment
 - [Windows Setup](./windows/README.md) - Set up a Windows development environment
 - [Ubuntu Setup](./ubuntu/README.md) - Set up an Ubuntu development environment
+- [Fedora Setup](./fedora/README.md) - Set up a Fedora development environment
 
 ### Comprehensive Documentation
 
@@ -37,13 +40,13 @@ by developers.
 This repository is designed to help developers quickly set up new machines with a consistent development environment.
 It automates the installation of common tools, applications, and configurations that developers use daily.
 
-The setup is platform-specific but provides a similar set of tools across macOS, Windows, and Ubuntu:
+The setup is platform-specific but provides a similar set of tools across macOS, Windows, Ubuntu, and Fedora:
 
 ### Common Tools Installed
 
 - **Version Control**: Git, Git LFS
 - **Editors & IDEs**: Visual Studio Code with extensions
-- **Package Managers**: Homebrew (macOS), Chocolatey (Windows), APT (Ubuntu)
+- **Package Managers**: Homebrew (macOS), Chocolatey (Windows), APT (Ubuntu), DNF (Fedora)
 - **Languages & Runtimes**: Python, Node.js, .NET SDK, etc.
 - **Cloud Tools**: AWS CLI, Azure CLI, Terraform, etc.
 - **Containers**: Docker
@@ -129,6 +132,31 @@ chmod 700 ./setup.sh
 
 [Detailed Ubuntu Setup Instructions](./ubuntu/README.md)
 
+### Fedora
+
+1. Clone this repository
+   (or grab a zip download of the repo and copy the contents of the `fedora` directory to somewhere like `~/Downloads` if
+   you don't have git installed yet)
+2. Open Terminal
+3. Navigate to the directory with the `fedora` script contents
+4. Run the setup script:
+
+```bash
+# Copy the contents of the fedora directory to somewhere like Downloads if you don't have git installed yet to clone
+# the repo
+
+# Change to that directory
+cd ~/Downloads
+
+# Allow the setup.sh script to run
+chmod 700 ./setup.sh
+
+# Run the script
+./setup.sh -e your.email@example.com
+```
+
+[Detailed Fedora Setup Instructions](./fedora/README.md)
+
 ## ⚙️ Customization
 
 All platforms support extensive customization through their respective configuration files:
@@ -136,6 +164,7 @@ All platforms support extensive customization through their respective configura
 - **macOS**: Edit `macOS/vars.yaml` to customize the Ansible playbook
 - **Windows**: Edit `windows/vars.yaml` to customize the PowerShell script
 - **Ubuntu**: Edit `ubuntu/vars.yaml` to customize the Ansible playbook
+- **Fedora**: Edit `fedora/vars.yaml` to customize the Ansible playbook
 
 You can add or remove packages, change system preferences, and even add custom scripts to run at the end of the setup
 process. For detailed customization instructions, see the [Customization Guide](./docs/customization.md).
@@ -158,5 +187,5 @@ This project includes comprehensive documentation covering all aspects of setup 
 
 - [Ansible](https://www.ansible.com/) for the macOS and Ubuntu automation
 - [PowerShell](https://github.com/PowerShell/PowerShell) for the Windows automation
-- [Homebrew](https://brew.sh/), [Chocolatey](https://chocolatey.org/), and APT and Snap for package management
+- [Homebrew](https://brew.sh/), [Chocolatey](https://chocolatey.org/), APT/Snap, and DNF/Flatpak for package management
 - All the developers who maintain the tools and applications installed by these scripts

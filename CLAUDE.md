@@ -5,7 +5,7 @@ when working with code in this repository.
 
 ## Project Overview
 
-Cross-platform dev machine setup automation for macOS, Windows, and Ubuntu.
+Cross-platform dev machine setup automation for macOS, Windows, Ubuntu, and Fedora.
 Each platform has its own directory with an entry-point script,
 an automation engine, and a `vars.yaml` configuration file.
 
@@ -18,6 +18,7 @@ an automation engine, and a `vars.yaml` configuration file.
 | macOS | `macOS/setup.sh` | Ansible (`setup.yaml`) | Homebrew |
 | Windows | `windows/setup.ps1` | Native PowerShell | Chocolatey |
 | Ubuntu | `ubuntu/setup.sh` | Ansible (`setup.yaml`) | APT + Snap |
+| Fedora | `fedora/setup.sh` | Ansible (`setup.yaml`) | DNF + Flatpak |
 
 All platforms share the same flow:
 install prerequisites, load `vars.yaml`, install packages by category,
@@ -28,7 +29,8 @@ configure Git, run custom commands, run custom script, clean up.
 Each platform's `vars.yaml` is the single source of truth.
 Package lists are flat YAML arrays grouped by category:
 
-- **OS packages**: `homebrew_formulae` / `homebrew_casks` / `choco_packages` / `apt_packages` / `snap_packages`
+- **OS packages**: `homebrew_formulae` / `homebrew_casks` / `choco_packages` /
+  `apt_packages` / `snap_packages` / `dnf_packages` / `flatpak_packages`
 - **Cross-platform**: `powershell_modules`, `pipx_packages`, `npm_global_packages`, `dotnet_tools`, `vscode_extensions`
 - **Git config**: `git_user_email`, `git_user_name`
 - **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo)
@@ -45,6 +47,12 @@ Package lists are flat YAML arrays grouped by category:
   and `apt_packages_prereqs` for bootstrap dependencies.
 - **Ubuntu** uses `supported_architectures` on some packages
   to skip amd64-only software on ARM64.
+- **Fedora** has `external_dnf_repositories` (yum_repository format)
+  and `dnf_packages_prereqs` for bootstrap dependencies.
+- **Fedora** uses `supported_architectures` with `x86_64`/`aarch64` values
+  (not `amd64`/`arm64` like Ubuntu).
+- **Fedora** uses `flatpak_packages` (Flathub app IDs)
+  instead of Snap packages.
 
 ## Running the Setup Scripts
 
@@ -56,6 +64,10 @@ chmod 700 ./macOS/setup.sh
 # Ubuntu
 chmod 700 ./ubuntu/setup.sh
 ./ubuntu/setup.sh -e your.email@example.com
+
+# Fedora
+chmod 700 ./fedora/setup.sh
+./fedora/setup.sh -e your.email@example.com
 ```
 
 ```powershell
@@ -65,9 +77,9 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 ```
 
 Common flags: `-v` (verbose, repeatable), `-e` (git email),
-`-n` (git name), `-p` (prerequisites only, macOS/Ubuntu).
+`-n` (git name), `-p` (prerequisites only, macOS/Ubuntu/Fedora).
 
-### Ansible Tags (macOS/Ubuntu)
+### Ansible Tags (macOS/Ubuntu/Fedora)
 
 The Ansible playbooks use tags to run specific sections:
 

@@ -1,8 +1,8 @@
 ---
-# Ansible playbook for Ubuntu development machine setup
-# Manages APT packages, Snap packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
+# Ansible playbook for Fedora development machine setup
+# Manages DNF packages, Flatpak packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
 
-- name: Setup development environment on Ubuntu
+- name: Setup development environment on Fedora
   hosts: localhost
   connection: local
   gather_facts: yes
@@ -49,20 +49,10 @@
         - system
         - wsl
 
-    # Get Debian architecture dynamically using dpkg
-    - name: Get Debian architecture from dpkg
-      ansible.builtin.command:
-        cmd: dpkg --print-architecture
-      register: dpkg_architecture
-      changed_when: false
-      tags:
-        - system
-        - architecture
-
-    # Set the deb_architecture fact based on dpkg output
-    - name: Set Debian architecture fact
+    # Get RPM architecture directly from ansible_architecture
+    - name: Set RPM architecture fact
       ansible.builtin.set_fact:
-        deb_architecture: "{{ dpkg_architecture.stdout }}"
+        rpm_architecture: "{{ ansible_architecture }}"
       tags:
         - system
         - architecture
@@ -72,100 +62,106 @@
       ansible.builtin.debug:
         msg:
           - "Detected system architecture: {{ ansible_architecture }}"
-          - "Using Debian architecture: {{ deb_architecture }}"
+          - "Using RPM architecture: {{ rpm_architecture }}"
       tags:
         - system
         - architecture
 
-    # apt update
-    - name: Update APT cache
-      ansible.builtin.apt:
+    # dnf makecache
+    - name: Update DNF cache
+      ansible.builtin.dnf:
         update_cache: yes
-        cache_valid_time: 3600
       become: yes
       tags:
-        - apt
+        - dnf
         - update
 
-    # apt upgrade
-    - name: Upgrade all packages
-      ansible.builtin.apt:
-        upgrade: yes
+    # dnf upgrade
+    - name: Upgrade all packages # noqa: package-latest
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
       become: yes
       tags:
-        - apt
+        - dnf
         - upgrade
 
-    # Install prerequisite APT packages
-    - name: Install prerequisite APT packages
-      ansible.builtin.apt:
-        name: "{{ apt_packages_prereqs | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages_prereqs | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
+    # Install prerequisite DNF packages
+    - name: Install prerequisite DNF packages
+      ansible.builtin.dnf:
+        name: "{{ dnf_packages_prereqs | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + dnf_packages_prereqs | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', rpm_architecture) | map(attribute='name') | list }}"
         state: present
       become: yes
       tags:
-        - apt
+        - dnf
         - prereqs
         - packages
 
-    # Add external APT repositories using deb822 format
-    - name: Add external APT repositories
-      ansible.builtin.deb822_repository:
+    # Add external DNF repositories
+    - name: Add external DNF repositories
+      ansible.builtin.yum_repository:
         name: "{{ item.name }}"
-        signed_by: "{{ item.signed_by }}"
-        uris: "{{ item.uris }}"
-        suites: "{{ item.suites }}"
-        components: "{{ item.components }}"
-        architectures: "{{ item.architectures }}"
+        description: "{{ item.description | default(item.name) }}"
+        baseurl: "{{ item.baseurl }}"
+        gpgkey: "{{ item.gpgkey | default(omit) }}"
+        gpgcheck: "{{ item.gpgcheck | default(true) }}"
+        enabled: true
         state: present
-      loop: "{{ external_apt_repositories }}"
+      loop: "{{ external_dnf_repositories }}"
       loop_control:
         label: "Adding repository: {{ item.name }}"
-      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      when: item.supported_architectures is not defined or rpm_architecture in item.supported_architectures
       become: yes
       tags:
-        - apt
+        - dnf
         - repositories
 
-    # Install APT packages
-    - name: Install APT packages
-      ansible.builtin.apt:
-        name: "{{ apt_packages | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
+    # Install DNF packages
+    - name: Install DNF packages
+      ansible.builtin.dnf:
+        name: "{{ dnf_packages | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + dnf_packages | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', rpm_architecture) | map(attribute='name') | list }}"
         state: present
       become: yes
       tags:
-        - apt
+        - dnf
         - packages
 
-    # Snap packages (classic)
-    - name: Install Snap packages (classic)
-      ansible.builtin.command:
-        cmd: snap install {{ item.name }} --classic
+    # Flatpak setup
+    - name: Ensure Flatpak is installed
+      ansible.builtin.dnf:
+        name: flatpak
+        state: present
       become: yes
-      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | list }}"
-      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
-      register: snap_classic_result
-      changed_when: "snap_classic_result.rc == 0 and 'already installed' not in snap_classic_result.stdout"
-      failed_when: false
-      loop_control:
-        label: "Installing classic snap: {{ item.name }}"
+      when: flatpak_packages | length > 0
       tags:
-        - snap
+        - flatpak
         - packages
 
-    # Snap packages (regular)
-    - name: Install Snap packages (regular)
-      ansible.builtin.command:
-        cmd: snap install {{ item.name }}
+    - name: Add Flathub remote
+      community.general.flatpak_remote:
+        name: flathub
+        flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+        state: present
       become: yes
-      loop: "{{ snap_packages | rejectattr('classic', 'defined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
-      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
-      register: snap_regular_result
-      changed_when: "snap_regular_result.rc == 0 and 'already installed' not in snap_regular_result.stdout"
+      when: flatpak_packages | length > 0
+      tags:
+        - flatpak
+        - packages
+
+    - name: Install Flatpak packages
+      community.general.flatpak:
+        name: "{{ item.name }}"
+        state: present
+        remote: flathub
+      become: yes
+      loop: "{{ flatpak_packages }}"
+      when: item.supported_architectures is not defined or rpm_architecture in item.supported_architectures
+      register: flatpak_install_result
       failed_when: false
       loop_control:
-        label: "Installing regular snap: {{ item.name }}"
+        label: "Installing Flatpak: {{ item.name }}"
       tags:
-        - snap
+        - flatpak
         - packages
 
     # npm configuration and installation
@@ -402,7 +398,6 @@
     # Notify user of completion
     - name: Setup complete
       ansible.builtin.debug:
-        msg: "Ubuntu development environment setup complete!"
+        msg: "Fedora development environment setup complete!"
       tags:
         - always
-

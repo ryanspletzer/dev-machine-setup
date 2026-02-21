@@ -68,6 +68,13 @@ Every package, tool, or application must be installed through a recognized packa
 - **pipx** for Python tools (`pipx_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 
+#### Fedora
+
+- **DNF** for system packages (`dnf_packages`)
+- **Flatpak** for applications (`flatpak_packages`)
+- **pipx** for Python tools (`pipx_packages`)
+- **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
+
 **Benefits:**
 
 - Automatic dependency resolution
@@ -84,6 +91,7 @@ Each platform uses its native tools and conventions:
 - **macOS**: Bash + Ansible playbooks
 - **Windows**: PowerShell scripts with native cmdlets
 - **Ubuntu**: Bash + Ansible playbooks
+- **Fedora**: Bash + Ansible playbooks
 
 But all platforms provide:
 

@@ -47,6 +47,7 @@ Ensure your system meets the minimum requirements:
 - **macOS**: 10.15+ (Catalina or later)
 - **Windows**: Windows 10/11 with PowerShell 5.1+
 - **Ubuntu**: 20.04 LTS or later
+- **Fedora**: 39 or later
 - **All platforms**: Internet connection and administrator privileges
 
 ## Platform-Specific Issues
@@ -251,6 +252,79 @@ newgrp docker
 sudo chown -R $USER:$USER ~/.vscode
 ```
 
+### Fedora Troubleshooting
+
+#### DNF Package Issues
+
+**Problem**: Package lists are outdated
+
+```bash
+Error: Failed to synchronize cache for repo
+```
+
+**Solution**:
+
+```bash
+sudo dnf makecache && sudo dnf upgrade -y
+```
+
+**Problem**: Broken package dependencies
+
+```bash
+Error: package requires ..., but none of the providers can be installed
+```
+
+**Solution**:
+
+```bash
+# Fix broken packages
+sudo dnf distro-sync
+
+# Clean package cache
+sudo dnf autoremove && sudo dnf clean all
+```
+
+#### Flatpak Issues
+
+**Problem**: Flatpak packages fail to install
+
+```bash
+error: Unable to load summary from remote flathub
+```
+
+**Solution**:
+
+```bash
+# Re-add the Flathub remote
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+# Update Flatpak metadata
+flatpak update
+```
+
+#### Permission Issues
+
+**Problem**: Docker requires sudo
+
+**Solution**:
+
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Log out and back in, or restart the shell
+newgrp docker
+```
+
+**Problem**: VS Code cannot write to directories
+
+**Solution**:
+
+```bash
+# Fix VS Code directory permissions
+sudo chown -R $USER:$USER ~/.vscode
+```
+
 ## Common Package Issues
 
 ### Package Not Found
@@ -270,6 +344,9 @@ sudo chown -R $USER:$USER ~/.vscode
 
    # Ubuntu
    apt search package-name
+
+   # Fedora
+   dnf search package-name
    ```
 
 2. **Add required repositories**:
@@ -310,6 +387,9 @@ sudo chown -R $USER:$USER ~/.vscode
 
    # Ubuntu
    sudo apt remove conflicting-package
+
+   # Fedora
+   sudo dnf remove conflicting-package
    ```
 
 2. **Use specific versions**:
@@ -460,6 +540,9 @@ git config --global user.name "Your Name"
 
    # Ubuntu
    sudo apt clean && sudo apt autoremove
+
+   # Fedora
+   sudo dnf clean all && sudo dnf autoremove
    ```
 
 3. **Check available disk space**:
@@ -542,6 +625,9 @@ When reporting issues, collect this information:
 
    # Ubuntu
    lsb_release -a && uname -m
+
+   # Fedora
+   cat /etc/fedora-release && uname -m
    ```
 
 2. **Package Manager Versions**:
@@ -555,6 +641,9 @@ When reporting issues, collect this information:
 
    # Ubuntu
    apt --version && snap --version
+
+   # Fedora
+   dnf --version && flatpak --version
    ```
 
 3. **Log Files**: Include relevant portions of setup log files
@@ -582,6 +671,9 @@ If the setup has partially completed and left your system in an inconsistent sta
 
    # Ubuntu
    apt list --installed
+
+   # Fedora
+   dnf list installed
    ```
 
 2. **Uninstall problematic packages**:
@@ -591,6 +683,7 @@ If the setup has partially completed and left your system in an inconsistent sta
    brew uninstall package-name
    choco uninstall package-name
    sudo apt remove package-name
+   sudo dnf remove package-name
    ```
 
 3. **Reset package managers**:

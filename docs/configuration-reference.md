@@ -4,7 +4,10 @@ This document provides a complete reference for all configuration options availa
 
 ## Overview
 
-Each platform uses YAML-based configuration files (`vars.yaml`) to define what gets installed and configured. While the specific variable names may differ between platforms, the structure and concepts remain consistent.
+Each platform (macOS, Windows, Ubuntu, and Fedora) uses YAML-based configuration
+files (`vars.yaml`) to define what gets installed and configured.
+While the specific variable names may differ between platforms,
+the structure and concepts remain consistent.
 
 ## Common Configuration Structure
 
@@ -159,6 +162,66 @@ snap_packages:
   - code --classic               # VS Code with classic confinement
   - discord                      # Communication app
   - slack --classic              # Team communication
+```
+
+### WSL Configuration
+
+```yaml
+# Windows Subsystem for Linux specific settings
+is_wsl: false                    # Set to true when running in WSL environment
+```
+
+### Custom Commands
+
+```yaml
+# Commands executed as the current user
+custom_commands_user:
+  # Configure Git to use Windows credential manager in WSL
+  - git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"
+  # Set dark theme
+  - gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+
+# Commands executed with sudo privileges
+custom_commands_elevated:
+  # Add user to docker group
+  - sudo usermod -aG docker $USER
+  # Enable and start Docker service
+  - sudo systemctl enable docker --now
+```
+
+## Fedora Configuration Reference
+
+### DNF Packages
+
+```yaml
+# System packages and command-line tools
+dnf_packages:
+  - git                          # Version control
+  - curl                         # HTTP client
+  - wget                         # Download utility
+  - gcc                          # C compiler
+  - make                         # Build automation
+  - dnf-plugins-core             # DNF plugin support
+```
+
+### Flatpak Packages
+
+```yaml
+# GUI applications via Flatpak
+flatpak_packages:
+  - com.visualstudio.code        # VS Code
+  - com.discordapp.Discord       # Communication app
+  - com.slack.Slack              # Team communication
+```
+
+### External DNF Repositories
+
+```yaml
+# Additional DNF repositories
+external_dnf_repositories:
+  - name: hashicorp
+    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
 ```
 
 ### WSL Configuration
@@ -379,12 +442,12 @@ homebrew_formulae:
 
 The same software may have different package names:
 
-| Software | macOS (Homebrew) | Windows (Chocolatey) | Ubuntu (APT/Snap) |
-|----------|------------------|---------------------|-------------------|
-| VS Code | `visual-studio-code` | `vscode` | `code` (snap) |
-| Node.js | `node` | `nodejs` | `nodejs` (apt) |
-| Docker | `docker-desktop` | `docker-desktop` | `docker.io` (apt) |
-| Git | `git` | `git` | `git` (apt) |
+| Software | macOS (Homebrew) | Windows (Chocolatey) | Ubuntu (APT/Snap) | Fedora (DNF/Flatpak) |
+|----------|------------------|---------------------|-------------------|---------------------|
+| VS Code | `visual-studio-code` | `vscode` | `code` (snap) | `com.visualstudio.code` (flatpak) |
+| Node.js | `node` | `nodejs` | `nodejs` (apt) | `nodejs` (dnf) |
+| Docker | `docker-desktop` | `docker-desktop` | `docker.io` (apt) | `docker-ce` (dnf) |
+| Git | `git` | `git` | `git` (apt) | `git` (dnf) |
 
 ### Command Syntax
 

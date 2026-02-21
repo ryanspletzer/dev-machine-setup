@@ -4,7 +4,9 @@ Thank you for your interest in contributing to the dev-machine-setup project! Th
 
 ## Project Overview
 
-The dev-machine-setup project provides automated scripts and configurations to set up consistent development environments across macOS, Windows, and Ubuntu platforms. The project emphasizes simplicity, reliability, and customizability through declarative configuration files.
+The dev-machine-setup project provides automated scripts and configurations
+to set up consistent development environments across macOS, Windows, Ubuntu,
+and Fedora platforms. The project emphasizes simplicity, reliability, and customizability through declarative configuration files.
 
 ## Ways to Contribute
 
@@ -73,6 +75,11 @@ Contribute directly to the codebase:
 - APT package manager
 - Snap package manager
 
+**For Fedora development:**
+- Fedora 39 or later
+- DNF package manager
+- Flatpak package manager
+
 ### Setting Up Your Development Environment
 
 1. **Fork the repository** on GitHub
@@ -88,7 +95,7 @@ Contribute directly to the codebase:
 4. **Test the existing setup** on your platform:
    ```bash
    # Navigate to your platform directory
-   cd macOS  # or windows, or ubuntu
+   cd macOS  # or windows, ubuntu, or fedora
 
    # Run prerequisites only for testing
    ./setup.sh -p  # macOS/Ubuntu
@@ -113,7 +120,11 @@ dev-machine-setup/
 ├── windows/               # Windows implementation
 │   ├── setup.ps1         # PowerShell script
 │   └── vars.yaml         # Configuration
-└── ubuntu/                # Ubuntu implementation
+├── ubuntu/                # Ubuntu implementation
+│   ├── setup.sh          # Entry point script
+│   ├── setup.yaml        # Ansible playbook
+│   └── vars.yaml         # Configuration
+└── fedora/                # Fedora implementation
     ├── setup.sh          # Entry point script
     ├── setup.yaml        # Ansible playbook
     └── vars.yaml         # Configuration
@@ -204,6 +215,9 @@ vscode_extensions:
 
    # Ubuntu
    apt search new-package
+
+   # Fedora
+   dnf search new-package
    ```
 
 2. **Test installation in isolation:**
@@ -245,6 +259,7 @@ When possible, test changes across multiple platforms:
 - Test on both Intel and Apple Silicon Macs
 - Verify Windows 10 and 11 compatibility
 - Test different Ubuntu LTS versions
+- Test on recent Fedora releases
 
 ### Documentation Updates
 
@@ -322,6 +337,9 @@ Before adding packages, research:
 
    apt_packages:          # Ubuntu
      - new-package
+
+   dnf_packages:          # Fedora
+     - new-package
    ```
 
 2. **Test the addition:**
@@ -348,6 +366,10 @@ Before adding packages, research:
    # Ubuntu
    apt_packages:
      - ubuntu-package-name           # Different name on Ubuntu
+
+   # Fedora
+   dnf_packages:
+     - fedora-package-name           # Different name on Fedora
    ```
 
 ## Adding New Platform Support

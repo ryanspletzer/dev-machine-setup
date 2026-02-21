@@ -33,6 +33,7 @@ Use the provided examples as starting points:
 - `examples/macOS_vars.yaml` - Extended macOS configuration
 - `examples/windows_vars.yaml` - Extended Windows configuration
 - `examples/ubuntu_vars.yaml` - Extended Ubuntu configuration
+- `examples/fedora_vars.yaml` - Extended Fedora configuration
 - `examples/*_custom_script.*` - Custom script examples
 
 ## Platform-Specific Customization
@@ -130,6 +131,41 @@ snap_packages:
   - code --classic
   - discord
   - slack --classic
+```
+
+#### System Configuration
+
+```yaml
+custom_commands_user:
+  # User-level commands
+  - gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  - gsettings set org.gnome.desktop.background picture-uri 'file:///path/to/wallpaper.jpg'
+
+custom_commands_elevated:
+  # Commands that require sudo
+  - sudo systemctl enable docker
+  - sudo usermod -aG docker $USER
+```
+
+### Fedora Customization
+
+#### Package Management
+
+```yaml
+# DNF packages (system packages and CLI tools)
+dnf_packages:
+  - git
+  - docker-ce
+  - curl
+  - wget
+  - gcc
+  - make
+
+# Flatpak packages (GUI applications)
+flatpak_packages:
+  - com.visualstudio.code
+  - com.discordapp.Discord
+  - com.slack.Slack
 ```
 
 #### System Configuration
@@ -393,6 +429,9 @@ brew search your-package-name
 
 # Test package availability (Ubuntu)
 apt search your-package-name
+
+# Test package availability (Fedora)
+dnf search your-package-name
 
 # Test custom script syntax
 bash -n your_custom_script.sh
