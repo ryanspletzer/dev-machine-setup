@@ -316,7 +316,7 @@
     # Git LFS setup
     - name: Ensure Git LFS is initialized
       ansible.builtin.command:
-        cmd: git lfs install --system
+        cmd: git lfs install
       register: git_lfs_result
       changed_when: "'Already initialized' not in git_lfs_result.stdout"
       tags:
