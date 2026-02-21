@@ -175,6 +175,7 @@
         npm config set prefix ~/.local
       args:
         creates: ~/.local/lib/node_modules
+      when: npm_global_packages | length > 0
       tags:
         - npm
         - packages
