@@ -30,7 +30,8 @@ Each platform's `vars.yaml` is the single source of truth.
 Package lists are flat YAML arrays grouped by category:
 
 - **OS packages**: `homebrew_formulae` / `homebrew_casks` / `choco_packages` /
-  `apt_packages` / `snap_packages` / `dnf_packages` / `flatpak_packages`
+  `apt_packages` / `snap_packages` / `dnf_packages` / `flatpak_packages` /
+  `appimage_packages`
 - **Cross-platform**: `powershell_modules`, `pipx_packages`, `npm_global_packages`, `dotnet_tools`, `vscode_extensions`
 - **Git config**: `git_user_email`, `git_user_name`
 - **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo)
@@ -53,6 +54,12 @@ Package lists are flat YAML arrays grouped by category:
   (not `amd64`/`arm64` like Ubuntu).
 - **Fedora** uses `flatpak_packages` (Flathub app IDs)
   instead of Snap packages.
+- **Ubuntu/Fedora** support `appimage_packages` for generic AppImage installation.
+  Each entry has `name`, `url`, and optional fields (`comment`, `categories`,
+  `mime_types`, `no_sandbox`, `checksum`, `supported_architectures`).
+  Cursor is installed this way on Linux; macOS uses Homebrew cask `cursor`,
+  Windows uses Chocolatey `cursoride`.
+  All platforms reuse the `vscode_extensions` list for Cursor extension installation.
 
 ## Running the Setup Scripts
 

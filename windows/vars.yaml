@@ -13,6 +13,7 @@ choco_packages:
   - name: azure-functions-core-tools
   - name: bicep
   - name: citrix-workspace
+  - name: cursoride
   - name: docker
   - name: dotnet-sdk
   # dotnetcore-sdk is deprecated, use dotnet-sdk instead

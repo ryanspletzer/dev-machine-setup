@@ -5,6 +5,21 @@
 # Enable WSL-specific configurations if running in WSL
 is_wsl: false  # Set to true if running in WSL
 
+# AppImage install directory
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+
+# AppImage packages
+appimage_packages:
+  - name: cursor
+    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    comment: "Cursor AI Code Editor"
+    categories: "Development;IDE;"
+    mime_types: "text/plain;"
+    # Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
+    # checksum: "sha256:abc123..."
+    # Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
+    # no_sandbox: true
+
 # APT prerequisite packages (installed first)
 # These are essential packages needed for basic system operations and some specific applications
 apt_packages_prereqs:
@@ -17,7 +32,7 @@ apt_packages_prereqs:
   - name: software-properties-common
   # For Docker Desktop
   - name: gnome-terminal
-  # For Cursor
+  # For AppImage packages
   - name: libfuse2
   # For Wine
   - name: libfaudio0

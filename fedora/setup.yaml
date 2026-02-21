@@ -313,6 +313,118 @@
         - vscode
         - extensions
 
+    # AppImage setup
+    - name: Ensure AppImage install directory exists
+      ansible.builtin.file:
+        path: "{{ appimage_install_dir }}"
+        state: directory
+        mode: '0755'
+      when: appimage_packages is defined and appimage_packages | length > 0
+      tags:
+        - appimage
+
+    - name: Ensure desktop entry directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.local/share/applications"
+        state: directory
+        mode: '0755'
+      when: appimage_packages is defined and appimage_packages | length > 0
+      tags:
+        - appimage
+
+    - name: Check if AppImage already exists
+      ansible.builtin.stat:
+        path: "{{ appimage_install_dir }}/{{ item.name }}.AppImage"
+      register: appimage_stat
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or rpm_architecture in item.supported_architectures
+      loop_control:
+        label: "Checking AppImage: {{ item.name }}"
+      tags:
+        - appimage
+
+    - name: Download AppImage
+      ansible.builtin.get_url:
+        url: "{{ item.0.url }}"
+        dest: "{{ appimage_install_dir }}/{{ item.0.name }}.AppImage"
+        mode: '0755'
+        checksum: "{{ item.0.checksum | default(omit) }}"
+      loop: "{{ appimage_packages | default([]) | zip(appimage_stat.results | default([])) | list }}"
+      when:
+        - item.1.stat is defined
+        - not item.1.stat.exists
+      loop_control:
+        label: "Downloading AppImage: {{ item.0.name }}"
+      tags:
+        - appimage
+
+    - name: Create AppImage desktop entry
+      ansible.builtin.copy:
+        dest: "{{ ansible_env.HOME }}/.local/share/applications/{{ item.name }}.desktop"
+        content: |
+          [Desktop Entry]
+          Name={{ item.name | capitalize }}
+          Exec={{ appimage_install_dir }}/{{ item.name }}.AppImage{{ ' --no-sandbox' if (item.no_sandbox | default(false)) else '' }} %F
+          Terminal=false
+          Type=Application
+          Icon={{ item.name }}
+          StartupWMClass={{ item.name | capitalize }}
+          Comment={{ item.comment | default(item.name) }}
+          MimeType={{ item.mime_types | default('') }}
+          Categories={{ item.categories | default('Application;') }}
+        mode: '0644'
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or rpm_architecture in item.supported_architectures
+      loop_control:
+        label: "Creating desktop entry: {{ item.name }}"
+      tags:
+        - appimage
+
+    - name: Create AppImage CLI symlink
+      ansible.builtin.file:
+        src: "{{ appimage_install_dir }}/{{ item.name }}.AppImage"
+        dest: "{{ appimage_install_dir }}/{{ item.name }}"
+        state: link
+        force: true
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or rpm_architecture in item.supported_architectures
+      loop_control:
+        label: "Creating symlink: {{ item.name }}"
+      tags:
+        - appimage
+
+    # Cursor extension setup
+    - name: Check if Cursor CLI is available
+      ansible.builtin.command:
+        cmd: which cursor
+      environment:
+        PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
+      register: cursor_cli_check
+      changed_when: false
+      failed_when: false
+      when: appimage_install_dir is defined
+      tags:
+        - cursor
+        - extensions
+
+    - name: Ensure Cursor extensions are installed
+      ansible.builtin.command:
+        cmd: cursor --install-extension {{ item }}
+      environment:
+        PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
+      ignore_errors: yes
+      loop: "{{ vscode_extensions }}"
+      register: cursor_ext_result
+      changed_when: "'already installed' not in cursor_ext_result.stdout"
+      when:
+        - appimage_install_dir is defined
+        - cursor_cli_check.rc == 0
+      loop_control:
+        label: "Installing Cursor extension: {{ item }}"
+      tags:
+        - cursor
+        - extensions
+
     # Git LFS setup
     - name: Ensure Git LFS is initialized
       ansible.builtin.command:

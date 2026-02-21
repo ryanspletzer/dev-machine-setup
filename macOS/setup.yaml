@@ -224,6 +224,31 @@
         - vscode
         - extensions
 
+    # Cursor extension setup
+    - name: Check if Cursor CLI is available
+      ansible.builtin.command:
+        cmd: which cursor
+      register: cursor_cli_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - cursor
+        - extensions
+
+    - name: Ensure Cursor extensions are installed
+      ansible.builtin.command:
+        cmd: cursor --install-extension {{ item }}
+      ignore_errors: yes
+      loop: "{{ vscode_extensions }}"
+      register: cursor_ext_result
+      changed_when: "'already installed' not in cursor_ext_result.stdout"
+      when: cursor_cli_check.rc == 0
+      loop_control:
+        label: "Installing Cursor extension: {{ item }}"
+      tags:
+        - cursor
+        - extensions
+
     # Git LFS setup
     - name: Ensure Git LFS is initialized
       ansible.builtin.command:

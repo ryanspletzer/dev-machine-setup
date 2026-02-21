@@ -5,6 +5,21 @@
 # Enable WSL-specific configurations if running in WSL
 is_wsl: false  # Set to true if running in WSL
 
+# AppImage install directory
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+
+# AppImage packages
+appimage_packages:
+  - name: cursor
+    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    comment: "Cursor AI Code Editor"
+    categories: "Development;IDE;"
+    mime_types: "text/plain;"
+    # Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
+    # checksum: "sha256:abc123..."
+    # Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
+    # no_sandbox: true
+
 # DNF prerequisite packages (installed first)
 # These are essential packages needed for basic system operations and some specific applications
 dnf_packages_prereqs:
@@ -14,6 +29,8 @@ dnf_packages_prereqs:
   - name: wget
   # For adding external repositories
   - name: dnf-plugins-core
+  # For AppImage packages
+  - name: fuse-libs
 
 # External DNF repositories
 # This uses the ansible.builtin.yum_repository module
@@ -195,6 +212,7 @@ powershell_modules:
 
 # pipx modules
 pipx_packages:
+  - ansible-lint
   - aws-sam-cli
   - cfn-lint
   - poetry

@@ -23,7 +23,6 @@ homebrew_casks:
   - citrix-workspace
   - comet
   - cursor
-  - cursor-cli
   - docker-desktop
   - dotnet-sdk
   - drawio
@@ -159,6 +158,7 @@ powershell_modules:
 
 # pipx modules
 pipx_packages:
+  - ansible-lint
   - poetry
   - taskcat
 
