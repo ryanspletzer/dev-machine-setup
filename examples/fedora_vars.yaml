@@ -10,6 +10,10 @@ cursor_appimage_url: "https://downloader.cursor.sh/linux/appImage/x64"
 cursor_install_dir: "{{ ansible_env.HOME }}/.local/bin"
 cursor_appimage_name: "cursor.AppImage"
 cursor_desktop_file: "{{ ansible_env.HOME }}/.local/share/applications/cursor.desktop"
+# Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
+# cursor_appimage_checksum: ""
+# Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
+cursor_no_sandbox: false
 
 # DNF prerequisite packages (installed first)
 # These are essential packages needed for basic system operations and some specific applications

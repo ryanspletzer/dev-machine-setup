@@ -336,9 +336,19 @@
         url: "{{ cursor_appimage_url }}"
         dest: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
         mode: '0755'
+        checksum: "{{ cursor_appimage_checksum | default(omit) }}"
       when:
         - cursor_appimage_url is defined
         - not cursor_appimage_stat.stat.exists
+      tags:
+        - cursor
+
+    - name: Ensure Cursor desktop entry directory exists
+      ansible.builtin.file:
+        path: "{{ cursor_desktop_file | dirname }}"
+        state: directory
+        mode: '0755'
+      when: cursor_appimage_url is defined
       tags:
         - cursor
 
@@ -348,7 +358,7 @@
         content: |
           [Desktop Entry]
           Name=Cursor
-          Exec={{ cursor_install_dir }}/{{ cursor_appimage_name }} --no-sandbox %F
+          Exec={{ cursor_install_dir }}/{{ cursor_appimage_name }}{{ ' --no-sandbox' if (cursor_no_sandbox | default(false)) else '' }} %F
           Terminal=false
           Type=Application
           Icon=cursor
@@ -366,6 +376,7 @@
         src: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
         dest: "{{ cursor_install_dir }}/cursor"
         state: link
+        force: true
       when: cursor_appimage_url is defined
       tags:
         - cursor
