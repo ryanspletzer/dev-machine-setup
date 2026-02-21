@@ -383,6 +383,7 @@
       register: cursor_cli_check
       changed_when: false
       failed_when: false
+      when: cursor_install_dir is defined
       tags:
         - cursor
         - extensions
@@ -396,7 +397,9 @@
       loop: "{{ vscode_extensions }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
-      when: cursor_cli_check.rc == 0
+      when:
+        - cursor_install_dir is defined
+        - cursor_cli_check.rc == 0
       loop_control:
         label: "Installing Cursor extension: {{ item }}"
       tags:
