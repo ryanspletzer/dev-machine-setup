@@ -1,6 +1,8 @@
 # Architecture Overview
 
-This document provides a high-level view of how the dev-machine-setup project is structured and how its components work together to provide automated development environment setup across multiple platforms.
+This document provides a high-level view of how the dev-machine-setup project is structured
+and how its components work together to provide automated development environment setup
+across multiple platforms.
 
 ## Repository Structure
 
@@ -158,6 +160,7 @@ graph LR
 ```
 
 **Key Components:**
+
 - `setup.sh`: Bash script that handles prerequisites and launches Ansible
 - `setup.yaml`: Ansible playbook with tagged tasks for different components
 - `vars.yaml`: YAML configuration file with package lists and settings
@@ -241,7 +244,7 @@ sequenceDiagram
 Each platform organizes packages into logical categories:
 
 | Category | macOS | Windows | Ubuntu | Fedora |
-|----------|-------|---------|--------|--------|
+| -------- | ----- | ------- | ------ | ------ |
 | CLI Tools | `homebrew_formulae` | `choco_packages` | `apt_packages` | `dnf_packages` |
 | Applications | `homebrew_casks` | `choco_packages` | `snap_packages` | `flatpak_packages` |
 | VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
@@ -385,6 +388,7 @@ graph TD
 ```
 
 All operations are logged with:
+
 - **Timestamps**: When each operation occurred
 - **Command details**: Exact commands executed
 - **Output capture**: Full stdout/stderr from operations
@@ -395,6 +399,7 @@ All operations are logged with:
 ### Parallel Operations
 
 Where possible, the setup performs operations in parallel:
+
 - **Package downloads**: Multiple packages downloaded simultaneously
 - **Independent installations**: Non-conflicting packages installed in parallel
 - **Platform optimization**: Each platform uses its native parallel capabilities
@@ -405,4 +410,6 @@ Where possible, the setup performs operations in parallel:
 - **Download caching**: Avoid re-downloading already cached packages
 - **State caching**: Remember completed operations to avoid repetition
 
-This architecture provides a robust, maintainable, and extensible foundation for automated development environment setup across multiple platforms while maintaining consistency and reliability.
+This architecture provides a robust, maintainable, and extensible foundation
+for automated development environment setup across multiple platforms
+while maintaining consistency and reliability.
