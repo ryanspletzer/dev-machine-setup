@@ -1,6 +1,7 @@
 # Troubleshooting Guide
 
-This guide helps you diagnose and resolve common issues when setting up development environments with the dev-machine-setup project.
+This guide helps you diagnose and resolve common issues
+when setting up development environments with the dev-machine-setup project.
 
 ## General Troubleshooting Steps
 
@@ -696,4 +697,6 @@ If the setup has partially completed and left your system in an inconsistent sta
 
 4. **Start fresh**: Re-run the setup with prerequisites only (`-p` flag) to rebuild the foundation
 
-This troubleshooting guide covers the most common issues encountered during setup. For additional help, check the platform-specific README files or open an issue in the project repository.
+This troubleshooting guide covers the most common issues encountered during setup.
+For additional help,
+check the platform-specific README files or open an issue in the project repository.

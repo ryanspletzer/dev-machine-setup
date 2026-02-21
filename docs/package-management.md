@@ -1,6 +1,8 @@
 # Package Management Strategy
 
-This document explains the comprehensive package management strategy used across all platforms in the dev-machine-setup project, including the rationale behind package manager selection and best practices.
+This document explains the comprehensive package management strategy
+used across all platforms in the dev-machine-setup project,
+including the rationale behind package manager selection and best practices.
 
 ## Philosophy
 
@@ -202,7 +204,7 @@ flatpak_packages:
 We organize packages into logical categories across all platforms:
 
 | Category | Purpose | Examples |
-|----------|---------|----------|
+| -------- | ------- | -------- |
 | **Version Control** | Code repository management | git, git-lfs, gh |
 | **Development Tools** | Core development utilities | docker, terraform, kubectl |
 | **Language Runtimes** | Programming language support | python, node, go, dotnet |
@@ -217,7 +219,7 @@ We organize packages into logical categories across all platforms:
 Where possible, we use equivalent packages across platforms:
 
 | Tool | macOS | Windows | Ubuntu | Fedora |
-|------|-------|---------|--------|--------|
+| ---- | ----- | ------- | ------ | ------ |
 | Git | `git` (brew) | `git` (choco) | `git` (apt) | `git` (dnf) |
 | VS Code | `visual-studio-code` (cask) | `vscode` (choco) | `code` (snap) | `com.visualstudio.code` (flatpak) |
 | Docker | `docker-desktop` (cask) | `docker-desktop` (choco) | `docker.io` (apt) | `docker-ce` (dnf) |
@@ -387,4 +389,6 @@ Packages are installed in dependency order:
 - **Community Feedback**: Incorporate user preferences in technology choices
 - **Performance Monitoring**: Continuously evaluate package manager performance
 
-This comprehensive package management strategy ensures reliable, secure, and maintainable software installation across all supported platforms while providing flexibility for customization and future evolution.
+This comprehensive package management strategy ensures reliable, secure,
+and maintainable software installation across all supported platforms
+while providing flexibility for customization and future evolution.

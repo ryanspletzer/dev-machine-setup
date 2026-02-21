@@ -8,7 +8,9 @@ This document answers common questions about the dev-machine-setup project, its 
 
 Dev-machine-setup is a collection of automated scripts and configurations
 that help developers quickly set up consistent development environments
-across macOS, Windows, Ubuntu, and Fedora platforms. It uses platform-native package managers and automation tools to install and configure development tools, applications, and system preferences.
+across macOS, Windows, Ubuntu, and Fedora platforms.
+It uses platform-native package managers and automation tools
+to install and configure development tools, applications, and system preferences.
 
 ### Why should I use this instead of manual installation?
 
@@ -31,7 +33,9 @@ Currently supported platforms:
 
 ### Do I need to be a developer to use this?
 
-While designed for developers, anyone who wants to automate software installation can benefit. The project includes configurations for:
+While designed for developers,
+anyone who wants to automate software installation can benefit.
+The project includes configurations for:
 
 - Development tools and programming languages
 - Productivity applications
@@ -207,6 +211,7 @@ Yes, but consider your organization's policies:
 ### Why are some packages available on one platform but not others?
 
 Package availability varies due to:
+
 - **Platform-specific software** (e.g., Xcode only on macOS)
 - **Different package names** (same software, different names)
 - **Repository differences** (not all packages in all repositories)
@@ -484,4 +489,5 @@ Helpful information includes:
 - Any custom scripts or modifications
 - Command-line options used
 
-This FAQ covers the most common questions about dev-machine-setup. For additional help, check the other documentation files or open an issue on GitHub!
+This FAQ covers the most common questions about dev-machine-setup.
+For additional help, check the other documentation files or open an issue on GitHub!

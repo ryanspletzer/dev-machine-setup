@@ -218,7 +218,6 @@ For comprehensive documentation and examples:
 
 - [Complete Documentation](../docs/README.md) - Full project documentation
 - [Design Principles](../docs/design-principles.md) - Understanding the philosophy
-- [Configuration Examples](../docs/examples/README.md) - Real-world use cases
 - [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
 - [Architecture Overview](../docs/architecture.md) - How all the pieces fit together
 - [Package Management Strategy](../docs/package-management.md) - Our approach to managing packages
