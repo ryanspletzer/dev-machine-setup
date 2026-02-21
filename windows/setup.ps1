@@ -773,6 +773,66 @@ if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
 
 #endregion Install Visual Studio Code Extensions from Vars file if Visual Studio Code is Installed
 
+#region Install Cursor Extensions from Vars file if Cursor is Installed
+
+$step++
+$stepText = 'Install Cursor Extensions from Vars file'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for Cursor extensions to install...'
+
+# Get
+Write-Verbose -Message '[Get] Cursor extensions from Vars file import...'
+$cursorExtensions = $vars.vscode_extensions
+
+# Test
+Write-Verbose -Message '[Test] Cursor extensions from Vars file import...'
+if ($cursorExtensions -and $cursorExtensions.Count -gt 0) {
+    # Get
+    Write-Verbose -Message '[Get] Checking for Cursor installation...'
+    $cursorCmd = Get-Command -Name cursor -ErrorAction SilentlyContinue
+
+    # Test
+    Write-Verbose -Message '[Test] Cursor installation...'
+    if ($null -eq $cursorCmd) {
+        Write-Warning -Message 'Cursor is not installed, skipping extension installation.'
+    } else {
+        $cursorExtensionsInstalled = cursor --list-extensions
+        foreach ($extension in $cursorExtensions) {
+            Write-Progress -Activity $Activity -Status (
+                & $StatusBlock
+            ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
+            Write-Information -MessageData "Checking for Cursor extension $extension..."
+
+            # Get
+            Write-Verbose -Message "[Get] Cursor extension: $extension"
+            $cursorExtensionInstalled = $cursorExtensionsInstalled |
+                Where-Object -FilterScript { $_ -eq $extension }
+
+            # Test
+            Write-Verbose -Message "[Test] Cursor extension: $extension"
+            if (-not $cursorExtensionInstalled) {
+                # Set
+                Write-Verbose -Message (
+                    "[Set] Cursor extension $extension is not installed, installing..."
+                )
+                try {
+                    cursor --install-extension $extension
+                    Write-Verbose -Message "[Set] Cursor extension $extension is now installed."
+                    Write-Information -MessageData "Installed Cursor extension: $extension."
+                } catch {
+                    Write-Error -Message "Failed to install Cursor extension: $extension. Error: $_"
+                }
+            } else {
+                Write-Information -MessageData "Cursor extension $extension is already installed."
+            }
+        }
+    }
+} else {
+    Write-Information -MessageData 'No Cursor extensions specified in vars.yaml file.'
+}
+
+#endregion Install Cursor Extensions from Vars file if Cursor is Installed
+
 #region Git user.email and user.name Config
 
 $step++

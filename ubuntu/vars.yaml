@@ -5,6 +5,12 @@
 # Enable WSL-specific configurations if running in WSL
 is_wsl: false  # Set to true if running in WSL
 
+# Cursor IDE AppImage configuration
+cursor_appimage_url: "https://downloader.cursor.sh/linux/appImage/x64"
+cursor_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+cursor_appimage_name: "cursor.AppImage"
+cursor_desktop_file: "{{ ansible_env.HOME }}/.local/share/applications/cursor.desktop"
+
 # APT prerequisite packages (installed first)
 # These are essential packages needed for basic system operations and some specific applications
 apt_packages_prereqs:

@@ -5,6 +5,12 @@
 # Enable WSL-specific configurations if running in WSL
 is_wsl: false  # Set to true if running in WSL
 
+# Cursor IDE AppImage configuration
+cursor_appimage_url: "https://downloader.cursor.sh/linux/appImage/x64"
+cursor_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+cursor_appimage_name: "cursor.AppImage"
+cursor_desktop_file: "{{ ansible_env.HOME }}/.local/share/applications/cursor.desktop"
+
 # DNF prerequisite packages (installed first)
 # These are essential packages needed for basic system operations and some specific applications
 dnf_packages_prereqs:
@@ -14,6 +20,8 @@ dnf_packages_prereqs:
   - name: wget
   # For adding external repositories
   - name: dnf-plugins-core
+  # For Cursor AppImage
+  - name: fuse-libs
 
 # External DNF repositories
 # This uses the ansible.builtin.yum_repository module

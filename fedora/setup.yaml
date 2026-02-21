@@ -313,6 +313,92 @@
         - vscode
         - extensions
 
+    # Cursor IDE AppImage setup
+    - name: Ensure Cursor install directory exists
+      ansible.builtin.file:
+        path: "{{ cursor_install_dir }}"
+        state: directory
+        mode: '0755'
+      when: cursor_appimage_url is defined
+      tags:
+        - cursor
+
+    - name: Check if Cursor AppImage already exists
+      ansible.builtin.stat:
+        path: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
+      register: cursor_appimage_stat
+      when: cursor_appimage_url is defined
+      tags:
+        - cursor
+
+    - name: Download Cursor AppImage
+      ansible.builtin.get_url:
+        url: "{{ cursor_appimage_url }}"
+        dest: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
+        mode: '0755'
+      when:
+        - cursor_appimage_url is defined
+        - not cursor_appimage_stat.stat.exists
+      tags:
+        - cursor
+
+    - name: Create Cursor desktop entry
+      ansible.builtin.copy:
+        dest: "{{ cursor_desktop_file }}"
+        content: |
+          [Desktop Entry]
+          Name=Cursor
+          Exec={{ cursor_install_dir }}/{{ cursor_appimage_name }} --no-sandbox %F
+          Terminal=false
+          Type=Application
+          Icon=cursor
+          StartupWMClass=Cursor
+          Comment=Cursor AI Code Editor
+          MimeType=text/plain;
+          Categories=Development;IDE;
+        mode: '0644'
+      when: cursor_appimage_url is defined
+      tags:
+        - cursor
+
+    - name: Create cursor CLI symlink
+      ansible.builtin.file:
+        src: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
+        dest: "{{ cursor_install_dir }}/cursor"
+        state: link
+      when: cursor_appimage_url is defined
+      tags:
+        - cursor
+
+    # Cursor extension setup
+    - name: Check if Cursor CLI is available
+      ansible.builtin.command:
+        cmd: which cursor
+      environment:
+        PATH: "{{ cursor_install_dir }}:{{ ansible_env.PATH }}"
+      register: cursor_cli_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - cursor
+        - extensions
+
+    - name: Ensure Cursor extensions are installed
+      ansible.builtin.command:
+        cmd: cursor --install-extension {{ item }}
+      environment:
+        PATH: "{{ cursor_install_dir }}:{{ ansible_env.PATH }}"
+      ignore_errors: yes
+      loop: "{{ vscode_extensions }}"
+      register: cursor_ext_result
+      changed_when: "'already installed' not in cursor_ext_result.stdout"
+      when: cursor_cli_check.rc == 0
+      loop_control:
+        label: "Installing Cursor extension: {{ item }}"
+      tags:
+        - cursor
+        - extensions
+
     # Git LFS setup
     - name: Ensure Git LFS is initialized
       ansible.builtin.command:

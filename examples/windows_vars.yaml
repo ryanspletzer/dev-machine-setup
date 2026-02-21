@@ -15,6 +15,7 @@ choco_packages:
   - name: bicep
   - name: cascadiacode
   - name: citrix-workspace
+  - name: cursoride
   - name: docker
   - name: dotnet-sdk
   # dotnetcore-sdk is deprecated, use dotnet-sdk instead

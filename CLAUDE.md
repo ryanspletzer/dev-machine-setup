@@ -53,6 +53,12 @@ Package lists are flat YAML arrays grouped by category:
   (not `amd64`/`arm64` like Ubuntu).
 - **Fedora** uses `flatpak_packages` (Flathub app IDs)
   instead of Snap packages.
+- **Cursor IDE** is installed differently per platform:
+  macOS uses Homebrew cask `cursor`,
+  Windows uses Chocolatey `cursoride`,
+  Ubuntu/Fedora use an AppImage downloaded to `~/.local/bin/`
+  with a CLI symlink and desktop entry.
+  All platforms reuse the `vscode_extensions` list for Cursor extension installation.
 
 ## Running the Setup Scripts
 
