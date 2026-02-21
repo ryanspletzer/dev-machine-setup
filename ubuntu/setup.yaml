@@ -317,84 +317,96 @@
         - vscode
         - extensions
 
-    # Cursor IDE AppImage setup
-    - name: Ensure Cursor install directory exists
+    # AppImage setup
+    - name: Ensure AppImage install directory exists
       ansible.builtin.file:
-        path: "{{ cursor_install_dir }}"
+        path: "{{ appimage_install_dir }}"
         state: directory
         mode: '0755'
-      when: cursor_appimage_url is defined
+      when: appimage_packages is defined and appimage_packages | length > 0
       tags:
-        - cursor
+        - appimage
 
-    - name: Check if Cursor AppImage already exists
+    - name: Ensure desktop entry directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.local/share/applications"
+        state: directory
+        mode: '0755'
+      when: appimage_packages is defined and appimage_packages | length > 0
+      tags:
+        - appimage
+
+    - name: Check if AppImage already exists
       ansible.builtin.stat:
-        path: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
-      register: cursor_appimage_stat
-      when: cursor_appimage_url is defined
+        path: "{{ appimage_install_dir }}/{{ item.name }}.AppImage"
+      register: appimage_stat
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      loop_control:
+        label: "Checking AppImage: {{ item.name }}"
       tags:
-        - cursor
+        - appimage
 
-    - name: Download Cursor AppImage
+    - name: Download AppImage
       ansible.builtin.get_url:
-        url: "{{ cursor_appimage_url }}"
-        dest: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
+        url: "{{ item.0.url }}"
+        dest: "{{ appimage_install_dir }}/{{ item.0.name }}.AppImage"
         mode: '0755'
-        checksum: "{{ cursor_appimage_checksum | default(omit) }}"
+        checksum: "{{ item.0.checksum | default(omit) }}"
+      loop: "{{ appimage_packages | default([]) | zip(appimage_stat.results | default([])) | list }}"
       when:
-        - cursor_appimage_url is defined
-        - not cursor_appimage_stat.stat.exists
+        - item.1.stat is defined
+        - not item.1.stat.exists
+      loop_control:
+        label: "Downloading AppImage: {{ item.0.name }}"
       tags:
-        - cursor
+        - appimage
 
-    - name: Ensure Cursor desktop entry directory exists
-      ansible.builtin.file:
-        path: "{{ cursor_desktop_file | dirname }}"
-        state: directory
-        mode: '0755'
-      when: cursor_appimage_url is defined
-      tags:
-        - cursor
-
-    - name: Create Cursor desktop entry
+    - name: Create AppImage desktop entry
       ansible.builtin.copy:
-        dest: "{{ cursor_desktop_file }}"
+        dest: "{{ ansible_env.HOME }}/.local/share/applications/{{ item.name }}.desktop"
         content: |
           [Desktop Entry]
-          Name=Cursor
-          Exec={{ cursor_install_dir }}/{{ cursor_appimage_name }}{{ ' --no-sandbox' if (cursor_no_sandbox | default(false)) else '' }} %F
+          Name={{ item.name | capitalize }}
+          Exec={{ appimage_install_dir }}/{{ item.name }}.AppImage{{ ' --no-sandbox' if (item.no_sandbox | default(false)) else '' }} %F
           Terminal=false
           Type=Application
-          Icon=cursor
-          StartupWMClass=Cursor
-          Comment=Cursor AI Code Editor
-          MimeType=text/plain;
-          Categories=Development;IDE;
+          Icon={{ item.name }}
+          StartupWMClass={{ item.name | capitalize }}
+          Comment={{ item.comment | default(item.name) }}
+          MimeType={{ item.mime_types | default('') }}
+          Categories={{ item.categories | default('Application;') }}
         mode: '0644'
-      when: cursor_appimage_url is defined
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      loop_control:
+        label: "Creating desktop entry: {{ item.name }}"
       tags:
-        - cursor
+        - appimage
 
-    - name: Create cursor CLI symlink
+    - name: Create AppImage CLI symlink
       ansible.builtin.file:
-        src: "{{ cursor_install_dir }}/{{ cursor_appimage_name }}"
-        dest: "{{ cursor_install_dir }}/cursor"
+        src: "{{ appimage_install_dir }}/{{ item.name }}.AppImage"
+        dest: "{{ appimage_install_dir }}/{{ item.name }}"
         state: link
         force: true
-      when: cursor_appimage_url is defined
+      loop: "{{ appimage_packages | default([]) }}"
+      when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
+      loop_control:
+        label: "Creating symlink: {{ item.name }}"
       tags:
-        - cursor
+        - appimage
 
     # Cursor extension setup
     - name: Check if Cursor CLI is available
       ansible.builtin.command:
         cmd: which cursor
       environment:
-        PATH: "{{ cursor_install_dir }}:{{ ansible_env.PATH }}"
+        PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
       register: cursor_cli_check
       changed_when: false
       failed_when: false
-      when: cursor_install_dir is defined
+      when: appimage_install_dir is defined
       tags:
         - cursor
         - extensions
@@ -403,13 +415,13 @@
       ansible.builtin.command:
         cmd: cursor --install-extension {{ item }}
       environment:
-        PATH: "{{ cursor_install_dir }}:{{ ansible_env.PATH }}"
+        PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
       ignore_errors: yes
       loop: "{{ vscode_extensions }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
       when:
-        - cursor_install_dir is defined
+        - appimage_install_dir is defined
         - cursor_cli_check.rc == 0
       loop_control:
         label: "Installing Cursor extension: {{ item }}"

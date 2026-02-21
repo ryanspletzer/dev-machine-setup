@@ -116,6 +116,7 @@ windows_powershell_modules:
 
 # pipx modules
 pipx_packages:
+  - ansible-lint
   - cfn-lint
   - poetry
   - taskcat
