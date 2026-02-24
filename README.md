@@ -1,5 +1,7 @@
 # Dev Machine Setup
 
+[![Test](https://github.com/ryanspletzer/dev-machine-setup/actions/workflows/test.yml/badge.svg)](https://github.com/ryanspletzer/dev-machine-setup/actions/workflows/test.yml)
+
 A collection of automated scripts and configurations to set up consistent development environments across macOS,
 Windows, and Ubuntu platforms.
 This repository helps you quickly configure a new development machine with common tools, applications, and settings used
