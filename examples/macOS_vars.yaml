@@ -129,6 +129,7 @@ homebrew_formulae:
   - tmux
   - tree-sitter-cli
   - uv
+  - yamllint
   - ykman
   - yq
   - wget2
