@@ -27,12 +27,14 @@ dev-machine-setup/
 │   ├── macOS_vars.yaml         # Example macOS configuration
 │   ├── windows_vars.yaml       # Example Windows configuration
 │   ├── ubuntu_vars.yaml        # Example Ubuntu configuration
+│   ├── debian_vars.yaml        # Example Debian configuration
 │   ├── fedora_vars.yaml        # Example Fedora configuration
 │   └── *_custom_script.*       # Example custom scripts
 ├── tests/                      # Platform-specific test suites
 │   ├── macOS/                  # macOS test vars and verification
 │   ├── windows/                # Windows test vars and verification
 │   ├── ubuntu/                 # Ubuntu test vars and verification
+│   ├── debian/                 # Debian test vars and verification
 │   └── fedora/                 # Fedora test vars and verification
 ├── macOS/                      # macOS-specific implementation
 │   ├── setup.sh               # Entry point script
@@ -42,6 +44,10 @@ dev-machine-setup/
 │   ├── setup.ps1              # PowerShell setup script
 │   └── vars.yaml              # Configuration variables
 ├── ubuntu/                     # Ubuntu-specific implementation
+│   ├── setup.sh               # Entry point script
+│   ├── setup.yaml             # Ansible playbook
+│   └── vars.yaml              # Configuration variables
+├── debian/                     # Debian-specific implementation
 │   ├── setup.sh               # Entry point script
 │   ├── setup.yaml             # Ansible playbook
 │   └── vars.yaml              # Configuration variables
@@ -61,16 +67,19 @@ graph TB
     B --> C[macOS Setup]
     B --> D[Windows Setup]
     B --> E[Ubuntu Setup]
+    B --> E2[Debian Setup]
     B --> F2[Fedora Setup]
 
     C --> F[Homebrew + Ansible]
     D --> G[Chocolatey + PowerShell]
     E --> H[APT/Snap + Ansible]
+    E2 --> H3[APT/Flatpak + Ansible]
     F2 --> H2[DNF/Flatpak + Ansible]
 
     F --> I[Configured Development Environment]
     G --> I
     H --> I
+    H3 --> I
     H2 --> I
 ```
 
@@ -177,6 +186,40 @@ graph LR
 - **Snap**: Application package manager for GUI applications
 - **Ansible**: Automation engine providing idempotent configuration
 
+### Debian Architecture
+
+```mermaid
+graph LR
+    A[setup.sh] --> B[Install Prerequisites]
+    B --> C[APT Packages]
+    B --> D[Ansible]
+    D --> E[setup.yaml Playbook]
+    E --> F[vars.yaml Config]
+
+    F --> G[APT Packages]
+    F --> H[Flatpak Packages]
+    F --> I[PowerShell Modules]
+    F --> J[Python Packages]
+    F --> K[VS Code Extensions]
+
+    subgraph "Package Managers"
+        G --> L[apt install]
+        H --> M[flatpak install]
+        I --> N[Install-PSResource]
+        J --> O[pipx install]
+        K --> P[code --install-extension]
+    end
+```
+
+**Key Components:**
+
+- `setup.sh`: Bash script that handles prerequisites and launches Ansible
+- `setup.yaml`: Ansible playbook with tagged tasks for different components
+- `vars.yaml`: YAML configuration file with package lists and settings
+- **APT**: System package manager for CLI tools and libraries
+- **Flatpak**: Application package manager for GUI applications
+- **Ansible**: Automation engine providing idempotent configuration
+
 ### Fedora Architecture
 
 ```mermaid
@@ -252,15 +295,15 @@ sequenceDiagram
 
 Each platform organizes packages into logical categories:
 
-| Category | macOS | Windows | Ubuntu | Fedora |
-| -------- | ----- | ------- | ------ | ------ |
-| CLI Tools | `homebrew_formulae` | `choco_packages` | `apt_packages` | `dnf_packages` |
-| Applications | `homebrew_casks` | `choco_packages` | `snap_packages` | `flatpak_packages` |
-| VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
-| PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` |
-| Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` |
-| Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
-| .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
+| Category | macOS | Windows | Ubuntu | Debian | Fedora |
+| -------- | ----- | ------- | ------ | ------ | ------ |
+| CLI Tools | `homebrew_formulae` | `choco_packages` | `apt_packages` | `apt_packages` | `dnf_packages` |
+| Applications | `homebrew_casks` | `choco_packages` | `snap_packages` | `flatpak_packages` | `flatpak_packages` |
+| VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
+| PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` |
+| Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` |
+| Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
+| .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
 
 ### Package Manager Integration
 
@@ -270,11 +313,13 @@ graph TD
     B -->|macOS| C[Homebrew]
     B -->|Windows| D[Chocolatey]
     B -->|Ubuntu| E[APT/Snap]
+    B -->|Debian| E3[APT/Flatpak]
     B -->|Fedora| E2[DNF/Flatpak]
 
     C --> F{Package Type?}
     D --> G{Package Type?}
     E --> H{Package Type?}
+    E3 --> H3{Package Type?}
     E2 --> H2{Package Type?}
 
     F -->|CLI| I[brew install formula]
@@ -285,6 +330,9 @@ graph TD
     H -->|System| L[apt install package]
     H -->|Application| M[snap install app]
 
+    H3 -->|System| L3[apt install package]
+    H3 -->|Application| M3[flatpak install app]
+
     H2 -->|System| L2[dnf install package]
     H2 -->|Application| M2[flatpak install app]
 
@@ -293,6 +341,8 @@ graph TD
     K --> N
     L --> N
     M --> N
+    L3 --> N
+    M3 --> N
     L2 --> N
     M2 --> N
 ```
@@ -325,6 +375,7 @@ graph TB
         G[Homebrew Repository]
         H[Chocolatey Community]
         I[Ubuntu Archives]
+        I3[Debian Archives]
         I2[Fedora Repositories]
         J[PowerShell Gallery]
         K[VS Code Marketplace]
@@ -334,6 +385,7 @@ graph TB
     D --> G
     D --> H
     D --> I
+    D --> I3
     D --> I2
     D --> J
     D --> K
@@ -415,7 +467,7 @@ Where possible, the setup performs operations in parallel:
 
 ### Caching Strategy
 
-- **Package managers**: Leverage built-in caching (Homebrew, Chocolatey, APT, DNF)
+- **Package managers**: Leverage built-in caching (Homebrew, Chocolatey, APT, DNF, Flatpak)
 - **Download caching**: Avoid re-downloading already cached packages
 - **State caching**: Remember completed operations to avoid repetition
 

@@ -73,6 +73,15 @@ Every package, tool, or application must be installed through a recognized packa
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **.NET CLI** for .NET tools (`dotnet_tools`)
 
+#### Debian
+
+- **APT** for system packages (`apt_packages`)
+- **Flatpak** for applications (`flatpak_packages`)
+- **pipx** for Python tools (`pipx_packages`)
+- **npm** for Node.js packages (`npm_global_packages`)
+- **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
+- **.NET CLI** for .NET tools (`dotnet_tools`)
+
 #### Fedora
 
 - **DNF** for system packages (`dnf_packages`)
@@ -98,6 +107,7 @@ Each platform uses its native tools and conventions:
 - **macOS**: Bash + Ansible playbooks
 - **Windows**: PowerShell scripts with native cmdlets
 - **Ubuntu**: Bash + Ansible playbooks
+- **Debian**: Bash + Ansible playbooks
 - **Fedora**: Bash + Ansible playbooks
 
 But all platforms provide:

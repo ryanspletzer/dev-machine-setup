@@ -8,6 +8,7 @@ on:
       - "ubuntu/**"
       - "windows/**"
       - "fedora/**"
+      - "debian/**"
       - "tests/**"
       - ".github/workflows/**"
       - ".yamllint.yaml"
@@ -18,6 +19,7 @@ on:
       - "ubuntu/**"
       - "windows/**"
       - "fedora/**"
+      - "debian/**"
       - "tests/**"
       - ".github/workflows/**"
       - ".yamllint.yaml"
@@ -31,6 +33,7 @@ jobs:
       ubuntu: ${{ steps.filter.outputs.ubuntu }}
       windows: ${{ steps.filter.outputs.windows }}
       fedora: ${{ steps.filter.outputs.fedora }}
+      debian: ${{ steps.filter.outputs.debian }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -53,6 +56,10 @@ jobs:
               - "fedora/**"
               - "tests/fedora/**"
               - ".github/workflows/**"
+            debian:
+              - "debian/**"
+              - "tests/debian/**"
+              - ".github/workflows/**"
 
   validate:
     runs-on: ubuntu-latest
@@ -66,16 +73,17 @@ jobs:
           pip install yamllint ansible-lint
 
       - name: YAML lint
-        run: yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml
+        run: yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml debian/vars.yaml
 
       - name: YAML lint (test fixtures)
-        run: yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml
+        run: yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml tests/debian/vars.yaml
 
       - name: shellcheck
         run: |
           shellcheck macOS/setup.sh
           shellcheck ubuntu/setup.sh
           shellcheck fedora/setup.sh
+          shellcheck debian/setup.sh
 
       - name: PSScriptAnalyzer
         run: |
@@ -90,12 +98,14 @@ jobs:
           ansible-lint macOS/setup.yaml
           ansible-lint ubuntu/setup.yaml
           ansible-lint fedora/setup.yaml
+          ansible-lint debian/setup.yaml
 
       - name: Ansible syntax check
         run: |
           ansible-playbook --syntax-check macOS/setup.yaml
           ansible-playbook --syntax-check ubuntu/setup.yaml
           ansible-playbook --syntax-check fedora/setup.yaml
+          ansible-playbook --syntax-check debian/setup.yaml
 
   integration-macos:
     needs: [detect-changes, validate]
@@ -163,6 +173,31 @@ jobs:
         run: |
           chmod 700 tests/fedora/verify.sh
           tests/fedora/verify.sh
+
+  integration-debian:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.debian == 'true'
+    runs-on: ubuntu-latest
+    container: debian:12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install container prerequisites
+        run: apt-get update && apt-get install -y sudo findutils
+
+      - name: Copy test fixtures
+        run: cp tests/debian/vars.yaml debian/vars.yaml
+
+      - name: Run setup
+        working-directory: debian
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/debian/verify.sh
+          tests/debian/verify.sh
 
   integration-windows:
     needs: [detect-changes, validate]

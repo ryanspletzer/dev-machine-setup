@@ -35,6 +35,7 @@ Use the provided examples as starting points:
 - `examples/macOS_vars.yaml` - Extended macOS configuration
 - `examples/windows_vars.yaml` - Extended Windows configuration
 - `examples/ubuntu_vars.yaml` - Extended Ubuntu configuration
+- `examples/debian_vars.yaml` - Extended Debian configuration
 - `examples/fedora_vars.yaml` - Extended Fedora configuration
 - `examples/*_custom_script.*` - Custom script examples
 
@@ -183,6 +184,48 @@ custom_commands_elevated:
   # Commands that require sudo
   - sudo systemctl enable docker
   - sudo usermod -aG docker $USER
+```
+
+### Debian Customization
+
+#### Package Management
+
+```yaml
+# APT packages (system packages and CLI tools, object format)
+apt_packages:
+  - name: git
+  - name: docker-ce
+  - name: curl
+  - name: wget
+  - name: build-essential
+
+# Flatpak packages (GUI applications, object format)
+# Debian uses Flatpak instead of Snap
+flatpak_packages:
+  - name: com.jgraph.drawio.desktop
+    supported_architectures:
+      - amd64
+  - name: com.slack.Slack
+    supported_architectures:
+      - amd64
+```
+
+#### System Configuration
+
+```yaml
+custom_commands_user:
+  # User-level commands
+  - command: gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+    description: Set dark theme
+  - command: gsettings set org.gnome.desktop.background picture-uri 'file:///path/to/wallpaper.jpg'
+    description: Set wallpaper
+
+custom_commands_elevated:
+  # Commands that require sudo
+  - command: systemctl enable docker
+    description: Enable Docker service
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
 ```
 
 ## Common Customization Scenarios
@@ -430,7 +473,7 @@ python -c "import yaml; yaml.safe_load(open('vars.yaml'))"
 # Test package availability (macOS)
 brew search your-package-name
 
-# Test package availability (Ubuntu)
+# Test package availability (Ubuntu/Debian)
 apt search your-package-name
 
 # Test package availability (Fedora)

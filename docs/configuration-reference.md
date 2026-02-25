@@ -5,7 +5,7 @@ available across all platforms in the dev-machine-setup project.
 
 ## Overview
 
-Each platform (macOS, Windows, Ubuntu, and Fedora) uses YAML-based configuration
+Each platform (macOS, Windows, Ubuntu, Debian, and Fedora) uses YAML-based configuration
 files (`vars.yaml`) to define what gets installed and configured.
 While the specific variable names may differ between platforms,
 the structure and concepts remain consistent.
@@ -340,6 +340,110 @@ custom_commands_elevated:
     description: Add current user to Docker group
 ```
 
+## Debian Configuration Reference
+
+### System Configuration
+
+```yaml
+# Windows Subsystem for Linux specific settings
+is_wsl: false                    # Set to true when running in WSL environment
+
+# AppImage install directory
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+```
+
+### APT Prerequisite Packages
+
+Debian uses `gnupg` instead of Ubuntu's `software-properties-common`,
+since Ubuntu PPAs are not compatible with Debian:
+
+```yaml
+# Essential packages installed first
+apt_packages_prereqs:
+  - name: apt-transport-https    # HTTPS transport for APT
+  - name: ca-certificates        # Certificate authority certs
+  - name: curl                   # HTTP client
+  - name: gnupg                  # GPG for repository key management
+  - name: libfuse2               # For AppImage packages
+```
+
+### External APT Repositories
+
+Debian uses the same deb822 format as Ubuntu,
+but repository URIs differ (e.g., `/linux/debian` instead of `/linux/ubuntu`):
+
+```yaml
+# Additional repositories using deb822 format
+external_apt_repositories:
+  - name: docker
+    signed_by: https://download.docker.com/linux/debian/gpg
+    uris: https://download.docker.com/linux/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    architectures: "{{ deb_architecture }}"
+```
+
+### APT Packages
+
+Debian uses objects with a `name` key and optional `supported_architectures`:
+
+```yaml
+# System packages and command-line tools
+apt_packages:
+  - name: git                    # Version control
+  - name: build-essential        # Compilation tools
+  - name: docker-ce              # Docker engine
+  - name: code                   # Visual Studio Code
+  - name: google-chrome-stable   # Web browser
+    supported_architectures:
+      - amd64                    # Skip on ARM64
+```
+
+### Flatpak Packages
+
+Debian uses Flatpak (not Snap) for GUI applications:
+
+```yaml
+# GUI applications via Flatpak
+flatpak_packages:
+  - name: com.jgraph.drawio.desktop
+    supported_architectures:
+      - amd64
+  - name: com.slack.Slack
+    supported_architectures:
+      - amd64
+```
+
+### AppImage Packages
+
+```yaml
+# AppImage packages for applications not in other package managers
+appimage_packages:
+  - name: cursor
+    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    comment: "Cursor AI Code Editor"
+    categories: "Development;IDE;"
+    mime_types: "text/plain;"
+```
+
+### Custom Commands
+
+Debian uses objects with `command` and `description` keys:
+
+```yaml
+# Commands executed as the current user
+custom_commands_user:
+  - command: pipx ensurepath
+    description: Ensure pipx is in PATH
+  - command: git lfs install
+    description: Install Git LFS
+
+# Commands executed with sudo privileges
+custom_commands_elevated:
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
+```
+
 ## Cross-Platform Configuration Options
 
 ### VS Code Extensions
@@ -533,19 +637,19 @@ homebrew_formulae:
 
 The same software may have different package names:
 
-| Software | macOS (Homebrew) | Windows (Chocolatey) | Ubuntu (APT/Snap) | Fedora (DNF/Flatpak) |
-| -------- | ---------------- | ------------------- | ----------------- | ------------------- |
-| VS Code | `visual-studio-code` | `vscode` | `code` (snap) | `com.visualstudio.code` (flatpak) |
-| Node.js | `node` | `nodejs` | `nodejs` (apt) | `nodejs` (dnf) |
-| Docker | `docker-desktop` | `docker-desktop` | `docker.io` (apt) | `docker-ce` (dnf) |
-| Git | `git` | `git` | `git` (apt) | `git` (dnf) |
+| Software | macOS (Homebrew) | Windows (Chocolatey) | Ubuntu (APT/Snap) | Debian (APT/Flatpak) | Fedora (DNF/Flatpak) |
+| -------- | ---------------- | ------------------- | ----------------- | ------------------- | ------------------- |
+| VS Code | `visual-studio-code` | `vscode` | `code` (snap) | `code` (apt) | `com.visualstudio.code` (flatpak) |
+| Node.js | `node` | `nodejs` | `nodejs` (apt) | `nodejs` (apt) | `nodejs` (dnf) |
+| Docker | `docker-desktop` | `docker-desktop` | `docker.io` (apt) | `docker-ce` (apt) | `docker-ce` (dnf) |
+| Git | `git` | `git` | `git` (apt) | `git` (apt) | `git` (dnf) |
 
 ### Command Syntax
 
 Custom commands must use platform-appropriate syntax:
 
 ```yaml
-# macOS/Ubuntu (Bash)
+# macOS/Ubuntu/Debian (Bash)
 custom_commands_user:
   - echo "Hello World"
   - mkdir -p ~/Development
@@ -561,7 +665,7 @@ custom_commands_user:
 Use appropriate path separators:
 
 ```yaml
-# macOS/Ubuntu
+# macOS/Ubuntu/Debian
 custom_script: './examples/custom_script.sh'
 
 # Windows

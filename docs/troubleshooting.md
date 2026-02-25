@@ -48,6 +48,7 @@ Ensure your system meets the minimum requirements:
 - **macOS**: 10.15+ (Catalina or later)
 - **Windows**: Windows 10/11 with PowerShell 5.1+
 - **Ubuntu**: 20.04 LTS or later
+- **Debian**: 12 (Bookworm) or later
 - **Fedora**: 39 or later
 - **All platforms**: Internet connection and administrator privileges
 
@@ -326,6 +327,79 @@ newgrp docker
 sudo chown -R $USER:$USER ~/.vscode
 ```
 
+### Debian Troubleshooting
+
+#### APT Package Issues
+
+**Problem**: Package lists are outdated
+
+```bash
+E: Unable to locate package
+```
+
+**Solution**:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+**Problem**: Broken package dependencies
+
+```bash
+E: Unmet dependencies
+```
+
+**Solution**:
+
+```bash
+# Fix broken packages
+sudo apt --fix-broken install
+
+# Clean package cache
+sudo apt autoremove && sudo apt autoclean
+```
+
+#### Flatpak Issues
+
+**Problem**: Flatpak packages fail to install
+
+```bash
+error: Unable to load summary from remote flathub
+```
+
+**Solution**:
+
+```bash
+# Re-add the Flathub remote
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+# Update Flatpak metadata
+flatpak update
+```
+
+#### Permission Issues
+
+**Problem**: Docker requires sudo
+
+**Solution**:
+
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Log out and back in, or restart the shell
+newgrp docker
+```
+
+**Problem**: VS Code cannot write to directories
+
+**Solution**:
+
+```bash
+# Fix VS Code directory permissions
+sudo chown -R $USER:$USER ~/.vscode
+```
+
 ## Common Package Issues
 
 ### Package Not Found
@@ -343,7 +417,7 @@ sudo chown -R $USER:$USER ~/.vscode
    # Windows
    choco search package-name
 
-   # Ubuntu
+   # Ubuntu/Debian
    apt search package-name
 
    # Fedora
@@ -539,7 +613,7 @@ git config --global user.name "Your Name"
    # Windows
    choco cleancache
 
-   # Ubuntu
+   # Ubuntu/Debian
    sudo apt clean && sudo apt autoremove
 
    # Fedora
@@ -627,6 +701,9 @@ When reporting issues, collect this information:
    # Ubuntu
    lsb_release -a && uname -m
 
+   # Debian
+   cat /etc/debian_version && uname -m
+
    # Fedora
    cat /etc/fedora-release && uname -m
    ```
@@ -642,6 +719,9 @@ When reporting issues, collect this information:
 
    # Ubuntu
    apt --version && snap --version
+
+   # Debian
+   apt --version && flatpak --version
 
    # Fedora
    dnf --version && flatpak --version
@@ -670,7 +750,7 @@ If the setup has partially completed and left your system in an inconsistent sta
    # Windows
    choco list --local-only
 
-   # Ubuntu
+   # Ubuntu/Debian
    apt list --installed
 
    # Fedora
@@ -683,7 +763,7 @@ If the setup has partially completed and left your system in an inconsistent sta
    # Use package manager uninstall commands
    brew uninstall package-name
    choco uninstall package-name
-   sudo apt remove package-name
+   sudo apt remove package-name    # Ubuntu/Debian
    sudo dnf remove package-name
    ```
 
