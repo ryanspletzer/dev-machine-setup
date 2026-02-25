@@ -48,7 +48,7 @@ Ensure your system meets the minimum requirements:
 - **macOS**: 10.15+ (Catalina or later)
 - **Windows**: Windows 10/11 with PowerShell 5.1+
 - **Ubuntu**: 20.04 LTS or later
-- **Debian**: 12 (Bookworm) or later
+- **Debian**: 13 (Trixie) or later
 - **Fedora**: 39 or later
 - **All platforms**: Internet connection and administrator privileges
 

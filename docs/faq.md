@@ -29,7 +29,7 @@ Currently supported platforms:
 - **macOS**: 10.15 (Catalina) and later, including Apple Silicon Macs
 - **Windows**: Windows 10 and 11 with PowerShell 5.1 or later
 - **Ubuntu**: 20.04 LTS and later, including WSL (Windows Subsystem for Linux)
-- **Debian**: 12 (Bookworm) and later, including WSL
+- **Debian**: 13 (Trixie) and later, including WSL
 - **Fedora**: 39 and later
 
 ### Do I need to be a developer to use this?

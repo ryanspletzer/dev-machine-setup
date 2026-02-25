@@ -178,7 +178,7 @@ jobs:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.debian == 'true'
     runs-on: ubuntu-latest
-    container: debian:12
+    container: debian:13
     steps:
       - uses: actions/checkout@v4
 

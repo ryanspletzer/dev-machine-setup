@@ -134,11 +134,13 @@ else
   echo "$SUDO_PASSWORD" | sudo -S apt-get install -y gnupg python3 python3-pip 2>&1 | tee -a "$LOG_FILE"
 fi
 
-# Install Ansible via pip (Debian 12 ships ansible-core 2.14 which lacks
-# the deb822_repository module added in 2.15; pip provides a current version)
-echo "Installing Ansible via pip..." | tee -a "$LOG_FILE"
-pip3 install --user --break-system-packages ansible 2>&1 | tee -a "$LOG_FILE"
-export PATH="$HOME/.local/bin:$PATH"
+# Install Ansible
+echo "Installing Ansible..." | tee -a "$LOG_FILE"
+if [ "$CI_MODE" = true ]; then
+  sudo -n apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+else
+  echo "$SUDO_PASSWORD" | sudo -S apt-get install -y ansible 2>&1 | tee -a "$LOG_FILE"
+fi
 
 # Check if we're in "prereqs only" mode
 if [ "$PREREQS_ONLY" = true ]; then

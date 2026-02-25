@@ -87,7 +87,7 @@ Contribute directly to the codebase:
 
 **For Debian development:**
 
-- Debian 12 (Bookworm) or later
+- Debian 13 (Trixie) or later
 - APT package manager
 - Flatpak package manager
 
@@ -297,7 +297,7 @@ When possible, test changes across multiple platforms:
 - Test on both Intel and Apple Silicon Macs
 - Verify Windows 10 and 11 compatibility
 - Test different Ubuntu LTS versions
-- Test on Debian 12 (Bookworm) or later
+- Test on Debian 13 (Trixie) or later
 - Test on recent Fedora releases
 
 ### Documentation Updates

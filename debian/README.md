@@ -23,7 +23,7 @@ development environment.
 
 ## Prerequisites
 
-- Debian 12 (Bookworm) or later
+- Debian 13 (Trixie) or later
 - Internet connection
 - Administrator (sudo) privileges
 
@@ -31,7 +31,7 @@ development environment.
 
 This setup has been tested and confirmed to work on:
 
-- Debian 12 (Bookworm)
+- Debian 13 (Trixie)
 - WSL Debian
 
 ## Quick Start
