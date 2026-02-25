@@ -127,6 +127,7 @@ homebrew_formulae:
   - rustup
   - tdd-guard
   - teamookla/speedtest/speedtest
+  - tlrc
   - tmux
   - tree-sitter-cli
   - uv
