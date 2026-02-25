@@ -126,9 +126,13 @@ Understanding the project organization:
 ```text
 dev-machine-setup/
 ├── README.md              # Project overview
+├── CLAUDE.md              # Claude Code project instructions
 ├── LICENSE                # MIT license
+├── .ansible/              # Ansible collections, modules, and roles
+├── .github/               # GitHub Actions CI workflows
 ├── docs/                  # Comprehensive documentation
-├── examples/              # Example configurations
+├── examples/              # Example configurations and custom scripts
+├── tests/                 # Platform-specific test suites
 ├── macOS/                 # macOS implementation
 │   ├── setup.sh          # Entry point script
 │   ├── setup.yaml        # Ansible playbook

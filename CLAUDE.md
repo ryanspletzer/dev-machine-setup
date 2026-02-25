@@ -84,7 +84,8 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 ```
 
 Common flags: `-v` (verbose, repeatable), `-e` (git email),
-`-n` (git name), `-p` (prerequisites only, macOS/Ubuntu/Fedora).
+`-n` (git name), `-p` (prerequisites only, macOS/Ubuntu/Fedora),
+`-c` (CI mode, skip interactive sudo prompts, macOS/Ubuntu/Fedora).
 
 ### Ansible Tags (macOS/Ubuntu/Fedora)
 

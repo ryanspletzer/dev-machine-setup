@@ -9,37 +9,46 @@ across multiple platforms.
 ```text
 dev-machine-setup/
 ├── README.md                    # Project overview and quick start
+├── CLAUDE.md                    # Claude Code project instructions
 ├── LICENSE                      # MIT license
+├── .ansible-lint                # Ansible linting configuration
+├── .markdownlint.yaml           # Markdown linting configuration
+├── .yamllint.yaml               # YAML linting configuration
+├── .ansible/                    # Ansible collections, modules, and roles
+├── .github/                     # GitHub Actions CI workflows
+│   └── workflows/
+│       └── test.yml            # CI test workflow
+├── docs/                       # Comprehensive documentation
+│   ├── README.md               # Documentation index
+│   ├── design-principles.md    # Core design principles
+│   ├── architecture.md         # This document
+│   └── ...                     # Additional documentation
 ├── examples/                    # Cross-platform example configurations
 │   ├── macOS_vars.yaml         # Example macOS configuration
 │   ├── windows_vars.yaml       # Example Windows configuration
 │   ├── ubuntu_vars.yaml        # Example Ubuntu configuration
 │   ├── fedora_vars.yaml        # Example Fedora configuration
 │   └── *_custom_script.*       # Example custom scripts
-├── docs/                       # Comprehensive documentation
-│   ├── README.md               # Documentation index
-│   ├── design-principles.md    # Core design principles
-│   ├── architecture.md         # This document
-│   └── ...                     # Additional documentation
+├── tests/                      # Platform-specific test suites
+│   ├── macOS/                  # macOS test vars and verification
+│   ├── windows/                # Windows test vars and verification
+│   ├── ubuntu/                 # Ubuntu test vars and verification
+│   └── fedora/                 # Fedora test vars and verification
 ├── macOS/                      # macOS-specific implementation
 │   ├── setup.sh               # Entry point script
 │   ├── setup.yaml             # Ansible playbook
-│   ├── vars.yaml              # Configuration variables
-│   └── examples/              # macOS-specific examples
+│   └── vars.yaml              # Configuration variables
 ├── windows/                    # Windows-specific implementation
 │   ├── setup.ps1              # PowerShell setup script
-│   ├── vars.yaml              # Configuration variables
-│   └── examples/              # Windows-specific examples
+│   └── vars.yaml              # Configuration variables
 ├── ubuntu/                     # Ubuntu-specific implementation
 │   ├── setup.sh               # Entry point script
 │   ├── setup.yaml             # Ansible playbook
-│   ├── vars.yaml              # Configuration variables
-│   └── examples/              # Ubuntu-specific examples
+│   └── vars.yaml              # Configuration variables
 └── fedora/                     # Fedora-specific implementation
     ├── setup.sh               # Entry point script
     ├── setup.yaml             # Ansible playbook
-    ├── vars.yaml              # Configuration variables
-    └── examples/              # Fedora-specific examples
+    └── vars.yaml              # Configuration variables
 ```
 
 ## Component Architecture

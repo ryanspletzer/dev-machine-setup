@@ -59,11 +59,12 @@ Some applications may require Rosetta 2, which can be installed automatically by
 The `setup.sh` script accepts several options:
 
 ```zsh
-Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [-c] [playbook_file]
   -v              Enable verbose output (can be repeated for more verbosity, e.g. -vv or -vvv)
   -e git_email    Specify Git user email
   -n git_name     Specify Git user name
   -p              Install prerequisites only (Homebrew and Ansible), don't run Ansible playbook
+  -c              CI mode: skip interactive sudo prompts (assumes passwordless sudo)
   playbook_file   Optional playbook file name (defaults to setup.yaml)
 ```
 
@@ -220,6 +221,8 @@ See `vars.yaml` for the complete list of installed packages.
 
 The playbook uses tags to allow selective execution of tasks:
 
+- `system`: System-level tasks
+  - `rosetta`: Rosetta 2 installation
 - `homebrew`: All Homebrew-related tasks
   - `taps`: Only Homebrew taps
   - `casks`: Only Homebrew casks (applications)
@@ -229,6 +232,7 @@ The playbook uses tags to allow selective execution of tasks:
 - `npm`: Node.js package installation via npm
 - `dotnet`: .NET global tools installation
 - `vscode`: VS Code extension installation
+- `cursor`: Cursor extension installation
 - `git`: Git configuration tasks
 - `macos`: macOS system preferences
   - `preferences`: macOS preference settings

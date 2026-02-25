@@ -12,13 +12,14 @@ development environment.
 - 🔧 **PowerShell Setup**: Installs PowerShell and modules for development
 - 🐍 **Python Setup**: Installs Python versions via pyenv and pipx modules
 - 💎 **Ruby Setup**: Installs Ruby via rbenv
-- 🟦 **Node.js Setup**: Installs Node.js via nvm
+- 🟦 **Node.js Setup**: Installs Node.js and npm global packages
 - 🦀 **Rust Setup**: Installs Rust via rustup
 - ⚡ **Go Setup**: Installs Go
-- 🔷 **.NET Setup**: Installs .NET SDK
+- 🔷 **.NET Setup**: Installs .NET SDK and global tools
 - 💻 **VS Code Extensions**: Configures VS Code with essential development extensions
 - 🔄 **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
 - 🏗️ **FEX Emulator**: Installs FEX for running x86/x64 applications on ARM64 systems
+- 📦 **AppImage Support**: Installs applications via AppImage with desktop integration
 - 🚀 **Custom Script Support**: Allows for additional customization via custom scripts
 
 ## Prerequisites
@@ -60,11 +61,12 @@ This setup has been tested and confirmed to work on:
 The `setup.sh` script accepts several options:
 
 ```bash
-Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [-c] [playbook_file]
   -v              Enable verbose output (can be repeated for more verbosity, e.g. -vv or -vvv)
   -e git_email    Specify Git user email
   -n git_name     Specify Git user name
   -p              Install prerequisites only (Ansible), don't run Ansible playbook
+  -c              CI mode: skip interactive sudo prompts (assumes passwordless sudo)
   playbook_file   Optional playbook file name (defaults to setup.yaml)
 ```
 
@@ -103,17 +105,23 @@ Edit `vars.yaml` to customize which packages get installed:
 #### System Packages
 
 ```yaml
-# Command-line tools and libraries via APT
+# Command-line tools and libraries via APT (object format)
 apt_packages:
-  - git
-  - curl
-  - build-essential
-  - python3-dev
+  - name: git
+  - name: curl
+  - name: build-essential
+  - name: docker-ce
 
-# GUI applications via Snap
+# GUI applications via Snap (object format)
 snap_packages:
-  - code
-  - discord
+  - name: drawio
+    classic: true
+    supported_architectures:
+      - amd64
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
 ```
 
 #### Development Tools
@@ -196,24 +204,27 @@ See `vars.yaml` for the complete list of installed packages.
 
 The playbook uses tags to allow selective execution of tasks:
 
+- `system`: System-level tasks
+  - `architecture`: Architecture detection
+  - `wsl`: WSL-specific configuration
 - `apt`: All APT-related tasks
   - `update`: Only update APT cache
   - `upgrade`: Only upgrade packages
   - `packages`: Only install packages
+  - `prereqs`: Only prerequisite packages
   - `repositories`: Only add repositories
 - `snap`: Snap package installation
-- `docker`: Docker installation and configuration
+- `appimage`: AppImage package installation
 - `powershell`: PowerShell installation and module setup
-- `python`: Python setup with pyenv
 - `pipx`: Python package installation via pipx
-- `ruby`: Ruby setup with rbenv
-- `nodejs`: Node.js setup with nvm
-- `go`: Go installation
-- `rust`: Rust installation
-- `dotnet`: .NET SDK installation
+- `npm`: Node.js package installation via npm
+- `dotnet`: .NET SDK and tools installation
 - `vscode`: VS Code extension installation
+- `cursor`: Cursor extension installation
 - `git`: Git configuration tasks
 - `custom`: Custom commands and script execution
+  - `user-commands`: User-level commands
+  - `elevated-commands`: Commands requiring sudo
 
 You can run the playbook with specific tags using the `-t` option:
 

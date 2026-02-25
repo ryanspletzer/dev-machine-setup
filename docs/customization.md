@@ -120,19 +120,24 @@ custom_commands_elevated:
 #### Package Management
 
 ```yaml
-# APT packages (system packages and CLI tools)
+# APT packages (system packages and CLI tools, object format)
 apt_packages:
-  - git
-  - docker.io
-  - curl
-  - wget
-  - build-essential
+  - name: git
+  - name: docker-ce
+  - name: curl
+  - name: wget
+  - name: build-essential
 
-# Snap packages (GUI applications)
+# Snap packages (GUI applications, object format)
 snap_packages:
-  - code --classic
-  - discord
-  - slack --classic
+  - name: drawio
+    classic: true
+    supported_architectures:
+      - amd64
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
 ```
 
 #### System Configuration
@@ -154,20 +159,16 @@ custom_commands_elevated:
 #### Package Management
 
 ```yaml
-# DNF packages (system packages and CLI tools)
+# DNF packages (system packages and CLI tools, object format)
 dnf_packages:
-  - git
-  - docker-ce
-  - curl
-  - wget
-  - gcc
-  - make
+  - name: git
+  - name: cmake
+  - name: curl
+  - name: wget
+  - name: golang
 
-# Flatpak packages (GUI applications)
-flatpak_packages:
-  - com.visualstudio.code
-  - com.discordapp.Discord
-  - com.slack.Slack
+# Flatpak packages (GUI applications, currently empty by default)
+flatpak_packages: []
 ```
 
 #### System Configuration

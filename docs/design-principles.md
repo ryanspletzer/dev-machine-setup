@@ -69,14 +69,18 @@ Every package, tool, or application must be installed through a recognized packa
 - **APT** for system packages (`apt_packages`)
 - **Snap** for applications (`snap_packages`)
 - **pipx** for Python tools (`pipx_packages`)
+- **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
+- **.NET CLI** for .NET tools (`dotnet_tools`)
 
 #### Fedora
 
 - **DNF** for system packages (`dnf_packages`)
 - **Flatpak** for applications (`flatpak_packages`)
 - **pipx** for Python tools (`pipx_packages`)
+- **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
+- **.NET CLI** for .NET tools (`dotnet_tools`)
 
 **Benefits:**
 

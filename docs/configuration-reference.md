@@ -102,10 +102,14 @@ custom_commands_elevated:
 
 ### Chocolatey Packages
 
+Windows uses objects with a `name` key (required)
+plus optional `parameters` and `prerelease` keys:
+
 ```yaml
 # Applications and tools via Chocolatey
 choco_packages:
   - name: git                     # Version control
+    parameters: /WindowsTerminal /NoShellIntegration
   - name: vscode                  # Code editor
   - name: docker-desktop          # Container platform
   - name: terraform               # Infrastructure as code
@@ -114,140 +118,226 @@ choco_packages:
   - name: awscli                  # AWS command line
 ```
 
+### Windows PowerShell Modules
+
+Legacy modules to install in Windows PowerShell 5.1 (if needed):
+
+```yaml
+windows_powershell_modules:
+  # - AWS.Tools.Common
+  # - Az.Accounts
+```
+
 ### Additional Package Managers
 
 ```yaml
 # Node.js global packages (installed via npm after Node.js)
 npm_global_packages:
   - aws-cdk                       # AWS CDK toolkit
-  - '@angular/cli'                # Angular CLI
-  - typescript                    # TypeScript compiler
+  - '@vue/cli'                    # Vue CLI
+  - serverless                    # Serverless framework
 ```
 
 ### Custom Commands
 
-```yaml
-# Commands executed as the current user
-custom_commands_user:
-  # Enable Windows features
-  - Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-  # Configure PowerShell execution policy
-  - Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Windows uses a single `custom_commands` list
+(not split into user/elevated) since the script already runs as Administrator:
 
-# Commands executed with administrator privileges
-custom_commands_elevated:
-  # Install Windows features that require elevation
-  - dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```yaml
+# Commands executed during setup (runs as Administrator)
+custom_commands:
+  # Enable Dark Mode
+  - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
+  # Enable WSL features
+  - Enable-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online -NoRestart
+  # Show file extensions in File Explorer
+  - Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name HideFileExt -Value 0
 ```
 
 ## Ubuntu Configuration Reference
 
-### APT Packages
-
-```yaml
-# System packages and command-line tools
-apt_packages:
-  - git                          # Version control
-  - curl                         # HTTP client
-  - wget                         # Download utility
-  - build-essential              # Compilation tools
-  - software-properties-common   # Repository management
-  - apt-transport-https          # HTTPS transport for APT
-```
-
-### Snap Packages
-
-```yaml
-# GUI applications via Snap
-snap_packages:
-  - code --classic               # VS Code with classic confinement
-  - discord                      # Communication app
-  - slack --classic              # Team communication
-```
-
-### WSL Configuration
+### System Configuration
 
 ```yaml
 # Windows Subsystem for Linux specific settings
 is_wsl: false                    # Set to true when running in WSL environment
+
+# AppImage install directory
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+```
+
+### APT Prerequisite Packages
+
+```yaml
+# Essential packages installed first
+apt_packages_prereqs:
+  - name: apt-transport-https    # HTTPS transport for APT
+  - name: ca-certificates        # Certificate authority certs
+  - name: curl                   # HTTP client
+  - name: software-properties-common  # PPA support
+  - name: libfuse2               # For AppImage packages
+```
+
+### External APT Repositories
+
+```yaml
+# Additional repositories using deb822 format
+external_apt_repositories:
+  - name: docker
+    signed_by: https://download.docker.com/linux/ubuntu/gpg
+    uris: https://download.docker.com/linux/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    architectures: "{{ deb_architecture }}"
+```
+
+### APT Packages
+
+Ubuntu uses objects with a `name` key and optional `supported_architectures`:
+
+```yaml
+# System packages and command-line tools
+apt_packages:
+  - name: git                    # Version control
+  - name: build-essential        # Compilation tools
+  - name: docker-ce              # Docker engine
+  - name: code                   # Visual Studio Code
+  - name: google-chrome-stable   # Web browser
+    supported_architectures:
+      - amd64                    # Skip on ARM64
+```
+
+### Snap Packages
+
+Snap packages use objects with `name`, `classic`, and optional `supported_architectures`:
+
+```yaml
+# GUI applications via Snap
+snap_packages:
+  - name: drawio
+    classic: true
+    supported_architectures:
+      - amd64
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
+```
+
+### AppImage Packages
+
+```yaml
+# AppImage packages for applications not in other package managers
+appimage_packages:
+  - name: cursor
+    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    comment: "Cursor AI Code Editor"
+    categories: "Development;IDE;"
+    mime_types: "text/plain;"
+    # checksum: "sha256:abc123..."   # Optional checksum verification
+    # no_sandbox: true               # Optional: disable Chromium sandbox
 ```
 
 ### Custom Commands
 
+Ubuntu uses objects with `command` and `description` keys:
+
 ```yaml
 # Commands executed as the current user
 custom_commands_user:
-  # Configure Git to use Windows credential manager in WSL
-  - git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"
-  # Set dark theme
-  - gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  - command: pipx ensurepath
+    description: Ensure pipx is in PATH
+  - command: git lfs install
+    description: Install Git LFS
 
 # Commands executed with sudo privileges
 custom_commands_elevated:
-  # Add user to docker group
-  - sudo usermod -aG docker $USER
-  # Enable and start Docker service
-  - sudo systemctl enable docker --now
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
 ```
 
 ## Fedora Configuration Reference
 
-### DNF Packages
+### System Configuration
 
 ```yaml
-# System packages and command-line tools
-dnf_packages:
-  - git                          # Version control
-  - curl                         # HTTP client
-  - wget                         # Download utility
-  - gcc                          # C compiler
-  - make                         # Build automation
-  - dnf-plugins-core             # DNF plugin support
+# Windows Subsystem for Linux specific settings
+is_wsl: false                    # Set to true when running in WSL environment
+
+# AppImage install directory
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
 ```
 
-### Flatpak Packages
+### DNF Prerequisite Packages
 
 ```yaml
-# GUI applications via Flatpak
-flatpak_packages:
-  - com.visualstudio.code        # VS Code
-  - com.discordapp.Discord       # Communication app
-  - com.slack.Slack              # Team communication
+# Essential packages installed first
+dnf_packages_prereqs:
+  - name: ca-certificates        # Certificate authority certs
+  - name: curl                   # HTTP client
+  - name: wget                   # Download utility
+  - name: dnf-plugins-core       # DNF plugin support
+  - name: fuse-libs              # For AppImage packages
 ```
 
 ### External DNF Repositories
 
 ```yaml
-# Additional DNF repositories
-external_dnf_repositories:
-  - name: hashicorp
-    baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
-    gpgkey: https://rpm.releases.hashicorp.com/gpg
+# Additional DNF repositories (yum_repository format)
+external_dnf_repositories: []    # Currently empty; add repos as needed
 ```
 
-### WSL Configuration
+### DNF Packages
+
+Fedora uses objects with a `name` key:
 
 ```yaml
-# Windows Subsystem for Linux specific settings
-is_wsl: false                    # Set to true when running in WSL environment
+# System packages and command-line tools
+dnf_packages:
+  - name: git                    # Version control
+  - name: cmake                  # Build tool
+  - name: golang                 # Go programming language
+  - name: nodejs                 # Node.js runtime
+  - name: code                   # Visual Studio Code
+```
+
+### Flatpak Packages
+
+Flatpak packages also use objects (currently empty by default):
+
+```yaml
+# GUI applications via Flatpak
+flatpak_packages: []             # Add Flathub app IDs as needed
+```
+
+### AppImage Packages
+
+```yaml
+# AppImage packages for applications not in other package managers
+appimage_packages:
+  - name: cursor
+    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    comment: "Cursor AI Code Editor"
+    categories: "Development;IDE;"
+    mime_types: "text/plain;"
 ```
 
 ### Custom Commands
 
+Fedora uses objects with `command` and `description` keys:
+
 ```yaml
 # Commands executed as the current user
 custom_commands_user:
-  # Configure Git to use Windows credential manager in WSL
-  - git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"
-  # Set dark theme
-  - gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+  - command: pipx ensurepath
+    description: Ensure pipx is in PATH
+  - command: git lfs install
+    description: Install Git LFS
 
 # Commands executed with sudo privileges
 custom_commands_elevated:
-  # Add user to docker group
-  - sudo usermod -aG docker $USER
-  # Enable and start Docker service
-  - sudo systemctl enable docker --now
+  - command: usermod -aG docker $USER
+    description: Add current user to Docker group
 ```
 
 ## Cross-Platform Configuration Options

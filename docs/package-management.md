@@ -119,11 +119,13 @@ Ubuntu uses a dual approach with complementary package managers:
 
 ```yaml
 apt_packages:
-  - git
-  - docker.io
-  - build-essential
-  - curl
-  - wget
+  - name: git
+  - name: docker-ce
+  - name: build-essential
+  - name: curl
+  - name: google-chrome-stable
+    supported_architectures:
+      - amd64                    # Skip on ARM64
 ```
 
 **Snap Packages**:
@@ -134,9 +136,14 @@ apt_packages:
 
 ```yaml
 snap_packages:
-  - code --classic
-  - discord
-  - slack --classic
+  - name: drawio
+    classic: true
+    supported_architectures:
+      - amd64
+  - name: slack
+    classic: true
+    supported_architectures:
+      - amd64
 ```
 
 #### Specialized Package Managers
@@ -165,11 +172,11 @@ Fedora uses a dual approach with complementary package managers:
 
 ```yaml
 dnf_packages:
-  - git
-  - docker-ce
-  - gcc
-  - curl
-  - wget
+  - name: git
+  - name: cmake
+  - name: golang
+  - name: curl
+  - name: wget
 ```
 
 **Flatpak Packages**:
@@ -179,10 +186,8 @@ dnf_packages:
 - Cross-distribution packages
 
 ```yaml
-flatpak_packages:
-  - com.visualstudio.code
-  - com.discordapp.Discord
-  - com.slack.Slack
+# Currently empty by default; add Flathub app IDs as needed
+flatpak_packages: []
 ```
 
 #### Specialized Package Managers

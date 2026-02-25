@@ -12,12 +12,13 @@ development environment.
 - **PowerShell Setup**: Installs PowerShell and modules for development
 - **Python Setup**: Installs Python versions via pyenv and pipx modules
 - **Ruby Setup**: Installs Ruby via chruby
-- **Node.js Setup**: Installs Node.js via nvm
+- **Node.js Setup**: Installs Node.js and npm global packages
 - **Rust Setup**: Installs Rust via rustup
 - **Go Setup**: Installs Go
-- **.NET Setup**: Installs .NET SDK
+- **.NET Setup**: Installs .NET SDK and global tools
 - **VS Code Extensions**: Configures VS Code with essential development extensions
 - **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
+- **AppImage Support**: Installs applications via AppImage with desktop integration
 - **Custom Script Support**: Allows for additional customization via custom scripts
 
 ## Prerequisites
@@ -58,11 +59,12 @@ This setup has been tested and confirmed to work on:
 The `setup.sh` script accepts several options:
 
 ```bash
-Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [playbook_file]
+Usage: ./setup.sh [-v] [-e git_email] [-n git_name] [-p] [-c] [playbook_file]
   -v              Enable verbose output (can be repeated for more verbosity, e.g. -vv or -vvv)
   -e git_email    Specify Git user email
   -n git_name     Specify Git user name
   -p              Install prerequisites only (Ansible), don't run Ansible playbook
+  -c              CI mode: skip interactive sudo prompts (assumes passwordless sudo)
   playbook_file   Optional playbook file name (defaults to setup.yaml)
 ```
 
@@ -101,16 +103,16 @@ Edit `vars.yaml` to customize which packages get installed:
 #### System Packages
 
 ```yaml
-# Command-line tools and libraries via DNF
+# Command-line tools and libraries via DNF (object format)
 dnf_packages:
   - name: git
   - name: curl
   - name: cmake
+  - name: golang
+  - name: code
 
-# GUI applications via Flatpak
-flatpak_packages:
-  - name: com.slack.Slack
-  - name: com.jgraph.drawio.desktop
+# GUI applications via Flatpak (currently empty by default)
+flatpak_packages: []
 ```
 
 #### Development Tools
@@ -192,19 +194,27 @@ See `vars.yaml` for the complete list of installed packages.
 
 The playbook uses tags to allow selective execution of tasks:
 
+- `system`: System-level tasks
+  - `architecture`: Architecture detection
+  - `wsl`: WSL-specific configuration
 - `dnf`: All DNF-related tasks
   - `update`: Only update DNF cache
   - `upgrade`: Only upgrade packages
   - `packages`: Only install packages
+  - `prereqs`: Only prerequisite packages
   - `repositories`: Only add repositories
 - `flatpak`: Flatpak package installation
+- `appimage`: AppImage package installation
 - `powershell`: PowerShell installation and module setup
 - `pipx`: Python package installation via pipx
-- `dotnet`: .NET SDK installation
 - `npm`: Node.js package installation
+- `dotnet`: .NET SDK and tools installation
 - `vscode`: VS Code extension installation
+- `cursor`: Cursor extension installation
 - `git`: Git configuration tasks
 - `custom`: Custom commands and script execution
+  - `user-commands`: User-level commands
+  - `elevated-commands`: Commands requiring sudo
 
 You can run the playbook with specific tags using the `-t` option:
 

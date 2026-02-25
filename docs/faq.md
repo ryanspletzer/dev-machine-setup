@@ -447,7 +447,7 @@ Several resources available:
 
 1. **Documentation**: Complete documentation in the `docs/` directory
 2. **GitHub Issues**: Report bugs or ask questions
-3. **Examples**: Real-world examples in `docs/examples/`
+3. **Examples**: Real-world examples in `examples/`
 4. **Community**: Engage with other users in discussions
 
 ### How do I report bugs or request features?
