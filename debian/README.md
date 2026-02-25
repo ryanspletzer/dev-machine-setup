@@ -8,14 +8,8 @@ development environment.
 
 - **APT Package Management**: Installs essential development tools and applications
 - **Flatpak Package Management**: Installs GUI applications via Flatpak
-- **Docker Setup**: Installs Docker and adds the user to the Docker group
-- **PowerShell Setup**: Installs PowerShell and modules for development
-- **Python Setup**: Installs Python versions via pyenv and pipx modules
-- **Ruby Setup**: Installs Ruby via chruby
-- **Node.js Setup**: Installs Node.js and npm global packages
-- **Rust Setup**: Installs Rust via rustup
-- **Go Setup**: Installs Go
-- **.NET Setup**: Installs .NET SDK and global tools
+- **Python Setup**: Installs Python packages via pipx
+- **Node.js Setup**: Installs npm global packages
 - **VS Code Extensions**: Configures VS Code with essential development extensions
 - **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
 - **AppImage Support**: Installs applications via AppImage with desktop integration
@@ -175,13 +169,9 @@ The default setup includes a curated selection of popular development tools and 
 
 ### Developer Tools
 
-- Docker
 - Git and Git LFS
 - Visual Studio Code
-- .NET SDK
-- Python, Node.js, Ruby, Go
-- AWS CLI, Azure CLI
-- PowerShell
+- Go
 
 ### Applications
 

@@ -40,9 +40,10 @@ Package lists are flat YAML arrays grouped by category:
 
 ### Key Differences Between Platforms
 
-- **Windows `choco_packages`** uses objects with `name` (required)
-  plus optional `parameters` and `prerelease` keys,
-  unlike the flat string arrays on other platforms.
+- **macOS** uses flat string arrays for `homebrew_formulae` and `homebrew_casks`.
+  All other platforms use objects with a `name` key.
+- **Windows `choco_packages`** objects support additional
+  `parameters` and `prerelease` keys beyond `name`.
 - **Windows `custom_commands`** is a single list (not split into user/elevated)
   since the script already runs as Administrator.
 - **Ubuntu** has additional `external_apt_repositories` (deb822 format)
@@ -119,7 +120,7 @@ Comment groups organize packages by purpose.
 
 When adding to multiple platforms,
 use the correct format for each
-(flat strings for macOS/Ubuntu/Debian, `name:` objects for Windows choco).
+(flat strings for macOS, `name:` objects for Ubuntu/Debian/Fedora/Windows).
 
 ### Commit Messages
 

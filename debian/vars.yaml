@@ -427,11 +427,11 @@ custom_commands_user:
   # Add commands to execute as the current user
   - command: pipx ensurepath
     description: Ensure pipx is in PATH
-  # Update PowerShell help
-  - command: ~/.dotnet/tools/pwsh -Command "Update-Help -Force -ErrorAction SilentlyContinue"
+  # Update PowerShell help (only if pwsh is installed)
+  - command: "[ -x ~/.dotnet/tools/pwsh ] && ~/.dotnet/tools/pwsh -Command 'Update-Help -Force -ErrorAction SilentlyContinue' || true"
     description: Update PowerShell help documentation
-  # Set PSResource Repository PSGallery as trusted repository
-  - command: ~/.dotnet/tools/pwsh -Command "Set-PSRepository -Name PSGallery -Trusted"
+  # Set PSResource Repository PSGallery as trusted repository (only if pwsh is installed)
+  - command: "[ -x ~/.dotnet/tools/pwsh ] && ~/.dotnet/tools/pwsh -Command 'Set-PSRepository -Name PSGallery -Trusted' || true"
     description: Set PSResource Repository PSGallery as trusted repository
   # Install Git LFS
   - command: git lfs install
