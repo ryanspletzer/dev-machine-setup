@@ -135,6 +135,7 @@ homebrew_formulae:
   - yq
   - wget2
   - xh
+  - zoxide
   - zsh-autocomplete
   - zsh-autosuggestions
   - zsh-syntax-highlighting
