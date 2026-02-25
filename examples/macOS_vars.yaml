@@ -88,6 +88,7 @@ homebrew_formulae:
   - fd
   - ffmpeg
   - fish
+  - fisher
   - fzf
   - gh
   - git
