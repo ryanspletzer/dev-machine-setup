@@ -158,6 +158,60 @@ snap_packages:
 - Snap provides modern applications with automatic updates
 - Covers the broadest range of software needs
 
+### Debian Package Management
+
+#### Primary Package Managers
+
+Debian uses a dual approach with complementary package managers:
+
+**APT (Advanced Package Tool)**:
+
+- System packages and libraries
+- Command-line tools
+- Development dependencies
+
+```yaml
+apt_packages:
+  - name: git
+  - name: docker-ce
+  - name: build-essential
+  - name: curl
+  - name: google-chrome-stable
+    supported_architectures:
+      - amd64                    # Skip on ARM64
+```
+
+**Flatpak Packages**:
+
+- GUI applications
+- Sandboxed applications
+- Cross-distribution packages
+
+Debian uses Flatpak instead of Snap,
+since `snapd` is not shipped with Debian by default:
+
+```yaml
+flatpak_packages:
+  - name: com.jgraph.drawio.desktop
+    supported_architectures:
+      - amd64
+  - name: com.slack.Slack
+    supported_architectures:
+      - amd64
+```
+
+#### Specialized Package Managers
+
+- **pipx**: Python applications
+- **PowerShell Gallery**: PowerShell modules (after PowerShell installation)
+- **VS Code Marketplace**: Editor extensions
+
+**Why the dual approach:**
+
+- APT provides system integration and dependencies
+- Flatpak provides sandboxed applications from Flathub
+- Covers the broadest range of software needs on Debian
+
 ### Fedora Package Management
 
 #### Primary Package Managers
@@ -223,13 +277,13 @@ We organize packages into logical categories across all platforms:
 
 Where possible, we use equivalent packages across platforms:
 
-| Tool | macOS | Windows | Ubuntu | Fedora |
-| ---- | ----- | ------- | ------ | ------ |
-| Git | `git` (brew) | `git` (choco) | `git` (apt) | `git` (dnf) |
-| VS Code | `visual-studio-code` (cask) | `vscode` (choco) | `code` (snap) | `com.visualstudio.code` (flatpak) |
-| Docker | `docker-desktop` (cask) | `docker-desktop` (choco) | `docker.io` (apt) | `docker-ce` (dnf) |
-| Node.js | `node` (brew) | `nodejs` (choco) | `nodejs` (apt) | `nodejs` (dnf) |
-| Python | `python` (brew) | `python` (choco) | `python3` (apt) | `python3` (dnf) |
+| Tool | macOS | Windows | Ubuntu | Debian | Fedora |
+| ---- | ----- | ------- | ------ | ------ | ------ |
+| Git | `git` (brew) | `git` (choco) | `git` (apt) | `git` (apt) | `git` (dnf) |
+| VS Code | `visual-studio-code` (cask) | `vscode` (choco) | `code` (snap) | `code` (apt) | `com.visualstudio.code` (flatpak) |
+| Docker | `docker-desktop` (cask) | `docker-desktop` (choco) | `docker.io` (apt) | `docker-ce` (apt) | `docker-ce` (dnf) |
+| Node.js | `node` (brew) | `nodejs` (choco) | `nodejs` (apt) | `nodejs` (apt) | `nodejs` (dnf) |
+| Python | `python` (brew) | `python` (choco) | `python3` (apt) | `python3` (apt) | `python3` (dnf) |
 
 ## Package List Management
 
@@ -242,10 +296,10 @@ Each platform maintains package lists in YAML format:
 homebrew_formulae: []    # macOS CLI tools
 homebrew_casks: []       # macOS GUI applications
 choco_packages: []       # Windows packages
-apt_packages: []         # Ubuntu system packages
+apt_packages: []         # Ubuntu/Debian system packages
 snap_packages: []        # Ubuntu applications
+flatpak_packages: []     # Debian/Fedora applications
 dnf_packages: []         # Fedora system packages
-flatpak_packages: []     # Fedora applications
 
 # Cross-platform sections (consistent naming)
 vscode_extensions: []    # VS Code extensions

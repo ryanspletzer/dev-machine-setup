@@ -8,7 +8,7 @@ to this cross-platform development environment automation project.
 
 The dev-machine-setup project provides automated scripts and configurations
 to set up consistent development environments across macOS, Windows, Ubuntu,
-and Fedora platforms.
+Debian, and Fedora platforms.
 The project emphasizes simplicity, reliability,
 and customizability through declarative configuration files.
 
@@ -85,6 +85,12 @@ Contribute directly to the codebase:
 - APT package manager
 - Snap package manager
 
+**For Debian development:**
+
+- Debian 13 (Trixie) or later
+- APT package manager
+- Flatpak package manager
+
 **For Fedora development:**
 
 - Fedora 39 or later
@@ -141,6 +147,10 @@ dev-machine-setup/
 │   ├── setup.ps1         # PowerShell script
 │   └── vars.yaml         # Configuration
 ├── ubuntu/                # Ubuntu implementation
+│   ├── setup.sh          # Entry point script
+│   ├── setup.yaml        # Ansible playbook
+│   └── vars.yaml         # Configuration
+├── debian/                # Debian implementation
 │   ├── setup.sh          # Entry point script
 │   ├── setup.yaml        # Ansible playbook
 │   └── vars.yaml         # Configuration
@@ -237,6 +247,9 @@ vscode_extensions:
    # Ubuntu
    apt search new-package
 
+   # Debian
+   apt search new-package
+
    # Fedora
    dnf search new-package
    ```
@@ -284,6 +297,7 @@ When possible, test changes across multiple platforms:
 - Test on both Intel and Apple Silicon Macs
 - Verify Windows 10 and 11 compatibility
 - Test different Ubuntu LTS versions
+- Test on Debian 13 (Trixie) or later
 - Test on recent Fedora releases
 
 ### Documentation Updates
@@ -363,7 +377,7 @@ Before adding packages, research:
    choco_packages:        # Windows
      - name: new-package
 
-   apt_packages:          # Ubuntu
+   apt_packages:          # Ubuntu/Debian
      - new-package
 
    dnf_packages:          # Fedora
@@ -392,9 +406,9 @@ Before adding packages, research:
    choco_packages:
      - name: different-package-name  # Different name on Windows
 
-   # Ubuntu
+   # Ubuntu/Debian
    apt_packages:
-     - ubuntu-package-name           # Different name on Ubuntu
+     - ubuntu-package-name           # Different name on Ubuntu/Debian
 
    # Fedora
    dnf_packages:
