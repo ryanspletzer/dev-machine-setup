@@ -66,6 +66,7 @@ homebrew_casks:
   - zulu
 
 homebrew_formulae:
+  - actionlint
   - aws-sam-cli
   - awscli
   - azure-cli
