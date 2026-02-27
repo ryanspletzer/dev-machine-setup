@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "claudeai.claude-code",
+    "davidanson.vscode-markdownlint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.powershell",
+    "redhat.ansible",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "timonwong.shellcheck",
+    "usernamehw.errorlens"
+  ]
+}
