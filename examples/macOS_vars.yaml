@@ -99,6 +99,7 @@ homebrew_formulae:
   - hashicorp/tap/packer
   - hashicorp/tap/terraform
   - hashicorp/tap/vault
+  - imagemagick
   - istioctl
   - jq
   - kubernetes-cli
