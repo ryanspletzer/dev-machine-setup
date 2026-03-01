@@ -1,8 +1,2 @@
-warn_list:
-  - command-instead-of-module
-  - command-instead-of-shell
-  - fqcn[action-core]
-  - name[missing]
-  - no-changed-when
-  - yaml[empty-lines]
-  - yaml[line-length]
+# All warn_list rules resolved — enforced at error level
+{}

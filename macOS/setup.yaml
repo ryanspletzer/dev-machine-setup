@@ -112,7 +112,8 @@
 
     # Refresh Ansible inventory
     # This ensures that the inventory is up-to-date after Homebrew installations which add to the PATH
-    - meta: refresh_inventory
+    - name: Refresh Ansible inventory
+      ansible.builtin.meta: refresh_inventory
 
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
@@ -273,7 +274,7 @@
         - extensions
 
     # Git LFS setup
-    - name: Ensure Git LFS is initialized
+    - name: Ensure Git LFS is initialized # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git lfs install
       register: git_lfs_result
@@ -284,27 +285,27 @@
 
     # Git configuration
     - name: Configure Git user.name
-      ansible.builtin.command:
-        cmd: git config --global user.name "{{ git_user_name }}"
-      register: git_name_result
-      changed_when: git_name_result.rc == 0
+      community.general.git_config:
+        name: user.name
+        value: "{{ git_user_name }}"
+        scope: global
       when: git_user_name is defined and git_user_name != ""
       tags:
         - git
         - config
 
     - name: Configure Git user.email
-      ansible.builtin.command:
-        cmd: git config --global user.email "{{ git_user_email }}"
-      register: git_email_result
-      changed_when: git_email_result.rc == 0
+      community.general.git_config:
+        name: user.email
+        value: "{{ git_user_email }}"
+        scope: global
       when: git_user_email is defined and git_user_email != ""
       tags:
         - git
         - config
 
     # Custom macOS commands and preferences - Non-elevated (user) commands
-    - name: Execute custom macOS commands (non-elevated)
+    - name: Execute custom macOS commands (non-elevated) # noqa: command-instead-of-shell
       ansible.builtin.shell:
         cmd: "{{ item }}"
         executable: /bin/bash
@@ -320,7 +321,7 @@
         - user-commands
 
     # Custom macOS commands that require elevated privileges
-    - name: Execute custom macOS commands (elevated)
+    - name: Execute custom macOS commands (elevated) # noqa: command-instead-of-shell
       ansible.builtin.shell:
         cmd: "{{ item }}"
         executable: /bin/bash
