@@ -35,8 +35,8 @@ check "git-lfs installed (Homebrew formula)" command -v git-lfs
 # Homebrew cask
 check "iTerm2 installed (Homebrew cask)" test -d /Applications/iTerm.app
 
-# pipx package
-check "ruff installed (pipx package)" command -v ruff
+# uv tool
+check "ruff installed (uv tool)" command -v ruff
 
 # Git config
 check_equal "git user.email configured" \

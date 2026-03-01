@@ -164,6 +164,9 @@ powershell_modules:
 
 # pipx modules
 pipx_packages:
+
+# uv tools
+uv_tools:
   - ansible-lint
   - poetry
   - taskcat

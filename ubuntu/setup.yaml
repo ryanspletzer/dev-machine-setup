@@ -1,6 +1,6 @@
 ---
 # Ansible playbook for Ubuntu development machine setup
-# Manages APT packages, Snap packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
+# Manages APT packages, Snap packages, PowerShell modules, pipx modules, uv tools, VS Code extensions, and Git configuration
 
 - name: Setup development environment on Ubuntu
   hosts: localhost
@@ -303,6 +303,31 @@
       tags:
         - pipx
         - modules
+
+    # uv tool setup
+    - name: Check if uv is installed
+      ansible.builtin.command:
+        cmd: which uv
+      register: uv_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - uv
+        - tools
+
+    - name: Install uv tools
+      ansible.builtin.command:
+        cmd: uv tool install {{ item }}
+      when: uv_check.rc == 0
+      loop: "{{ uv_tools | default([]) }}"
+      ignore_errors: yes
+      register: uv_tool_install_result
+      changed_when: "'already installed' not in uv_tool_install_result.stderr"
+      loop_control:
+        label: "Installing uv tool: {{ item }}"
+      tags:
+        - uv
+        - tools
 
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed

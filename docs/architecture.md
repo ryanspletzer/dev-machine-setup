@@ -109,7 +109,7 @@ graph LR
     subgraph "Package Managers"
         G --> L[brew install]
         H --> M[Install-PSResource]
-        I --> N[pipx install]
+        I --> N[uv tool install]
         J --> O[code --install-extension]
     end
 ```
@@ -140,7 +140,7 @@ graph LR
     subgraph "Package Managers"
         F --> K[choco install]
         G --> L[Install-PSResource]
-        H --> M[pipx install]
+        H --> M[uv tool install]
         I --> N[code --install-extension]
     end
 ```
@@ -172,7 +172,7 @@ graph LR
         G --> L[apt install]
         H --> M[snap install]
         I --> N[Install-PSResource]
-        J --> O[pipx install]
+        J --> O[uv tool install]
         K --> P[code --install-extension]
     end
 ```
@@ -206,7 +206,7 @@ graph LR
         G --> L[apt install]
         H --> M[flatpak install]
         I --> N[Install-PSResource]
-        J --> O[pipx install]
+        J --> O[uv tool install]
         K --> P[code --install-extension]
     end
 ```
@@ -240,7 +240,7 @@ graph LR
         G --> L[dnf install]
         H --> M[flatpak install]
         I --> N[Install-PSResource]
-        J --> O[pipx install]
+        J --> O[uv tool install]
         K --> P[code --install-extension]
     end
 ```
@@ -301,7 +301,7 @@ Each platform organizes packages into logical categories:
 | Applications | `homebrew_casks` | `choco_packages` | `snap_packages` | `flatpak_packages` | `flatpak_packages` |
 | VS Code Extensions | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` | `vscode_extensions` |
 | PowerShell Modules | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` | `powershell_modules` |
-| Python Packages | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` | `pipx_packages` |
+| Python Packages | `uv_tools` | `uv_tools` | `uv_tools` | `uv_tools` | `uv_tools` |
 | Node.js Packages | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` | `npm_global_packages` |
 | .NET Tools | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` | `dotnet_tools` |
 

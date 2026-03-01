@@ -12,6 +12,8 @@ homebrew_formulae:
 powershell_modules: []
 
 pipx_packages:
+
+uv_tools:
   - ruff
 
 npm_global_packages: []

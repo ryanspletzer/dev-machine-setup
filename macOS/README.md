@@ -8,7 +8,7 @@ development environment.
 
 - 🍺 **Homebrew Package Management**: Installs Homebrew taps, casks, and formulae
 - 🔧 **PowerShell Module Installation**: Sets up PowerShell modules for development
-- 📦 **Python Package Management**: Installs pipx modules
+- 📦 **Python Package Management**: Installs Python CLI tools via uv
 - 🧩 **Node.js Package Management**: Installs npm packages globally
 - ⚙️ **.NET Global Tools**: Installs .NET global tools (when .NET SDK is available)
 - 💻 **VS Code Extensions**: Configures VS Code with essential development extensions
@@ -132,8 +132,11 @@ powershell_modules:
   - AWS.Tools.Common
   - Terminal-Icons
 
-# Python packages via pipx
+# Python packages via pipx (empty on macOS; uv is available via Homebrew)
 pipx_packages:
+
+# Python CLI tools via uv
+uv_tools:
   - poetry
   - black
 
@@ -229,6 +232,7 @@ The playbook uses tags to allow selective execution of tasks:
   - `formulae`: Only Homebrew formulae (CLI tools)
 - `powershell`: PowerShell module installation
 - `pipx`: Python package installation via pipx
+- `uv`: Python CLI tool installation via uv
 - `npm`: Node.js package installation via npm
 - `dotnet`: .NET global tools installation
 - `vscode`: VS Code extension installation

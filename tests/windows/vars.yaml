@@ -8,7 +8,9 @@ powershell_modules:
 
 windows_powershell_modules: []
 
-pipx_packages: []
+pipx_packages:
+
+uv_tools:
 
 npm_global_packages: []
 

@@ -210,15 +210,18 @@ powershell_modules:
   - PSTcpIp
   - Terminal-Icons
 
-# pipx modules
+# pipx modules (bootstraps uv on Linux)
 pipx_packages:
+  - uv
+
+# uv tools
+uv_tools:
   - ansible-lint
   - aws-sam-cli
   - cfn-lint
   - poetry
   - ruff
   - taskcat
-  - uv
 
 # npm global packages
 npm_global_packages:

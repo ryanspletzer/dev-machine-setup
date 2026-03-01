@@ -8,7 +8,7 @@ development environment.
 
 - **APT Package Management**: Installs essential development tools and applications
 - **Flatpak Package Management**: Installs GUI applications via Flatpak
-- **Python Setup**: Installs Python packages via pipx
+- **Python Setup**: Bootstraps uv via pipx and installs Python CLI tools via uv
 - **Node.js Setup**: Installs npm global packages
 - **VS Code Extensions**: Configures VS Code with essential development extensions
 - **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
@@ -117,8 +117,12 @@ powershell_modules:
   - AWS.Tools.Common
   - Terminal-Icons
 
-# Python packages via pipx
+# Bootstrap uv via pipx
 pipx_packages:
+  - uv
+
+# Python CLI tools via uv
+uv_tools:
   - poetry
   - ruff
 
@@ -196,7 +200,8 @@ The playbook uses tags to allow selective execution of tasks:
 - `flatpak`: Flatpak package installation
 - `appimage`: AppImage package installation
 - `powershell`: PowerShell installation and module setup
-- `pipx`: Python package installation via pipx
+- `pipx`: Python package installation via pipx (bootstraps uv)
+- `uv`: Python CLI tool installation via uv
 - `npm`: Node.js package installation
 - `dotnet`: .NET SDK and tools installation
 - `vscode`: VS Code extension installation

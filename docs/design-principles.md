@@ -52,7 +52,7 @@ Every package, tool, or application must be installed through a recognized packa
 
 - **Homebrew** for CLI tools (`homebrew_formulae`)
 - **Homebrew Casks** for GUI applications (`homebrew_casks`)
-- **pipx** for Python tools (`pipx_packages`)
+- **uv** for Python tools (`uv_tools`)
 - **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **.NET CLI** for .NET tools (`dotnet_tools`)
@@ -62,13 +62,14 @@ Every package, tool, or application must be installed through a recognized packa
 - **Chocolatey** for applications and tools (`choco_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **npm** for Node.js packages (`npm_global_packages`)
-- **pipx** for Python tools (`pipx_packages`)
+- **uv** for Python tools (`uv_tools`)
 
 #### Ubuntu
 
 - **APT** for system packages (`apt_packages`)
 - **Snap** for applications (`snap_packages`)
-- **pipx** for Python tools (`pipx_packages`)
+- **pipx** for bootstrapping uv (`pipx_packages`)
+- **uv** for Python tools (`uv_tools`)
 - **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **.NET CLI** for .NET tools (`dotnet_tools`)
@@ -77,7 +78,8 @@ Every package, tool, or application must be installed through a recognized packa
 
 - **APT** for system packages (`apt_packages`)
 - **Flatpak** for applications (`flatpak_packages`)
-- **pipx** for Python tools (`pipx_packages`)
+- **pipx** for bootstrapping uv (`pipx_packages`)
+- **uv** for Python tools (`uv_tools`)
 - **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **.NET CLI** for .NET tools (`dotnet_tools`)
@@ -86,7 +88,8 @@ Every package, tool, or application must be installed through a recognized packa
 
 - **DNF** for system packages (`dnf_packages`)
 - **Flatpak** for applications (`flatpak_packages`)
-- **pipx** for Python tools (`pipx_packages`)
+- **pipx** for bootstrapping uv (`pipx_packages`)
+- **uv** for Python tools (`uv_tools`)
 - **npm** for Node.js packages (`npm_global_packages`)
 - **PowerShell Gallery** for PowerShell modules (`powershell_modules`)
 - **.NET CLI** for .NET tools (`dotnet_tools`)

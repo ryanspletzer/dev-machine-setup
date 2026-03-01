@@ -331,10 +331,9 @@ homebrew_formulae:
   - pyenv
   - poetry
 
-pipx_packages:
+uv_tools:
   - poetry
-  - black
-  - flake8
+  - ruff
   - mypy
   - pytest
 

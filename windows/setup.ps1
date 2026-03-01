@@ -602,6 +602,52 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
 #endregion Ensure pipx Packages from Vars file are Installed
 
+#region Ensure uv Tools from Vars file are Installed
+
+$step++
+$stepText = 'Ensure uv Tools from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for uv tools to install...'
+
+# Get
+Write-Verbose -Message '[Get] uv...'
+$uvCmd = Get-Command -Name uv -ErrorAction SilentlyContinue
+
+# Test
+Write-Verbose -Message '[Test] uv...'
+if ($null -eq $uvCmd) {
+    Write-Information -MessageData 'uv is not installed, skipping uv tool installations.'
+} else {
+    # Get
+    Write-Verbose -Message '[Get] uv tools from Vars file import...'
+    $uvTools = $vars.uv_tools
+
+    # Test
+    Write-Verbose -Message '[Test] uv tools from Vars file import...'
+    if ($uvTools -and $uvTools.Count -gt 0) {
+        foreach ($tool in $uvTools) {
+            Write-Progress -Activity $activity -Status (
+                & $StatusBlock
+            ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
+            Write-Information -MessageData "Installing uv tool $tool..."
+
+            # Set
+            Write-Verbose -Message "[Set] uv tool: $tool"
+            try {
+                uv tool install $tool
+                Write-Verbose -Message "[Set] uv tool $tool installation complete."
+                Write-Information -MessageData "Installed uv tool: $tool."
+            } catch {
+                Write-Error -Message "Failed to install uv tool: $tool. Error: $_"
+            }
+        }
+    } else {
+        Write-Information -MessageData 'No uv tools specified in vars.yaml file.'
+    }
+}
+
+#endregion Ensure uv Tools from Vars file are Installed
+
 #region Ensure npm global Packages from Vars file are Installed
 
 $step++
