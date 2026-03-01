@@ -4,6 +4,7 @@
     "davidanson.vscode-markdownlint",
     "esbenp.prettier-vscode",
     "ms-vscode.powershell",
+    "oderwat.indent-rainbow",
     "redhat.ansible",
     "redhat.vscode-yaml",
     "streetsidesoftware.code-spell-checker",
