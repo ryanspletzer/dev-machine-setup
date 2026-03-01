@@ -16,7 +16,7 @@
 
   tasks:
     # System setup
-    - name: Check WSL version (0=not WSL, 1=WSL1, 2=WSL2)
+    - name: Check WSL version (0=not WSL, 1=WSL1, 2=WSL2) # noqa: risky-shell-pipe
       ansible.builtin.shell: |
         if ! grep -q -i microsoft /proc/version && ! uname -r | grep -q microsoft; then
           exit 0
