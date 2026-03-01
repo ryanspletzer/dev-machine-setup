@@ -134,7 +134,7 @@
       ansible.builtin.command:
         cmd: pipx install {{ item }}
       ignore_errors: yes
-      loop: "{{ pipx_packages | default([]) }}"
+      loop: "{{ pipx_packages | default([], true) }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:
@@ -158,7 +158,7 @@
       ansible.builtin.command:
         cmd: uv tool install {{ item }}
       when: uv_check.rc == 0
-      loop: "{{ uv_tools | default([]) }}"
+      loop: "{{ uv_tools | default([], true) }}"
       ignore_errors: yes
       register: uv_tool_install_result
       changed_when: "'already installed' not in uv_tool_install_result.stderr"
