@@ -5,7 +5,7 @@
 - name: Setup development environment on macOS
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
   # Define the become password at the play level so it's available to all tasks
   vars:
     ansible_become_pass: "{{ lookup('env', 'ANSIBLE_SUDO_PASS') }}"
@@ -30,7 +30,7 @@
       ansible.builtin.command:
         cmd: pgrep -q oahd
       register: rosetta_check
-      ignore_errors: yes
+      failed_when: false
       changed_when: false
       when:
         - install_rosetta | bool
@@ -42,8 +42,8 @@
     - name: Install Rosetta 2 (with become_method=sudo)
       ansible.builtin.command:
         cmd: softwareupdate --install-rosetta --agree-to-license
-      become: yes
-      become_method: sudo
+      become: true
+      become_method: ansible.builtin.sudo
       when:
         - install_rosetta | bool
         - arch_check.stdout == "arm64"
@@ -59,7 +59,7 @@
       community.general.homebrew_tap:
         name: "{{ item }}"
         state: present
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ homebrew_taps | default([], true) }}"
       loop_control:
         label: "Adding tap: {{ item }}"
@@ -70,7 +70,6 @@
     - name: Check if Homebrew casks are already installed
       ansible.builtin.command:
         cmd: "brew list --cask {{ item }}"
-      ignore_errors: yes
       loop: "{{ homebrew_casks | default([], true) }}"
       register: brew_cask_check
       changed_when: false
@@ -82,7 +81,7 @@
         - casks
 
     - name: Install missing Homebrew casks
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "brew install --cask {{ item.0 }}"
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
@@ -102,8 +101,8 @@
       community.general.homebrew:
         name: "{{ item }}"
         state: present
-        update_homebrew: yes
-      ignore_errors: yes
+        update_homebrew: true
+      failed_when: false
       loop: "{{ homebrew_formulae | default([], true) }}"
       loop_control:
         label: "Installing formula: {{ item }}"
@@ -119,7 +118,7 @@
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
         cmd: pwsh -Command "Install-PSResource -Name {{ item }} -TrustRepository"
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ powershell_modules | default([], true) }}"
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
@@ -133,7 +132,7 @@
     - name: Ensure pipx modules are installed
       ansible.builtin.command:
         cmd: pipx install {{ item }}
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ pipx_packages | default([], true) }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
@@ -159,7 +158,7 @@
         cmd: uv tool install {{ item }}
       when: uv_check.rc == 0
       loop: "{{ uv_tools | default([], true) }}"
-      ignore_errors: yes
+      failed_when: false
       register: uv_tool_install_result
       changed_when: "'already installed' not in uv_tool_install_result.stderr"
       loop_control:
@@ -185,7 +184,7 @@
     - name: Ensure npm global packages are installed
       ansible.builtin.command:
         cmd: npm install -g {{ item.0 }}
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ npm_global_packages | default([], true) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
@@ -221,7 +220,6 @@
     - name: Ensure .NET global tools are installed
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
-      ignore_errors: yes
       loop: "{{ dotnet_tools | default([], true) }}"
       register: dotnet_tool_install_result
       changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
@@ -239,7 +237,7 @@
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
         cmd: code --install-extension {{ item }}
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ vscode_extensions | default([], true) }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
@@ -263,7 +261,7 @@
     - name: Ensure Cursor extensions are installed
       ansible.builtin.command:
         cmd: cursor --install-extension {{ item }}
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ vscode_extensions | default([], true) }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
@@ -313,7 +311,7 @@
       loop: "{{ custom_commands_user | default([], true) }}"
       register: custom_command_user_result
       changed_when: custom_command_user_result.rc == 0
-      ignore_errors: yes
+      failed_when: false
       loop_control:
         label: "Executing user command: '{{ item | truncate(40) }}'"
       tags:
@@ -329,9 +327,9 @@
       loop: "{{ custom_commands_elevated | default([], true) }}"
       register: custom_command_elevated_result
       changed_when: custom_command_elevated_result.rc == 0
-      ignore_errors: yes
-      become: yes
-      become_method: sudo
+      failed_when: false
+      become: true
+      become_method: ansible.builtin.sudo
       loop_control:
         label: "Executing elevated command: '{{ item | truncate(40) }}'"
       tags:
