@@ -60,7 +60,7 @@
         name: "{{ item }}"
         state: present
       ignore_errors: yes
-      loop: "{{ homebrew_taps }}"
+      loop: "{{ homebrew_taps | default([], true) }}"
       loop_control:
         label: "Adding tap: {{ item }}"
       tags:
@@ -71,7 +71,7 @@
       ansible.builtin.command:
         cmd: "brew list --cask {{ item }}"
       ignore_errors: yes
-      loop: "{{ homebrew_casks }}"
+      loop: "{{ homebrew_casks | default([], true) }}"
       register: brew_cask_check
       changed_when: false
       failed_when: false
@@ -87,7 +87,7 @@
       environment:
         SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
         HOMEBREW_SUDO_ASKPASS: "{{ lookup('env', 'SUDO_ASKPASS') }}"
-      loop: "{{ homebrew_casks | zip(brew_cask_check.results) | list }}"
+      loop: "{{ homebrew_casks | default([], true) | zip(brew_cask_check.results) | list }}"
       when: item.1.rc != 0
       register: brew_cask_install_result
       changed_when: brew_cask_install_result.rc == 0
@@ -104,7 +104,7 @@
         state: present
         update_homebrew: yes
       ignore_errors: yes
-      loop: "{{ homebrew_formulae }}"
+      loop: "{{ homebrew_formulae | default([], true) }}"
       loop_control:
         label: "Installing formula: {{ item }}"
       tags:
@@ -120,7 +120,7 @@
       ansible.builtin.command:
         cmd: pwsh -Command "Install-PSResource -Name {{ item }} -TrustRepository"
       ignore_errors: yes
-      loop: "{{ powershell_modules }}"
+      loop: "{{ powershell_modules | default([], true) }}"
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
       loop_control:
@@ -175,7 +175,7 @@
       register: npm_check_result
       changed_when: false
       failed_when: false
-      loop: "{{ npm_global_packages | default([]) }}"
+      loop: "{{ npm_global_packages | default([], true) }}"
       loop_control:
         label: "Checking npm package: {{ item }}"
       tags:
@@ -186,7 +186,7 @@
       ansible.builtin.command:
         cmd: npm install -g {{ item.0 }}
       ignore_errors: yes
-      loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
+      loop: "{{ npm_global_packages | default([], true) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
       changed_when: "npm_install_result.rc == 0"
@@ -222,7 +222,7 @@
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
       ignore_errors: yes
-      loop: "{{ dotnet_tools | default([]) }}"
+      loop: "{{ dotnet_tools | default([], true) }}"
       register: dotnet_tool_install_result
       changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
       failed_when: false
@@ -240,7 +240,7 @@
       ansible.builtin.command:
         cmd: code --install-extension {{ item }}
       ignore_errors: yes
-      loop: "{{ vscode_extensions }}"
+      loop: "{{ vscode_extensions | default([], true) }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
       loop_control:
@@ -264,7 +264,7 @@
       ansible.builtin.command:
         cmd: cursor --install-extension {{ item }}
       ignore_errors: yes
-      loop: "{{ vscode_extensions }}"
+      loop: "{{ vscode_extensions | default([], true) }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
       when: cursor_cli_check.rc == 0
@@ -310,7 +310,7 @@
       ansible.builtin.shell:
         cmd: "{{ item }}"
         executable: /bin/bash
-      loop: "{{ custom_commands_user | default([]) }}"
+      loop: "{{ custom_commands_user | default([], true) }}"
       register: custom_command_user_result
       changed_when: custom_command_user_result.rc == 0
       ignore_errors: yes
@@ -326,7 +326,7 @@
       ansible.builtin.shell:
         cmd: "{{ item }}"
         executable: /bin/bash
-      loop: "{{ custom_commands_elevated | default([]) }}"
+      loop: "{{ custom_commands_elevated | default([], true) }}"
       register: custom_command_elevated_result
       changed_when: custom_command_elevated_result.rc == 0
       ignore_errors: yes
