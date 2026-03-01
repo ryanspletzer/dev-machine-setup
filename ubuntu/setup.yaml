@@ -5,7 +5,7 @@
 - name: Setup development environment on Ubuntu
   hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
   # Define the become password at the play level so it's available to all tasks
   vars:
     ansible_become_pass: "{{ lookup('env', 'ANSIBLE_SUDO_PASS') }}"
@@ -32,7 +32,7 @@
           exit 0
         fi
       register: wsl_check
-      ignore_errors: yes
+      failed_when: false
       changed_when: false
       tags:
         - system
@@ -80,9 +80,9 @@
     # apt update
     - name: Update APT cache
       ansible.builtin.apt:
-        update_cache: yes
+        update_cache: true
         cache_valid_time: 3600
-      become: yes
+      become: true
       tags:
         - apt
         - update
@@ -90,8 +90,8 @@
     # apt upgrade
     - name: Upgrade all packages
       ansible.builtin.apt:
-        upgrade: yes
-      become: yes
+        upgrade: true
+      become: true
       tags:
         - apt
         - upgrade
@@ -101,7 +101,7 @@
       ansible.builtin.apt:
         name: "{{ apt_packages_prereqs | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages_prereqs | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
         state: present
-      become: yes
+      become: true
       tags:
         - apt
         - prereqs
@@ -121,7 +121,7 @@
       loop_control:
         label: "Adding repository: {{ item.name }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
-      become: yes
+      become: true
       tags:
         - apt
         - repositories
@@ -131,7 +131,7 @@
       ansible.builtin.apt:
         name: "{{ apt_packages | selectattr('supported_architectures', 'undefined') | map(attribute='name') | list + apt_packages | selectattr('supported_architectures', 'defined') | selectattr('supported_architectures', 'contains', deb_architecture) | map(attribute='name') | list }}"
         state: present
-      become: yes
+      become: true
       tags:
         - apt
         - packages
@@ -140,7 +140,7 @@
     - name: Install Snap packages (classic)
       ansible.builtin.command:
         cmd: snap install {{ item.name }} --classic
-      become: yes
+      become: true
       loop: "{{ (snap_packages | default([], true)) | selectattr('classic', 'defined') | selectattr('classic') | list }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       register: snap_classic_result
@@ -156,7 +156,7 @@
     - name: Install Snap packages (regular)
       ansible.builtin.command:
         cmd: snap install {{ item.name }}
-      become: yes
+      become: true
       loop: "{{ (snap_packages | default([], true)) | rejectattr('classic', 'defined') | list + (snap_packages | default([], true)) | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       register: snap_regular_result
@@ -320,7 +320,7 @@
         cmd: uv tool install {{ item }}
       when: uv_check.rc == 0
       loop: "{{ uv_tools | default([], true) }}"
-      ignore_errors: yes
+      failed_when: false
       register: uv_tool_install_result
       changed_when: "'already installed' not in uv_tool_install_result.stderr"
       loop_control:
@@ -441,7 +441,7 @@
         cmd: cursor --install-extension {{ item }}
       environment:
         PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
-      ignore_errors: yes
+      failed_when: false
       loop: "{{ vscode_extensions | default([], true) }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
@@ -499,7 +499,7 @@
     # Custom elevated commands
     - name: Execute custom elevated commands
       ansible.builtin.shell: "{{ item.command }}"
-      become: yes
+      become: true
       loop: "{{ custom_commands_elevated | default([], true) }}"
       loop_control:
         label: "Executing: {{ item.description }}"
