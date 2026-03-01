@@ -33,7 +33,8 @@ Package lists are flat YAML arrays grouped by category:
 - **OS packages**: `homebrew_formulae` / `homebrew_casks` / `choco_packages` /
   `apt_packages` / `snap_packages` / `dnf_packages` / `flatpak_packages` /
   `appimage_packages`
-- **Cross-platform**: `powershell_modules`, `pipx_packages`, `npm_global_packages`, `dotnet_tools`, `vscode_extensions`
+- **Cross-platform**: `powershell_modules`, `pipx_packages`, `uv_tools`,
+  `npm_global_packages`, `dotnet_tools`, `vscode_extensions`
 - **Git config**: `git_user_email`, `git_user_name`
 - **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo)
 - **Custom script**: `custom_script` (path to a script run at the end)
@@ -67,6 +68,12 @@ Package lists are flat YAML arrays grouped by category:
   Cursor is installed this way on Linux; macOS uses Homebrew cask `cursor`,
   Windows uses Chocolatey `cursoride`.
   All platforms reuse the `vscode_extensions` list for Cursor extension installation.
+- **`uv_tools`** installs Python CLI tools via `uv tool install`.
+  On macOS/Windows, `pipx_packages` is empty (uv is available via Homebrew/Chocolatey);
+  on Linux, `pipx_packages` retains only `uv` (pipx bootstraps uv,
+  then uv manages the rest).
+  The uv tools step is guarded on uv being installed --
+  if uv is not on PATH, the step is silently skipped.
 
 ## Running the Setup Scripts
 

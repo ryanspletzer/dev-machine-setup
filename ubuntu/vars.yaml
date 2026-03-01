@@ -295,12 +295,15 @@ powershell_modules:
 
 # pipx modules
 pipx_packages:
+  - uv
+
+# uv tools
+uv_tools:
   - aws-sam-cli
   - cfn-lint
   - poetry
   - ruff
   - taskcat
-  - uv
 
 # npm global packages
 npm_global_packages:

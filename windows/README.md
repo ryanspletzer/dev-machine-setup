@@ -11,6 +11,7 @@ The setup script (`setup.ps1`) automates the installation and configuration of:
 - [PowerShell](https://github.com/PowerShell/PowerShell) modules (via PSResourceGet)
 - Windows PowerShell modules (via PowerShellGet)
 - [pipx](https://pypa.github.io/pipx/) packages (Python tools)
+- [uv](https://docs.astral.sh/uv/) tools (Python CLI tools)
 - [npm](https://www.npmjs.com/) global packages (Node.js tools)
 - [.NET Global Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools) (when .NET SDK is available)
 - [Visual Studio Code](https://code.visualstudio.com/) extensions
@@ -140,10 +141,20 @@ windows_powershell_modules:
 
 ### pipx Packages
 
-Python tools installed in isolated environments:
+Python tools installed in isolated environments
+(empty on Windows; uv is available via Chocolatey):
 
 ```yaml
 pipx_packages:
+```
+
+### uv Tools
+
+Python CLI tools installed via `uv tool install`.
+Skipped if uv is not installed:
+
+```yaml
+uv_tools:
   - cfn-lint
   - poetry
   # etc.

@@ -1,6 +1,6 @@
 ---
 # Ansible playbook for Ubuntu development machine setup
-# Manages APT packages, Snap packages, PowerShell modules, pipx modules, VS Code extensions, and Git configuration
+# Manages APT packages, Snap packages, PowerShell modules, pipx modules, uv tools, VS Code extensions, and Git configuration
 
 - name: Setup development environment on Ubuntu
   hosts: localhost
@@ -117,7 +117,7 @@
         components: "{{ item.components }}"
         architectures: "{{ item.architectures }}"
         state: present
-      loop: "{{ external_apt_repositories }}"
+      loop: "{{ external_apt_repositories | default([], true) }}"
       loop_control:
         label: "Adding repository: {{ item.name }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
@@ -141,7 +141,7 @@
       ansible.builtin.command:
         cmd: snap install {{ item.name }} --classic
       become: yes
-      loop: "{{ snap_packages | selectattr('classic', 'defined') | selectattr('classic') | list }}"
+      loop: "{{ (snap_packages | default([], true)) | selectattr('classic', 'defined') | selectattr('classic') | list }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       register: snap_classic_result
       changed_when: "snap_classic_result.rc == 0 and 'already installed' not in snap_classic_result.stdout"
@@ -157,7 +157,7 @@
       ansible.builtin.command:
         cmd: snap install {{ item.name }}
       become: yes
-      loop: "{{ snap_packages | rejectattr('classic', 'defined') | list + snap_packages | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
+      loop: "{{ (snap_packages | default([], true)) | rejectattr('classic', 'defined') | list + (snap_packages | default([], true)) | selectattr('classic', 'defined') | rejectattr('classic') | list }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       register: snap_regular_result
       changed_when: "snap_regular_result.rc == 0 and 'already installed' not in snap_regular_result.stdout"
@@ -175,7 +175,7 @@
         npm config set prefix ~/.local
       args:
         creates: ~/.local/lib/node_modules
-      when: npm_global_packages | length > 0
+      when: (npm_global_packages | default([], true)) | length > 0
       tags:
         - npm
         - packages
@@ -188,7 +188,7 @@
       register: npm_check_result
       changed_when: false
       failed_when: false
-      loop: "{{ npm_global_packages | default([]) }}"
+      loop: "{{ npm_global_packages | default([], true) }}"
       loop_control:
         label: "Checking npm package: {{ item }}"
       tags:
@@ -200,7 +200,7 @@
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
         npm install -g {{ item.0 }}
-      loop: "{{ npm_global_packages | default([]) | zip(npm_check_result.results) | list }}"
+      loop: "{{ npm_global_packages | default([], true) | zip(npm_check_result.results) | list }}"
       when: "item.1.rc != 0"
       register: npm_install_result
       changed_when: "npm_install_result.rc == 0"
@@ -237,7 +237,7 @@
     - name: Ensure .NET global tools are installed
       ansible.builtin.command:
         cmd: dotnet tool install -g {{ item }}
-      loop: "{{ dotnet_tools | default([]) }}"
+      loop: "{{ dotnet_tools | default([], true) }}"
       register: dotnet_tool_install_result
       changed_when: "'already installed' not in dotnet_tool_install_result.stderr and dotnet_tool_install_result.rc == 0"
       failed_when: false
@@ -281,7 +281,7 @@
         cmd: pwsh -Command "Install-PSResource -Name {{ item }} -TrustRepository"
       environment:
         PATH: "{{ ansible_env.HOME }}/.dotnet/tools:{{ ansible_env.PATH }}"
-      loop: "{{ powershell_modules }}"
+      loop: "{{ powershell_modules | default([], true) }}"
       register: pwsh_install_result
       changed_when: "'is already installed' not in pwsh_install_result.stdout"
       loop_control:
@@ -295,7 +295,7 @@
     - name: Install pipx modules
       ansible.builtin.shell: |
         pipx install {{ item }}
-      loop: "{{ pipx_packages }}"
+      loop: "{{ pipx_packages | default([], true) }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:
@@ -304,11 +304,36 @@
         - pipx
         - modules
 
+    # uv tool setup
+    - name: Check if uv is installed
+      ansible.builtin.command:
+        cmd: which uv
+      register: uv_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - uv
+        - tools
+
+    - name: Install uv tools
+      ansible.builtin.command:
+        cmd: uv tool install {{ item }}
+      when: uv_check.rc == 0
+      loop: "{{ uv_tools | default([], true) }}"
+      ignore_errors: yes
+      register: uv_tool_install_result
+      changed_when: "'already installed' not in uv_tool_install_result.stderr"
+      loop_control:
+        label: "Installing uv tool: {{ item }}"
+      tags:
+        - uv
+        - tools
+
     # VS Code extension setup
     - name: Ensure VS Code extensions are installed
       ansible.builtin.command:
         cmd: code --install-extension {{ item }}
-      loop: "{{ vscode_extensions }}"
+      loop: "{{ vscode_extensions | default([], true) }}"
       register: vscode_ext_result
       changed_when: "'already installed' not in vscode_ext_result.stdout"
       loop_control:
@@ -323,7 +348,7 @@
         path: "{{ appimage_install_dir }}"
         state: directory
         mode: '0755'
-      when: appimage_packages is defined and appimage_packages | length > 0
+      when: (appimage_packages | default([], true)) | length > 0
       tags:
         - appimage
 
@@ -332,7 +357,7 @@
         path: "{{ ansible_env.HOME }}/.local/share/applications"
         state: directory
         mode: '0755'
-      when: appimage_packages is defined and appimage_packages | length > 0
+      when: (appimage_packages | default([], true)) | length > 0
       tags:
         - appimage
 
@@ -340,7 +365,7 @@
       ansible.builtin.stat:
         path: "{{ appimage_install_dir }}/{{ item.name }}.AppImage"
       register: appimage_stat
-      loop: "{{ appimage_packages | default([]) }}"
+      loop: "{{ appimage_packages | default([], true) }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       loop_control:
         label: "Checking AppImage: {{ item.name }}"
@@ -353,7 +378,7 @@
         dest: "{{ appimage_install_dir }}/{{ item.0.name }}.AppImage"
         mode: '0755'
         checksum: "{{ item.0.checksum | default(omit) }}"
-      loop: "{{ appimage_packages | default([]) | zip(appimage_stat.results | default([])) | list }}"
+      loop: "{{ appimage_packages | default([], true) | zip(appimage_stat.results | default([], true)) | list }}"
       when:
         - item.1.stat is defined
         - not item.1.stat.exists
@@ -377,7 +402,7 @@
           MimeType={{ item.mime_types | default('') }}
           Categories={{ item.categories | default('Application;') }}
         mode: '0644'
-      loop: "{{ appimage_packages | default([]) }}"
+      loop: "{{ appimage_packages | default([], true) }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       loop_control:
         label: "Creating desktop entry: {{ item.name }}"
@@ -390,7 +415,7 @@
         dest: "{{ appimage_install_dir }}/{{ item.name }}"
         state: link
         force: true
-      loop: "{{ appimage_packages | default([]) }}"
+      loop: "{{ appimage_packages | default([], true) }}"
       when: item.supported_architectures is not defined or deb_architecture in item.supported_architectures
       loop_control:
         label: "Creating symlink: {{ item.name }}"
@@ -417,7 +442,7 @@
       environment:
         PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
       ignore_errors: yes
-      loop: "{{ vscode_extensions }}"
+      loop: "{{ vscode_extensions | default([], true) }}"
       register: cursor_ext_result
       changed_when: "'already installed' not in cursor_ext_result.stdout"
       when:
@@ -464,7 +489,7 @@
     # Custom user commands
     - name: Execute custom user commands
       ansible.builtin.shell: "{{ item.command }}"
-      loop: "{{ custom_commands_user }}"
+      loop: "{{ custom_commands_user | default([], true) }}"
       loop_control:
         label: "Executing: {{ item.description }}"
       tags:
@@ -475,7 +500,7 @@
     - name: Execute custom elevated commands
       ansible.builtin.shell: "{{ item.command }}"
       become: yes
-      loop: "{{ custom_commands_elevated }}"
+      loop: "{{ custom_commands_elevated | default([], true) }}"
       loop_control:
         label: "Executing: {{ item.description }}"
       tags:

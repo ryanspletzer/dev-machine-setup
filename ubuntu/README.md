@@ -10,7 +10,7 @@ development environment.
 - 📱 **Snap Package Management**: Installs GUI applications via Snap
 - 🐳 **Docker Setup**: Installs Docker and adds the user to the Docker group
 - 🔧 **PowerShell Setup**: Installs PowerShell and modules for development
-- 🐍 **Python Setup**: Installs Python versions via pyenv and pipx modules
+- 🐍 **Python Setup**: Installs Python versions via pyenv, bootstraps uv via pipx, and installs CLI tools via uv
 - 💎 **Ruby Setup**: Installs Ruby via rbenv
 - 🟦 **Node.js Setup**: Installs Node.js and npm global packages
 - 🦀 **Rust Setup**: Installs Rust via rustup
@@ -132,8 +132,12 @@ powershell_modules:
   - AWS.Tools.Common
   - Terminal-Icons
 
-# Python packages via pipx
+# Bootstrap uv via pipx
 pipx_packages:
+  - uv
+
+# Python CLI tools via uv
+uv_tools:
   - poetry
   - black
 
@@ -216,7 +220,8 @@ The playbook uses tags to allow selective execution of tasks:
 - `snap`: Snap package installation
 - `appimage`: AppImage package installation
 - `powershell`: PowerShell installation and module setup
-- `pipx`: Python package installation via pipx
+- `pipx`: Python package installation via pipx (bootstraps uv)
+- `uv`: Python CLI tool installation via uv
 - `npm`: Node.js package installation via npm
 - `dotnet`: .NET SDK and tools installation
 - `vscode`: VS Code extension installation

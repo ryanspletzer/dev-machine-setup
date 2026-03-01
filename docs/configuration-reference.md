@@ -28,8 +28,11 @@ vscode_extensions: []              # List of VS Code extensions
 # PowerShell modules (all platforms)
 powershell_modules: []             # List of PowerShell modules
 
-# Python packages via pipx (all platforms)
-pipx_packages: []                  # List of Python CLI tools
+# Python packages via pipx (bootstraps uv on Linux; empty on macOS/Windows)
+pipx_packages: []                  # List of Python packages
+
+# Python CLI tools via uv (all platforms)
+uv_tools: []                       # List of Python CLI tools
 ```
 
 ## macOS Configuration Reference
@@ -498,21 +501,22 @@ powershell_modules:
   - Microsoft.Graph.Authentication # Microsoft Graph
 ```
 
-### Python Packages (pipx)
+### Python CLI Tools (uv)
 
-Python CLI tools installed via pipx:
+Python CLI tools installed via `uv tool install`.
+On macOS and Windows, uv is available via the system package manager
+(Homebrew/Chocolatey).
+On Linux, pipx bootstraps uv, then uv manages the rest:
 
 ```yaml
-pipx_packages:
+uv_tools:
   # Development tools
   - poetry                       # Dependency management
-  - black                        # Code formatter
-  - flake8                       # Linting
-  - mypy                         # Type checking
+  - ruff                         # Linting and formatting
 
   # AWS tools
   - taskcat                      # CloudFormation testing
-  - awscli-local                 # LocalStack CLI
+  - cfn-lint                     # CloudFormation linting
 
   # DevOps tools
   - ansible                      # Automation (where not system package)

@@ -54,7 +54,7 @@ homebrew_casks:
 
 Additional package managers handle specific ecosystems:
 
-- **pipx**: Python applications and CLI tools
+- **uv**: Python applications and CLI tools (via `uv tool install`)
 - **npm**: Node.js packages and tools
 - **PowerShell Gallery**: PowerShell modules
 - **.NET CLI**: .NET global tools
@@ -86,7 +86,7 @@ choco_packages:
 
 - **PowerShell Gallery**: PowerShell modules (built-in to Windows)
 - **npm**: Node.js packages (installed via Chocolatey)
-- **pipx**: Python tools (installed via Chocolatey)
+- **uv**: Python CLI tools (installed via Chocolatey)
 - **VS Code Marketplace**: Editor extensions
 
 **Why Chocolatey:**
@@ -148,7 +148,8 @@ snap_packages:
 
 #### Specialized Package Managers
 
-- **pipx**: Python applications
+- **pipx**: Bootstraps uv
+- **uv**: Python CLI tools (via `uv tool install`)
 - **PowerShell Gallery**: PowerShell modules (after PowerShell installation)
 - **VS Code Marketplace**: Editor extensions
 
@@ -202,7 +203,8 @@ flatpak_packages:
 
 #### Specialized Package Managers
 
-- **pipx**: Python applications
+- **pipx**: Bootstraps uv
+- **uv**: Python CLI tools (via `uv tool install`)
 - **PowerShell Gallery**: PowerShell modules (after PowerShell installation)
 - **VS Code Marketplace**: Editor extensions
 
@@ -246,7 +248,8 @@ flatpak_packages: []
 
 #### Specialized Package Managers
 
-- **pipx**: Python applications
+- **pipx**: Bootstraps uv
+- **uv**: Python CLI tools (via `uv tool install`)
 - **PowerShell Gallery**: PowerShell modules (after PowerShell installation)
 - **VS Code Marketplace**: Editor extensions
 
@@ -304,7 +307,8 @@ dnf_packages: []         # Fedora system packages
 # Cross-platform sections (consistent naming)
 vscode_extensions: []    # VS Code extensions
 powershell_modules: []   # PowerShell modules
-pipx_packages: []        # Python applications
+pipx_packages: []        # Python applications (bootstraps uv on Linux)
+uv_tools: []             # Python CLI tools (via uv tool install)
 npm_global_packages: []  # Node.js global packages
 ```
 
@@ -347,7 +351,7 @@ npm_global_packages: []  # Node.js global packages
 Packages are installed in dependency order:
 
 1. **System Prerequisites**: Basic system tools and libraries
-2. **Package Managers**: Additional package managers (pipx, npm)
+2. **Package Managers**: Additional package managers (pipx, uv, npm)
 3. **Development Runtimes**: Language runtimes and frameworks
 4. **Development Tools**: IDEs, version control, containers
 5. **Applications**: GUI applications and end-user tools

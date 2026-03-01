@@ -8,10 +8,13 @@ homebrew_casks:
 homebrew_formulae:
   - git-lfs
   - jq
+  - uv
 
 powershell_modules: []
 
 pipx_packages:
+
+uv_tools:
   - ruff
 
 npm_global_packages: []
