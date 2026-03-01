@@ -134,7 +134,7 @@
       ansible.builtin.command:
         cmd: pipx install {{ item }}
       ignore_errors: yes
-      loop: "{{ pipx_packages }}"
+      loop: "{{ pipx_packages | default([]) }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:

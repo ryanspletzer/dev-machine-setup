@@ -8,6 +8,7 @@ homebrew_casks:
 homebrew_formulae:
   - git-lfs
   - jq
+  - uv
 
 powershell_modules: []
 

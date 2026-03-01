@@ -291,7 +291,7 @@
     - name: Install pipx modules
       ansible.builtin.shell: |
         pipx install {{ item }}
-      loop: "{{ pipx_packages }}"
+      loop: "{{ pipx_packages | default([]) }}"
       register: pipx_install_result
       changed_when: "'already installed' not in pipx_install_result.stdout"
       loop_control:
