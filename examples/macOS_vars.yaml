@@ -526,6 +526,9 @@ custom_commands_user:
   # Symlink powershell-style skill into Claude Code skills
   - echo "Linking powershell-style skill..."
   - "mkdir -p ~/.claude/skills && ln -sfn ~/git/powershell-style ~/.claude/skills/powershell-style"
+  # Clone Humanizer Claude Code Skill
+  - echo "Clonging humanizer Claude Code skill..."
+  - "git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer"
   # iTerm2 global preferences (non-default)
   - echo "Configuring iTerm2 preferences..."
   # Disable press-and-hold accent menu (enables key repeat)
