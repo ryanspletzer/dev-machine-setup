@@ -24,7 +24,6 @@ homebrew_casks:
   - comet
   - cursor
   - docker-desktop
-  - dotnet-sdk
   - drawio
   - elgato-camera-hub
   - firefox
@@ -48,7 +47,6 @@ homebrew_casks:
   # Doesn't work without Rosetta 2
   # - parallels
   - obsidian
-  - powershell
   - rectangle-pro
   - steam
   - synologyassistant
@@ -82,6 +80,7 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
+  - dotnet
   - docker-completion
   - elixir
   - emacs
@@ -119,6 +118,7 @@ homebrew_formulae:
   - pinentry-mac
   - pipx
   - pnpm
+  - powershell
   - pyenv-virtualenv
   - python
   - qemu

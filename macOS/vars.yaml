@@ -16,7 +16,6 @@ homebrew_casks:
   - citrix-workspace
   - cursor
   - docker-desktop
-  - dotnet-sdk
   - drawio
   - firefox
   - git-credential-manager
@@ -27,7 +26,6 @@ homebrew_casks:
   - microsoft-office
   - microsoft-remote-desktop
   - microsoft-teams
-  - powershell
   - utm
   - virtualbox
   - visual-studio-code
@@ -50,6 +48,7 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
+  - dotnet
   - ffmpeg
   - fish
   - fzf
@@ -67,6 +66,7 @@ homebrew_formulae:
   - nvm
   - oh-my-posh
   - pipx
+  - powershell
   - pyenv-virtualenv
   - python
   - qemu
