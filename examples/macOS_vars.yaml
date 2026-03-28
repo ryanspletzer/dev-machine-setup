@@ -24,6 +24,7 @@ homebrew_casks:
   - comet
   - cursor
   - docker-desktop
+  - dotnet-sdk
   - drawio
   - elgato-camera-hub
   - firefox
@@ -80,7 +81,6 @@ homebrew_formulae:
   - chruby-fish
   - cmake
   - direnv
-  - dotnet
   - docker-completion
   - elixir
   - emacs
@@ -118,7 +118,6 @@ homebrew_formulae:
   - pinentry-mac
   - pipx
   - pnpm
-  - powershell
   - pyenv-virtualenv
   - python
   - qemu
@@ -182,6 +181,7 @@ npm_global_packages:
 # .NET Global Tools
 dotnet_tools:
   - Amazon.Lambda.Tools
+  - powershell
 
 # VS Code extensions
 # You can list your VS Code extensions with the command:
