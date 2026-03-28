@@ -135,6 +135,7 @@ homebrew_formulae:
   - yamllint
   - ykman
   - yq
+  - weasyprint
   - wget2
   - xh
   - zoxide
