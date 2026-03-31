@@ -22,6 +22,7 @@ homebrew_casks:
   - claude-code
   - citrix-workspace
   - comet
+  - copilot-cli
   - cursor
   - docker-desktop
   - dotnet-sdk
@@ -173,7 +174,6 @@ uv_tools:
 
 npm_global_packages:
   - '@vue/cli'
-  - '@github/copilot'
   - aws-cdk
   - npmrc
   - serverless
