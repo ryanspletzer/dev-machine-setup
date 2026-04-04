@@ -96,6 +96,7 @@ homebrew_formulae:
   - git-delta
   - git-lfs
   - go
+  - golangci-lint
   - hashicorp/tap/packer
   - hashicorp/tap/terraform
   - hashicorp/tap/vault
