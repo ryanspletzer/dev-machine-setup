@@ -237,7 +237,7 @@
     # output (keyed by bare name) rather than the exit code.
     - name: Check which pnpm global packages are already installed
       ansible.builtin.shell: |
-        export PNPM_HOME=~/Library/pnpm
+        export PNPM_HOME=~/.local/share/pnpm
         export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
         pnpm list -g --depth=0 --json
       register: pnpm_list_result
@@ -255,7 +255,7 @@
     # convention in the shell configs, so no pnpm config file is written.
     - name: Ensure pnpm global packages are installed
       ansible.builtin.shell: |
-        export PNPM_HOME=~/Library/pnpm
+        export PNPM_HOME=~/.local/share/pnpm
         export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
         mkdir -p "$PNPM_HOME/bin"
         pnpm add -g {{ item }}

@@ -720,12 +720,14 @@ if ($null -eq $pnpmCmd) {
     # ERR_PNPM_NO_GLOBAL_BIN_DIR. This mirrors the PNPM_HOME + $PNPM_HOME\bin
     # convention in the shell profiles, so no pnpm config file is written.
     if (-not $env:PNPM_HOME) {
-        $env:PNPM_HOME = Join-Path -Path $HOME -ChildPath 'Library/pnpm'
+        $env:PNPM_HOME = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'pnpm'
     }
+
     $pnpmBinDir = Join-Path -Path $env:PNPM_HOME -ChildPath 'bin'
     if (-not (Test-Path -Path $pnpmBinDir)) {
         New-Item -Path $pnpmBinDir -ItemType Directory -Force | Out-Null
     }
+
     if (($env:PATH -split ';') -notcontains $pnpmBinDir) {
         $env:PATH = "$pnpmBinDir;$env:PATH"
     }

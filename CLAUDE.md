@@ -84,9 +84,10 @@ Package lists are flat YAML arrays grouped by category:
   Chocolatey (`pnpm`, `bun`) on Windows,
   and via `npm_global_packages` (`pnpm`, `bun`) on Linux.
   pnpm needs its global bin directory on `PATH`, so the steps export
-  `PNPM_HOME=~/Library/pnpm` and prepend `$PNPM_HOME/bin` (pnpm's default
-  global bin dir) -- matching the shell configs' pnpm convention, so no pnpm
-  config file is written.
+  `PNPM_HOME` (`~/Library/pnpm` on macOS to match the shell configs,
+  `~/.local/share/pnpm` on Linux, `%LOCALAPPDATA%\pnpm` on Windows) and
+  prepend `$PNPM_HOME/bin` (pnpm's default global bin dir), so no pnpm config
+  file is written.
 
 ## Running the Setup Scripts
 
