@@ -254,6 +254,7 @@
         export PNPM_HOME=~/.local/share/pnpm
         export PATH=~/.local/bin:$PNPM_HOME:$PATH
         mkdir -p "$PNPM_HOME"
+        pnpm config set global-bin-dir "$PNPM_HOME"
         pnpm add -g {{ item }}
       loop: "{{ pnpm_global_packages | default([], true) }}"
       when:

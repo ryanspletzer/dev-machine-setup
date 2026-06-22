@@ -724,6 +724,9 @@ if ($null -eq $pnpmCmd) {
     if (($env:PATH -split ';') -notcontains $env:PNPM_HOME) {
         $env:PATH = "$env:PNPM_HOME;$env:PATH"
     }
+    # Pin global-bin-dir to PNPM_HOME so `pnpm add -g` does not error with
+    # ERR_PNPM_NO_GLOBAL_BIN_DIR and binaries land in a known location.
+    pnpm config set global-bin-dir $env:PNPM_HOME | Out-Null
 
     # Get
     Write-Verbose -Message '[Get] pnpm global packages from Vars file import...'

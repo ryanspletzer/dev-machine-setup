@@ -22,7 +22,7 @@ uv_tools:
 npm_global_packages: []
 
 pnpm_global_packages:
-  - cowsay
+  - json
 
 bun_global_packages:
   - cowsay

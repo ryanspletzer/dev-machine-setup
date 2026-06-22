@@ -42,8 +42,8 @@ check "ruff installed (uv tool)" command -v ruff
 check "pnpm installed (Homebrew formula)" command -v pnpm
 check "bun installed (Homebrew formula)" command -v bun
 
-# pnpm + bun global packages
-check "cowsay installed (pnpm global)" test -e "$HOME/Library/pnpm/cowsay"
+# pnpm + bun global packages (distinct packages so each tool is verified independently)
+check "json installed (pnpm global)" test -e "$HOME/Library/pnpm/json"
 check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
 
 # Git config
