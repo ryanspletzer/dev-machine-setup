@@ -1,15 +1,14 @@
 install_rosetta: false
 
-homebrew_taps:
-  - oven-sh/bun
+homebrew_taps: []
 
 homebrew_casks:
   - iterm2
 
 homebrew_formulae:
+  - bun
   - git-lfs
   - jq
-  - oven-sh/bun/bun
   - pnpm
   - uv
 

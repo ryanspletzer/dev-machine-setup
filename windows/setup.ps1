@@ -802,9 +802,9 @@ if ($null -eq $bunCmd) {
 
             # Get
             Write-Verbose -Message "[Get] bun global package: $package"
-            # Strip a trailing @version (but keep a leading scope like @scope/name)
-            $packageName = $package -replace '(?<!^)@[^/]*$', ''
-            $bunPackageInstalled = $bunGlobalPackagesInstalled -match [regex]::Escape($packageName)
+            # Match the full requested spec (incl. any pinned @version) against the
+            # installed list so re-pinning to a different version triggers a reinstall.
+            $bunPackageInstalled = $bunGlobalPackagesInstalled -match [regex]::Escape($package)
 
             # Test
             Write-Verbose -Message "[Test] bun global package: $package"

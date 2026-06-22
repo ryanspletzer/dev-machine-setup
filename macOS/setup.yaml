@@ -275,7 +275,7 @@
       loop: "{{ bun_global_packages | default([], true) }}"
       when:
         - bun_check.rc == 0
-        - item | regex_replace('@[^/]*$', '') not in (bun_list_result.stdout | default(''))
+        - item not in (bun_list_result.stdout | default(''))
       register: bun_install_result
       changed_when: "bun_install_result.rc == 0"
       environment:

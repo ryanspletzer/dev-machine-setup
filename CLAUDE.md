@@ -80,7 +80,7 @@ Package lists are flat YAML arrays grouped by category:
   Like `uv_tools`, both steps are guarded on the tool being installed --
   if `pnpm` / `bun` is not on PATH, the step is silently skipped.
   The binaries are installed as ordinary package-manager entries:
-  Homebrew (`pnpm` formula, `oven-sh/bun` tap + `oven-sh/bun/bun` formula) on macOS,
+  Homebrew (`pnpm`, `bun` formulae) on macOS,
   Chocolatey (`pnpm`, `bun`) on Windows,
   and via `npm_global_packages` (`pnpm`, `bun`) on Linux.
   pnpm requires a global bin directory, so the steps set `PNPM_HOME`
