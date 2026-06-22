@@ -196,6 +196,96 @@
         - npm
         - packages
 
+    # pnpm global package setup
+    - name: Check if pnpm is installed
+      ansible.builtin.command:
+        cmd: which pnpm
+      register: pnpm_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - pnpm
+        - packages
+
+    - name: Check if pnpm packages are already installed
+      ansible.builtin.command:
+        cmd: pnpm list -g {{ item }}
+      register: pnpm_check_result
+      changed_when: false
+      failed_when: false
+      when: pnpm_check.rc == 0
+      loop: "{{ pnpm_global_packages | default([], true) }}"
+      environment:
+        PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
+        PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
+      loop_control:
+        label: "Checking pnpm package: {{ item }}"
+      tags:
+        - pnpm
+        - packages
+
+    - name: Ensure pnpm global packages are installed
+      ansible.builtin.command:
+        cmd: pnpm add -g {{ item.0 }}
+      failed_when: false
+      loop: "{{ pnpm_global_packages | default([], true) | zip(pnpm_check_result.results | default([], true)) | list }}"
+      when:
+        - pnpm_check.rc == 0
+        - item.1.rc is defined
+        - item.1.rc != 0
+      register: pnpm_install_result
+      changed_when: "pnpm_install_result.rc == 0"
+      environment:
+        PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
+        PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
+      loop_control:
+        label: "Installing pnpm package: {{ item.0 }}"
+      tags:
+        - pnpm
+        - packages
+
+    # bun global package setup
+    - name: Check if bun is installed
+      ansible.builtin.command:
+        cmd: which bun
+      register: bun_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - bun
+        - packages
+
+    - name: Check if bun packages are already installed
+      ansible.builtin.command:
+        cmd: bun pm ls -g
+      register: bun_list_result
+      changed_when: false
+      failed_when: false
+      when: bun_check.rc == 0
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.bun/bin:{{ ansible_env.PATH }}"
+      tags:
+        - bun
+        - packages
+
+    - name: Ensure bun global packages are installed
+      ansible.builtin.command:
+        cmd: bun add -g {{ item }}
+      failed_when: false
+      loop: "{{ bun_global_packages | default([], true) }}"
+      when:
+        - bun_check.rc == 0
+        - item | regex_replace('@[^/]*$', '') not in (bun_list_result.stdout | default(''))
+      register: bun_install_result
+      changed_when: "bun_install_result.rc == 0"
+      environment:
+        PATH: "{{ ansible_env.HOME }}/.bun/bin:{{ ansible_env.PATH }}"
+      loop_control:
+        label: "Installing bun package: {{ item }}"
+      tags:
+        - bun
+        - packages
+
     # .NET Global Tools setup
     - name: Check if dotnet is installed
       ansible.builtin.command:

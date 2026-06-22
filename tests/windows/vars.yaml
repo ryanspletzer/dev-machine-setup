@@ -1,7 +1,9 @@
 choco_packages:
+  - name: bun
   - name: git
     parameters: /WindowsTerminal /NoShellIntegration
   - name: jq
+  - name: pnpm
 
 powershell_modules:
   - Pester
@@ -13,6 +15,10 @@ pipx_packages:
 uv_tools:
 
 npm_global_packages: []
+
+pnpm_global_packages:
+
+bun_global_packages:
 
 dotnet_tools: []
 

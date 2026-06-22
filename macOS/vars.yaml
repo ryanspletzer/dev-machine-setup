@@ -11,6 +11,7 @@ homebrew_taps:
   - azure/functions
   - hashicorp/tap
   - microsoft/git
+  - oven-sh/bun
 
 homebrew_casks:
   - citrix-workspace
@@ -65,7 +66,9 @@ homebrew_formulae:
   - node
   - nvm
   - oh-my-posh
+  - oven-sh/bun/bun
   - pipx
+  - pnpm
   - powershell
   - pyenv-virtualenv
   - python
@@ -111,6 +114,12 @@ npm_global_packages:
   - aws-cdk
   - npmrc
   - serverless
+
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
 
 # .NET Global Tools
 dotnet_tools:

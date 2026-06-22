@@ -171,6 +171,26 @@ npm_global_packages:
   # etc.
 ```
 
+### pnpm Global Packages
+
+Packages installed globally with pnpm (installed only if `pnpm` is present):
+
+```yaml
+pnpm_global_packages:
+  - aws-cdk
+  # etc.
+```
+
+### bun Global Packages
+
+Packages installed globally with bun (installed only if `bun` is present):
+
+```yaml
+bun_global_packages:
+  - aws-cdk
+  # etc.
+```
+
 ### .NET Global Tools
 
 .NET global tools to install (requires .NET SDK):

@@ -697,6 +697,138 @@ if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
 
 #endregion Ensure npm global Packages from Vars file are Installed
 
+#region Ensure pnpm global Packages from Vars file are Installed
+
+$step++
+$stepText = 'Ensure pnpm global Packages from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for pnpm global packages to install...'
+
+# Get
+Write-Verbose -Message '[Get] pnpm...'
+$pnpmCmd = Get-Command -Name pnpm -ErrorAction SilentlyContinue
+
+# Test
+Write-Verbose -Message '[Test] pnpm...'
+if ($null -eq $pnpmCmd) {
+    Write-Information -MessageData 'pnpm is not installed, skipping pnpm global package installations.'
+} else {
+    # pnpm requires a configured global bin directory (PNPM_HOME) for `pnpm add -g`.
+    Write-Verbose -Message '[Set] Ensuring PNPM_HOME is configured...'
+    if (-not $env:PNPM_HOME) {
+        $env:PNPM_HOME = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'pnpm'
+    }
+    if (-not (Test-Path -Path $env:PNPM_HOME)) {
+        New-Item -Path $env:PNPM_HOME -ItemType Directory -Force | Out-Null
+    }
+    if (($env:PATH -split ';') -notcontains $env:PNPM_HOME) {
+        $env:PATH = "$env:PNPM_HOME;$env:PATH"
+    }
+
+    # Get
+    Write-Verbose -Message '[Get] pnpm global packages from Vars file import...'
+    $pnpmGlobalPackages = $vars.pnpm_global_packages
+
+    # Test
+    Write-Verbose -Message '[Test] pnpm global packages from Vars file import...'
+    if ($pnpmGlobalPackages -and $pnpmGlobalPackages.Count -gt 0) {
+        # Get the list of currently installed pnpm global packages
+        Write-Verbose -Message '[Get] Currently installed pnpm global packages...'
+        $pnpmGlobalPackagesInstalled = pnpm list -g --depth=0 --json | ConvertFrom-Json
+        foreach ($package in $pnpmGlobalPackages) {
+            Write-Progress -Activity $activity -Status (
+                & $StatusBlock
+            ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
+            Write-Information -MessageData "Checking for pnpm global package $package..."
+
+            # Get
+            Write-Verbose -Message "[Get] pnpm global package: $package"
+            $pnpmPackageInstalled = $pnpmGlobalPackagesInstalled.dependencies.$package
+
+            # Test
+            Write-Verbose -Message "[Test] pnpm global package: $package"
+            if (-not $pnpmPackageInstalled) {
+                # Set
+                Write-Verbose -Message "[Set] pnpm global package $package is not installed, installing..."
+                try {
+                    pnpm add -g $package
+                    Write-Verbose -Message "[Set] pnpm global package $package is now installed."
+                    Write-Information -MessageData "Installed pnpm global package: $package."
+                } catch {
+                    Write-Error -Message "Failed to install pnpm global package: $package. Error: $_"
+                }
+            } else {
+                Write-Information -MessageData "pnpm global package $package is already installed."
+            }
+        }
+    } else {
+        Write-Information -MessageData 'No pnpm global packages specified in vars.yaml file.'
+    }
+}
+
+#endregion Ensure pnpm global Packages from Vars file are Installed
+
+#region Ensure bun global Packages from Vars file are Installed
+
+$step++
+$stepText = 'Ensure bun global Packages from Vars file are Installed'
+Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Information -MessageData 'Checking for bun global packages to install...'
+
+# Get
+Write-Verbose -Message '[Get] bun...'
+$bunCmd = Get-Command -Name bun -ErrorAction SilentlyContinue
+
+# Test
+Write-Verbose -Message '[Test] bun...'
+if ($null -eq $bunCmd) {
+    Write-Information -MessageData 'bun is not installed, skipping bun global package installations.'
+} else {
+    # Get
+    Write-Verbose -Message '[Get] bun global packages from Vars file import...'
+    $bunGlobalPackages = $vars.bun_global_packages
+
+    # Test
+    Write-Verbose -Message '[Test] bun global packages from Vars file import...'
+    if ($bunGlobalPackages -and $bunGlobalPackages.Count -gt 0) {
+        # Get the list of currently installed bun global packages
+        Write-Verbose -Message '[Get] Currently installed bun global packages...'
+        $bunGlobalPackagesInstalled = bun pm ls -g 2>$null | Out-String
+        foreach ($package in $bunGlobalPackages) {
+            Write-Progress -Activity $activity -Status (
+                & $StatusBlock
+            ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
+            Write-Information -MessageData "Checking for bun global package $package..."
+
+            # Get
+            Write-Verbose -Message "[Get] bun global package: $package"
+            # Strip a trailing @version (but keep a leading scope like @scope/name)
+            $packageName = $package -replace '(?<!^)@[^/]*$', ''
+            $bunPackageInstalled = $bunGlobalPackagesInstalled -match [regex]::Escape($packageName)
+
+            # Test
+            Write-Verbose -Message "[Test] bun global package: $package"
+            if (-not $bunPackageInstalled) {
+                # Set
+                Write-Verbose -Message "[Set] bun global package $package is not installed, installing..."
+                try {
+                    bun add -g $package
+                    Write-Verbose -Message "[Set] bun global package $package is now installed."
+                    Write-Information -MessageData "Installed bun global package: $package."
+                } catch {
+                    Write-Error -Message "Failed to install bun global package: $package. Error: $_"
+                }
+            } else {
+                Write-Information -MessageData "bun global package $package is already installed."
+            }
+        }
+    } else {
+        Write-Information -MessageData 'No bun global packages specified in vars.yaml file.'
+    }
+}
+
+#endregion Ensure bun global Packages from Vars file are Installed
+
 #region Ensure .NET Global Tools from Vars file are Installed
 
 $step++

@@ -37,6 +37,10 @@ check "git installed (DNF package)" command -v git
 check "git-lfs installed (DNF package)" command -v git-lfs
 check "jq installed (DNF package)" command -v jq
 
+# pnpm + bun (installed via npm into ~/.local/bin)
+check "bun installed (npm global)" test -x "$HOME/.local/bin/bun"
+check "pnpm installed (npm global)" test -x "$HOME/.local/bin/pnpm"
+
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"

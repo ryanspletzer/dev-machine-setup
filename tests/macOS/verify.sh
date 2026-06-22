@@ -38,6 +38,14 @@ check "iTerm2 installed (Homebrew cask)" test -d /Applications/iTerm.app
 # uv tool
 check "ruff installed (uv tool)" command -v ruff
 
+# pnpm + bun (Homebrew formulae)
+check "pnpm installed (Homebrew formula)" command -v pnpm
+check "bun installed (Homebrew formula)" command -v bun
+
+# pnpm + bun global packages
+check "cowsay installed (pnpm global)" test -e "$HOME/Library/pnpm/cowsay"
+check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
+
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"

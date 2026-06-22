@@ -13,6 +13,7 @@ choco_packages:
   - name: azure-cli
   - name: azure-functions-core-tools
   - name: bicep
+  - name: bun
   - name: cascadiacode
   - name: citrix-workspace
   - name: cursoride
@@ -48,6 +49,7 @@ choco_packages:
   - name: office365business
   - name: oh-my-posh
   - name: packer
+  - name: pnpm
   # Required to for pipx_packages
   - name: python
   - name: pwsh
@@ -131,6 +133,12 @@ npm_global_packages:
   - aws-cdk
   - npmrc
   - serverless
+
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
 
 # .NET Global Tools
 dotnet_tools:

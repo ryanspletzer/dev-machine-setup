@@ -355,8 +355,16 @@ npm_global_packages:
   - '@vue/cli'
   - aws-cdk
   - azure-functions-core-tools@4
+  - bun
   - npmrc
+  - pnpm
   - serverless
+
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
 
 # .NET Global Tools
 dotnet_tools:

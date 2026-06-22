@@ -1,6 +1,7 @@
 install_rosetta: false
 
-homebrew_taps: []
+homebrew_taps:
+  - oven-sh/bun
 
 homebrew_casks:
   - iterm2
@@ -8,6 +9,8 @@ homebrew_casks:
 homebrew_formulae:
   - git-lfs
   - jq
+  - oven-sh/bun/bun
+  - pnpm
   - uv
 
 powershell_modules: []
@@ -18,6 +21,12 @@ uv_tools:
   - ruff
 
 npm_global_packages: []
+
+pnpm_global_packages:
+  - cowsay
+
+bun_global_packages:
+  - cowsay
 
 dotnet_tools: []
 

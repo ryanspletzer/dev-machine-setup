@@ -12,7 +12,7 @@ development environment.
 - 🔧 **PowerShell Setup**: Installs PowerShell and modules for development
 - 🐍 **Python Setup**: Installs Python versions via pyenv, bootstraps uv via pipx, and installs CLI tools via uv
 - 💎 **Ruby Setup**: Installs Ruby via rbenv
-- 🟦 **Node.js Setup**: Installs Node.js and npm global packages
+- 🟦 **Node.js Setup**: Installs Node.js and npm/pnpm/bun global packages
 - 🦀 **Rust Setup**: Installs Rust via rustup
 - ⚡ **Go Setup**: Installs Go
 - 🔷 **.NET Setup**: Installs .NET SDK and global tools
