@@ -237,8 +237,8 @@
     # output (keyed by bare name) rather than the exit code.
     - name: Check which pnpm global packages are already installed
       ansible.builtin.shell: |
-        export PNPM_HOME=~/.local/share/pnpm
-        export PATH=~/.local/bin:$PNPM_HOME:$PATH
+        export PNPM_HOME=~/Library/pnpm
+        export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
         pnpm list -g --depth=0 --json
       register: pnpm_list_result
       changed_when: false
@@ -249,12 +249,15 @@
         - packages
 
     # pnpm global package installs
+    # pnpm installs global binaries into its global bin dir ($PNPM_HOME/bin,
+    # pnpm's default), which must exist and be on PATH or it errors with
+    # ERR_PNPM_NO_GLOBAL_BIN_DIR. This mirrors the PNPM_HOME + $PNPM_HOME/bin
+    # convention in the shell configs, so no pnpm config file is written.
     - name: Ensure pnpm global packages are installed
       ansible.builtin.shell: |
-        export PNPM_HOME=~/.local/share/pnpm
-        export PATH=~/.local/bin:$PNPM_HOME:$PATH
-        mkdir -p "$PNPM_HOME"
-        pnpm config set global-bin-dir "$PNPM_HOME"
+        export PNPM_HOME=~/Library/pnpm
+        export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
+        mkdir -p "$PNPM_HOME/bin"
         pnpm add -g {{ item }}
       loop: "{{ pnpm_global_packages | default([], true) }}"
       when:

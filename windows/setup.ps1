@@ -715,18 +715,20 @@ if ($null -eq $pnpmCmd) {
 } else {
     # pnpm requires a configured global bin directory (PNPM_HOME) for `pnpm add -g`.
     Write-Verbose -Message '[Set] Ensuring PNPM_HOME is configured...'
+    # pnpm installs global binaries into its global bin dir ($PNPM_HOME\bin,
+    # pnpm's default), which must exist and be on PATH or it errors with
+    # ERR_PNPM_NO_GLOBAL_BIN_DIR. This mirrors the PNPM_HOME + $PNPM_HOME\bin
+    # convention in the shell profiles, so no pnpm config file is written.
     if (-not $env:PNPM_HOME) {
-        $env:PNPM_HOME = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'pnpm'
+        $env:PNPM_HOME = Join-Path -Path $HOME -ChildPath 'Library/pnpm'
     }
-    if (-not (Test-Path -Path $env:PNPM_HOME)) {
-        New-Item -Path $env:PNPM_HOME -ItemType Directory -Force | Out-Null
+    $pnpmBinDir = Join-Path -Path $env:PNPM_HOME -ChildPath 'bin'
+    if (-not (Test-Path -Path $pnpmBinDir)) {
+        New-Item -Path $pnpmBinDir -ItemType Directory -Force | Out-Null
     }
-    if (($env:PATH -split ';') -notcontains $env:PNPM_HOME) {
-        $env:PATH = "$env:PNPM_HOME;$env:PATH"
+    if (($env:PATH -split ';') -notcontains $pnpmBinDir) {
+        $env:PATH = "$pnpmBinDir;$env:PATH"
     }
-    # Pin global-bin-dir to PNPM_HOME so `pnpm add -g` does not error with
-    # ERR_PNPM_NO_GLOBAL_BIN_DIR and binaries land in a known location.
-    pnpm config set global-bin-dir $env:PNPM_HOME | Out-Null
 
     # Get
     Write-Verbose -Message '[Get] pnpm global packages from Vars file import...'

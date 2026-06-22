@@ -218,20 +218,20 @@
       when: pnpm_check.rc == 0
       environment:
         PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
-        PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
+        PATH: "{{ ansible_env.HOME }}/Library/pnpm/bin:{{ ansible_env.PATH }}"
       tags:
         - pnpm
         - packages
 
-    # pnpm add -g needs its global bin dir configured and on PATH, otherwise it
-    # errors with ERR_PNPM_NO_GLOBAL_BIN_DIR. Pin global-bin-dir to PNPM_HOME so
-    # installed binaries land directly in ~/Library/pnpm.
+    # pnpm installs global binaries into its global bin dir ($PNPM_HOME/bin,
+    # pnpm's default), which must exist and be on PATH or it errors with
+    # ERR_PNPM_NO_GLOBAL_BIN_DIR. This mirrors the PNPM_HOME + $PNPM_HOME/bin
+    # convention in the shell configs, so no pnpm config file is written.
     - name: Ensure pnpm global packages are installed
       ansible.builtin.shell: |
         export PNPM_HOME="$HOME/Library/pnpm"
-        export PATH="$PNPM_HOME:$PATH"
-        mkdir -p "$PNPM_HOME"
-        pnpm config set global-bin-dir "$PNPM_HOME"
+        export PATH="$PNPM_HOME/bin:$PATH"
+        mkdir -p "$PNPM_HOME/bin"
         pnpm add -g {{ item }}
       failed_when: false
       loop: "{{ pnpm_global_packages | default([], true) }}"

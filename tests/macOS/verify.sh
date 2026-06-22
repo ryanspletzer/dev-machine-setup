@@ -43,7 +43,7 @@ check "pnpm installed (Homebrew formula)" command -v pnpm
 check "bun installed (Homebrew formula)" command -v bun
 
 # pnpm + bun global packages (distinct packages so each tool is verified independently)
-check "json installed (pnpm global)" test -e "$HOME/Library/pnpm/json"
+check "json installed (pnpm global)" test -e "$HOME/Library/pnpm/bin/json"
 check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
 
 # Git config
