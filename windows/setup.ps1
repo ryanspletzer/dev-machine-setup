@@ -732,9 +732,12 @@ if ($null -eq $pnpmCmd) {
     # Test
     Write-Verbose -Message '[Test] pnpm global packages from Vars file import...'
     if ($pnpmGlobalPackages -and $pnpmGlobalPackages.Count -gt 0) {
-        # Get the list of currently installed pnpm global packages
+        # Get the list of currently installed pnpm global packages.
+        # pnpm list -g --json returns an array of global store objects; collect
+        # the installed dependency names (keyed by bare name, without @version).
         Write-Verbose -Message '[Get] Currently installed pnpm global packages...'
-        $pnpmGlobalPackagesInstalled = pnpm list -g --depth=0 --json | ConvertFrom-Json
+        $pnpmInstalledNames = @(pnpm list -g --depth=0 --json | ConvertFrom-Json) |
+            ForEach-Object -Process { $_.dependencies.PSObject.Properties.Name }
         foreach ($package in $pnpmGlobalPackages) {
             Write-Progress -Activity $activity -Status (
                 & $StatusBlock
@@ -743,7 +746,9 @@ if ($null -eq $pnpmCmd) {
 
             # Get
             Write-Verbose -Message "[Get] pnpm global package: $package"
-            $pnpmPackageInstalled = $pnpmGlobalPackagesInstalled.dependencies.$package
+            # A version-pinned spec (name@version) won't exact-match a bare name,
+            # so it is (re)installed to honor the pin; unpinned names are skipped.
+            $pnpmPackageInstalled = $pnpmInstalledNames -contains $package
 
             # Test
             Write-Verbose -Message "[Test] pnpm global package: $package"

@@ -207,39 +207,37 @@
         - pnpm
         - packages
 
-    - name: Check if pnpm packages are already installed
+    # pnpm list -g always exits 0, so detect installed packages from the JSON
+    # output (keyed by bare name) rather than the exit code.
+    - name: Check which pnpm global packages are already installed
       ansible.builtin.command:
-        cmd: pnpm list -g {{ item }}
-      register: pnpm_check_result
+        cmd: pnpm list -g --depth=0 --json
+      register: pnpm_list_result
       changed_when: false
       failed_when: false
       when: pnpm_check.rc == 0
-      loop: "{{ pnpm_global_packages | default([], true) }}"
       environment:
         PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
         PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
-      loop_control:
-        label: "Checking pnpm package: {{ item }}"
       tags:
         - pnpm
         - packages
 
     - name: Ensure pnpm global packages are installed
       ansible.builtin.command:
-        cmd: pnpm add -g {{ item.0 }}
+        cmd: pnpm add -g {{ item }}
       failed_when: false
-      loop: "{{ pnpm_global_packages | default([], true) | zip(pnpm_check_result.results | default([], true)) | list }}"
+      loop: "{{ pnpm_global_packages | default([], true) }}"
       when:
         - pnpm_check.rc == 0
-        - item.1.rc is defined
-        - item.1.rc != 0
+        - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies') | map('list') | flatten)
       register: pnpm_install_result
       changed_when: "pnpm_install_result.rc == 0"
       environment:
         PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
         PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
       loop_control:
-        label: "Installing pnpm package: {{ item.0 }}"
+        label: "Installing pnpm package: {{ item }}"
       tags:
         - pnpm
         - packages
