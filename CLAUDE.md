@@ -34,7 +34,8 @@ Package lists are flat YAML arrays grouped by category:
   `apt_packages` / `snap_packages` / `dnf_packages` / `flatpak_packages` /
   `appimage_packages`
 - **Cross-platform**: `powershell_modules`, `pipx_packages`, `uv_tools`,
-  `npm_global_packages`, `dotnet_tools`, `vscode_extensions`
+  `npm_global_packages`, `pnpm_global_packages`, `bun_global_packages`,
+  `dotnet_tools`, `vscode_extensions`
 - **Git config**: `git_user_email`, `git_user_name`
 - **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo)
 - **Custom script**: `custom_script` (path to a script run at the end)
@@ -74,6 +75,19 @@ Package lists are flat YAML arrays grouped by category:
   then uv manages the rest).
   The uv tools step is guarded on uv being installed --
   if uv is not on PATH, the step is silently skipped.
+- **`pnpm_global_packages`** / **`bun_global_packages`** install global CLI tools
+  via `pnpm add -g` / `bun add -g`.
+  Like `uv_tools`, both steps are guarded on the tool being installed --
+  if `pnpm` / `bun` is not on PATH, the step is silently skipped.
+  The binaries are installed as ordinary package-manager entries:
+  Homebrew (`pnpm`, `bun` formulae) on macOS,
+  Chocolatey (`pnpm`, `bun`) on Windows,
+  and via `npm_global_packages` (`pnpm`, `bun`) on Linux.
+  pnpm needs its global bin directory on `PATH`, so the steps export
+  `PNPM_HOME` (`~/Library/pnpm` on macOS to match the shell configs,
+  `~/.local/share/pnpm` on Linux, `%LOCALAPPDATA%\pnpm` on Windows) and
+  prepend `$PNPM_HOME/bin` (pnpm's default global bin dir), so no pnpm config
+  file is written.
 
 ## Running the Setup Scripts
 

@@ -10,6 +10,8 @@ apt_packages:
   - name: git
   - name: git-lfs
   - name: jq
+  - name: nodejs
+  - name: npm
 
 snap_packages: []
 
@@ -19,7 +21,13 @@ pipx_packages:
 
 uv_tools:
 
-npm_global_packages: []
+npm_global_packages:
+  - bun
+  - pnpm
+
+pnpm_global_packages:
+
+bun_global_packages:
 
 dotnet_tools: []
 

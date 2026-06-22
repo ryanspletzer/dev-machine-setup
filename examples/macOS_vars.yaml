@@ -11,7 +11,6 @@ homebrew_taps:
   - azure/functions
   - hashicorp/tap
   - microsoft/git
-  - oven-sh/bun
   - teamookla/speedtest
 
 homebrew_casks:
@@ -77,6 +76,7 @@ homebrew_formulae:
   - bat
   - beads
   - bicep
+  - bun
   - cfn-lint
   - chruby
   - chruby-fish
@@ -115,7 +115,6 @@ homebrew_formulae:
   - node
   - nvm
   - oh-my-posh
-  - oven-sh/bun/bun
   - pandoc
   - pinentry-mac
   - pipx
@@ -174,6 +173,12 @@ uv_tools:
   - taskcat
 
 npm_global_packages:
+
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
   - '@vue/cli'
   - aws-cdk
   - npmrc

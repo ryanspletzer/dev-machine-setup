@@ -38,6 +38,8 @@ function Test-Equal {
 # Chocolatey packages
 Test-Check "jq installed (Chocolatey package)" { Get-Command jq -ErrorAction Stop }
 Test-Check "git installed (Chocolatey package)" { Get-Command git -ErrorAction Stop }
+Test-Check "bun installed (Chocolatey package)" { Get-Command bun -ErrorAction Stop }
+Test-Check "pnpm installed (Chocolatey package)" { Get-Command pnpm -ErrorAction Stop }
 
 # PowerShell module
 Test-Check "Pester installed (PowerShell module)" {

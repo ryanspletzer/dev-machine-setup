@@ -43,6 +43,7 @@ homebrew_formulae:
   - bash
   - bash-git-prompt
   - bicep
+  - bun
   - cfn-lint
   - chruby
   - chruby-fish
@@ -66,6 +67,7 @@ homebrew_formulae:
   - nvm
   - oh-my-posh
   - pipx
+  - pnpm
   - powershell
   - pyenv-virtualenv
   - python
@@ -111,6 +113,12 @@ npm_global_packages:
   - aws-cdk
   - npmrc
   - serverless
+
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
 
 # .NET Global Tools
 dotnet_tools:

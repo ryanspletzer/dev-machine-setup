@@ -229,6 +229,99 @@
         - npm
         - packages
 
+    # pnpm presence check
+    - name: Check if pnpm is installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        which pnpm
+      register: pnpm_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - pnpm
+        - packages
+
+    # pnpm global package list
+    # pnpm list -g always exits 0, so detect installed packages from the JSON
+    # output (keyed by bare name) rather than the exit code.
+    - name: Check which pnpm global packages are already installed
+      ansible.builtin.shell: |
+        export PNPM_HOME=~/.local/share/pnpm
+        export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
+        pnpm list -g --depth=0 --json
+      register: pnpm_list_result
+      changed_when: false
+      failed_when: false
+      when: pnpm_check.rc == 0
+      tags:
+        - pnpm
+        - packages
+
+    # pnpm global package installs
+    # pnpm installs global binaries into its global bin dir ($PNPM_HOME/bin,
+    # pnpm's default), which must exist and be on PATH or it errors with
+    # ERR_PNPM_NO_GLOBAL_BIN_DIR. This mirrors the PNPM_HOME + $PNPM_HOME/bin
+    # convention in the shell configs, so no pnpm config file is written.
+    - name: Ensure pnpm global packages are installed
+      ansible.builtin.shell: |
+        export PNPM_HOME=~/.local/share/pnpm
+        export PATH=~/.local/bin:$PNPM_HOME/bin:$PATH
+        mkdir -p "$PNPM_HOME/bin"
+        pnpm add -g {{ item }}
+      loop: "{{ pnpm_global_packages | default([], true) }}"
+      when:
+        - pnpm_check.rc == 0
+        - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies') | map('list') | flatten)
+      register: pnpm_install_result
+      changed_when: "pnpm_install_result.rc == 0"
+      loop_control:
+        label: "Installing pnpm package: {{ item }}"
+      tags:
+        - pnpm
+        - packages
+
+    # bun presence check
+    - name: Check if bun is installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:$PATH
+        which bun
+      register: bun_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - bun
+        - packages
+
+    # bun global package list
+    - name: Check if bun packages are already installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:~/.bun/bin:$PATH
+        bun pm ls -g
+      register: bun_list_result
+      changed_when: false
+      failed_when: false
+      when: bun_check.rc == 0
+      tags:
+        - bun
+        - packages
+
+    # bun global package installs
+    - name: Ensure bun global packages are installed
+      ansible.builtin.shell: |
+        export PATH=~/.local/bin:~/.bun/bin:$PATH
+        bun add -g {{ item }}
+      loop: "{{ bun_global_packages | default([], true) }}"
+      when:
+        - bun_check.rc == 0
+        - item not in (bun_list_result.stdout | default(''))
+      register: bun_install_result
+      changed_when: "bun_install_result.rc == 0"
+      loop_control:
+        label: "Installing bun package: {{ item }}"
+      tags:
+        - bun
+        - packages
+
     # .NET Install check
     - name: Check if dotnet is installed
       ansible.builtin.command:

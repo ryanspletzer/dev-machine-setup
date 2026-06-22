@@ -9,7 +9,7 @@ development environment.
 - **APT Package Management**: Installs essential development tools and applications
 - **Flatpak Package Management**: Installs GUI applications via Flatpak
 - **Python Setup**: Bootstraps uv via pipx and installs Python CLI tools via uv
-- **Node.js Setup**: Installs npm global packages
+- **Node.js Setup**: Installs npm/pnpm/bun global packages
 - **VS Code Extensions**: Configures VS Code with essential development extensions
 - **Git Setup**: Configures Git with user information, Git LFS, and Git Credential Manager
 - **AppImage Support**: Installs applications via AppImage with desktop integration

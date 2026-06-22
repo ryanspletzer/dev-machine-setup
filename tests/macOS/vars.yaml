@@ -6,8 +6,10 @@ homebrew_casks:
   - iterm2
 
 homebrew_formulae:
+  - bun
   - git-lfs
   - jq
+  - pnpm
   - uv
 
 powershell_modules: []
@@ -18,6 +20,12 @@ uv_tools:
   - ruff
 
 npm_global_packages: []
+
+pnpm_global_packages:
+  - json
+
+bun_global_packages:
+  - cowsay
 
 dotnet_tools: []
 

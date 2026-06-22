@@ -145,6 +145,14 @@ npm_global_packages:
   - aws-cdk
   - npmrc
 
+# pnpm global packages (installed only if pnpm is present)
+pnpm_global_packages:
+  - aws-cdk
+
+# bun global packages (installed only if bun is present)
+bun_global_packages:
+  - aws-cdk
+
 # .NET global tools (requires .NET SDK)
 dotnet_tools:
   - Amazon.Lambda.Tools
