@@ -70,9 +70,11 @@ homebrew_formulae:
   - awscli
   - azure-cli
   - azure-functions-core-tools@4
+  - basedpyright
   - bash
   - bash-git-prompt
   - bash-completion
+  - bash-language-server
   - bat
   - beads
   - bicep
@@ -83,6 +85,7 @@ homebrew_formulae:
   - cmake
   - direnv
   - docker-completion
+  - dockerfile-language-server
   - elixir
   - emacs
   - eza
@@ -97,6 +100,7 @@ homebrew_formulae:
   - git-lfs
   - go
   - golangci-lint
+  - gopls
   - hashicorp/tap/packer
   - hashicorp/tap/terraform
   - hashicorp/tap/vault
@@ -105,8 +109,10 @@ homebrew_formulae:
   - jq
   - kubernetes-cli
   - lazygit
+  - lua-language-server
   - markdownlint-cli
   - markdownlint-cli2
+  - marksman
   - mas
   - maven
   - mcp-inspector
@@ -119,20 +125,27 @@ homebrew_formulae:
   - pinentry-mac
   - pipx
   - pnpm
+  - prettier
   - pyenv-virtualenv
   - python
   - qemu
   - rip2
   - ripgrep
   - ruby-install
+  - ruby-lsp
   - ruff
+  - rust-analyzer
   - rustup
+  - taplo
   - tdd-guard
   - teamookla/speedtest/speedtest
   - tlrc
   - tmux
   - tree-sitter-cli
+  - typescript-language-server
   - uv
+  - vscode-langservers-extracted
+  - yaml-language-server
   - yamllint
   - ykman
   - yq
@@ -188,6 +201,7 @@ bun_global_packages:
 # .NET Global Tools
 dotnet_tools:
   - Amazon.Lambda.Tools
+  - csharp-ls
   - powershell
 
 # VS Code extensions
@@ -495,6 +509,9 @@ custom_commands_user:
   # Rustup init
   - echo "Initializing Rust toolchain..."
   - rustup-init -y
+  # Install emacs-lsp-booster (speeds up Emacs eglot LSP responses)
+  - echo "Installing emacs-lsp-booster via cargo..."
+  - ~/.cargo/bin/cargo install emacs-lsp-booster
   # Ruby Install for Jekyll
   - echo "Installing Ruby 3.4.1 via ruby-install..."
   - ruby-install ruby 3.4.1
