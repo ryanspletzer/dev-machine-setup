@@ -43,8 +43,10 @@ jobs:
       fedora: ${{ steps.filter.outputs.fedora }}
       debian: ${{ steps.filter.outputs.debian }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 # v3.0.3
         id: filter
         with:
           filters: |
@@ -72,14 +74,16 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Install validation tools
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
-      - uses: astral-sh/setup-uv@v8
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
         id: setup-uv
         with:
           enable-cache: true
@@ -131,7 +135,9 @@ jobs:
     if: needs.detect-changes.outputs.macos == 'true'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Copy test fixtures
         run: cp tests/macOS/vars.yaml macOS/vars.yaml
@@ -152,7 +158,9 @@ jobs:
     if: needs.detect-changes.outputs.ubuntu == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Copy test fixtures
         run: cp tests/ubuntu/vars.yaml ubuntu/vars.yaml
@@ -174,7 +182,9 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:43
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Install container prerequisites
         run: dnf install -y sudo findutils
@@ -199,7 +209,9 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:13
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Install container prerequisites
         run: apt-get update && apt-get install -y sudo findutils
@@ -223,7 +235,9 @@ jobs:
     if: needs.detect-changes.outputs.windows == 'true'
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Copy test fixtures
         run: Copy-Item tests/windows/vars.yaml windows/vars.yaml
