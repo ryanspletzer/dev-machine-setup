@@ -420,8 +420,10 @@ $nuGetPackageProvider = powershell -Command {
 }
 
 # Get-PackageProvider -ListAvailable can return multiple versions; take the highest.
+# The provider comes from a child powershell.exe, so Version is a deserialized
+# property bag — cast via its string form, not the object itself.
 $nuGetProviderVersion = $nuGetPackageProvider |
-    ForEach-Object -Process { [version]$_.Version } |
+    ForEach-Object -Process { [version]"$($_.Version)" } |
     Sort-Object -Descending |
     Select-Object -First 1
 
