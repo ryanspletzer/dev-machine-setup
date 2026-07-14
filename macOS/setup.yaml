@@ -166,7 +166,7 @@
     # npm global package setup
     - name: Check if npm packages are already installed
       ansible.builtin.command:
-        cmd: npm list -g {{ item }}
+        cmd: npm list -g --depth=0 {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false

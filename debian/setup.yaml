@@ -204,7 +204,7 @@
     - name: Check if npm packages are already installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        npm list -g {{ item }}
+        npm list -g --depth=0 {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -234,7 +234,7 @@
     - name: Check if pnpm is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which pnpm
+        command -v pnpm
       register: pnpm_check
       changed_when: false
       failed_when: false
@@ -285,7 +285,7 @@
     - name: Check if bun is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which bun
+        command -v bun
       register: bun_check
       changed_when: false
       failed_when: false
@@ -422,7 +422,7 @@
     - name: Check if uv is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which uv
+        command -v uv
       register: uv_check
       changed_when: false
       failed_when: false
@@ -540,9 +540,8 @@
         - appimage
 
     # Cursor extension setup
-    - name: Check if Cursor CLI is available
-      ansible.builtin.command:
-        cmd: which cursor
+    - name: Check if Cursor CLI is available # noqa: command-instead-of-shell (command -v is a shell builtin)
+      ansible.builtin.shell: command -v cursor
       environment:
         PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
       register: cursor_cli_check
