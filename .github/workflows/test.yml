@@ -21,17 +21,10 @@ on:
       - ".github/workflows/**"
       - ".yamllint.yaml"
       - ".ansible-lint"
+  # No paths filter on pull_request: required status checks deadlock as
+  # "Expected" when the workflow never triggers, so validate must run on
+  # every PR. Integration jobs still skip via detect-changes.
   pull_request:
-    paths:
-      - "macOS/**"
-      - "ubuntu/**"
-      - "windows/**"
-      - "fedora/**"
-      - "debian/**"
-      - "tests/**"
-      - ".github/workflows/**"
-      - ".yamllint.yaml"
-      - ".ansible-lint"
 
 jobs:
   detect-changes:
