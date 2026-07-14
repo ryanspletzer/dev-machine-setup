@@ -93,26 +93,31 @@ Package lists are flat YAML arrays grouped by category:
 
 ```bash
 # macOS
-chmod 700 ./macOS/setup.sh
-./macOS/setup.sh -e your.email@example.com
+cd macOS
+chmod 700 ./setup.sh
+./setup.sh -e your.email@example.com
 
 # Ubuntu
-chmod 700 ./ubuntu/setup.sh
-./ubuntu/setup.sh -e your.email@example.com
+cd ubuntu
+chmod 700 ./setup.sh
+./setup.sh -e your.email@example.com
 
 # Debian
-chmod 700 ./debian/setup.sh
-./debian/setup.sh -e your.email@example.com
+cd debian
+chmod 700 ./setup.sh
+./setup.sh -e your.email@example.com
 
 # Fedora
-chmod 700 ./fedora/setup.sh
-./fedora/setup.sh -e your.email@example.com
+cd fedora
+chmod 700 ./setup.sh
+./setup.sh -e your.email@example.com
 ```
 
 ```powershell
 # Windows (run as Administrator)
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
-.\windows\setup.ps1 -e your.email@example.com
+cd windows
+.\setup.ps1 -e your.email@example.com
 ```
 
 Common flags: `-v` (verbose, repeatable), `-e` (git email),

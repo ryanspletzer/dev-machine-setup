@@ -110,11 +110,6 @@
         - homebrew
         - formulae
 
-    # Refresh Ansible inventory
-    # This ensures that the inventory is up-to-date after Homebrew installations which add to the PATH
-    - name: Refresh Ansible inventory
-      ansible.builtin.meta: refresh_inventory
-
     # PowerShell module setup
     - name: Ensure PowerShell modules are installed
       ansible.builtin.command:
@@ -237,7 +232,7 @@
       loop: "{{ pnpm_global_packages | default([], true) }}"
       when:
         - pnpm_check.rc == 0
-        - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies') | map('list') | flatten)
+        - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies', default={}) | map('list') | flatten)
       register: pnpm_install_result
       changed_when: "pnpm_install_result.rc == 0"
       loop_control:
@@ -277,7 +272,8 @@
       loop: "{{ bun_global_packages | default([], true) }}"
       when:
         - bun_check.rc == 0
-        - item not in (bun_list_result.stdout | default(''))
+        # bun pm ls -g prints "── <name>@<version>"; anchor with space+@ to avoid substring false matches
+        - (' ' ~ item ~ '@') not in (bun_list_result.stdout | default(''))
       register: bun_install_result
       changed_when: "bun_install_result.rc == 0"
       environment:
@@ -319,7 +315,7 @@
       failed_when: false
       when:
         - dotnet_check.rc == 0
-        - item not in dotnet_tools_list.stdout
+        - (item | lower) not in (dotnet_tools_list.stdout | default('') | lower)
       loop_control:
         label: "Installing .NET tool: {{ item }}"
       tags:

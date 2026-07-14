@@ -15,6 +15,9 @@ appimage_packages:
     comment: "Cursor AI Code Editor"
     categories: "Development;IDE;"
     mime_types: "text/plain;"
+    # The download URL is x64-only, so skip on other architectures
+    supported_architectures:
+      - amd64
     # Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
     # checksum: "sha256:abc123..."
     # Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
@@ -67,6 +70,8 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - arm64
   # Fish shell latest stable releases
   - name: fish-shell
     signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x59FDA1CE1B84B3FAD89366C027557F056DC33CA5
@@ -240,7 +245,11 @@ apt_packages:
   - name: wine
   # FEX emulator for running x86/x64 applications on ARM64
   - name: fex-emu-armv8.4
+    supported_architectures:
+      - arm64
   - name: fex-emu-wine
+    supported_architectures:
+      - arm64
   # wget
   - name: wget
   # Zoom Workplace for Linux
@@ -570,7 +579,7 @@ custom_commands_user:
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
   # Add Docker User
-  - command: usermod -aG docker $USER
+  - command: usermod -aG docker {{ ansible_user_id }}
     description: Add current user to Docker group
   # Connect Azure Storage Explorer to password manager service
   # See:

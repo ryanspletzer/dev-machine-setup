@@ -15,6 +15,9 @@ appimage_packages:
     comment: "Cursor AI Code Editor"
     categories: "Development;IDE;"
     mime_types: "text/plain;"
+    # The download URL is x64-only, so skip on other architectures
+    supported_architectures:
+      - amd64
     # Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
     # checksum: "sha256:abc123..."
     # Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
@@ -459,7 +462,7 @@ custom_commands_user:
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
   # Add Docker User
-  - command: usermod -aG docker $USER
+  - command: usermod -aG docker {{ ansible_user_id }}
     description: Add current user to Docker group
 
 # Custom script path (optional)

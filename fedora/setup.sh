@@ -169,13 +169,17 @@ EOF
 
 echo "Configured Ansible logging to: $LOG_FILE" | tee -a "$LOG_FILE"
 
-# Build extra vars for Git email and name if provided
+# Build extra vars as JSON so values with spaces or quotes survive parsing
+json_escape() {
+  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+}
+
 EXTRA_VARS=""
 if [ -n "$GIT_EMAIL" ]; then
-  EXTRA_VARS="$EXTRA_VARS git_user_email='$GIT_EMAIL'"
+  EXTRA_VARS="\"git_user_email\": \"$(json_escape "$GIT_EMAIL")\""
 fi
 if [ -n "$GIT_NAME" ]; then
-  EXTRA_VARS="$EXTRA_VARS git_user_name='$GIT_NAME'"
+  EXTRA_VARS="${EXTRA_VARS:+$EXTRA_VARS, }\"git_user_name\": \"$(json_escape "$GIT_NAME")\""
 fi
 
 # Run the playbook with the specified verbosity
@@ -185,7 +189,7 @@ if [ -n "$VERBOSITY" ]; then
 fi
 
 if [ -n "$EXTRA_VARS" ]; then
-  ansible-playbook $VERBOSITY --extra-vars "$EXTRA_VARS" "$PLAYBOOK_FILE"
+  ansible-playbook $VERBOSITY --extra-vars "{$EXTRA_VARS}" "$PLAYBOOK_FILE"
 else
   ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
 fi
