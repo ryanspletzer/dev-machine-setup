@@ -3,6 +3,11 @@ name: Test
 permissions:
   contents: read
 
+env:
+  # Pins uv's view of PyPI and keys the uv cache in the validate job.
+  # Bump this date to pick up newer tool releases and invalidate the cache.
+  UV_EXCLUDE_NEWER: "2026-07-14"
+
 on:
   push:
     branches: [main]
@@ -73,13 +78,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
-          pip install yamllint ansible-lint
+
+      - uses: astral-sh/setup-uv@v8
+        id: setup-uv
+        with:
+          enable-cache: true
+          cache-dependency-glob: ""
+          cache-suffix: tools-${{ env.UV_EXCLUDE_NEWER }}
+          prune-cache: false
+
+      - name: Use cache-only uv on cache hits
+        if: steps.setup-uv.outputs.cache-hit == 'true'
+        run: echo "UV_OFFLINE=1" >> "$GITHUB_ENV"
 
       - name: YAML lint
-        run: yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml debian/vars.yaml
+        run: uvx yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml debian/vars.yaml
 
       - name: YAML lint (test fixtures)
-        run: yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml tests/debian/vars.yaml
+        run: uvx yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml tests/debian/vars.yaml
 
       - name: shellcheck
         run: |
@@ -94,21 +110,21 @@ jobs:
           pwsh -Command "Invoke-ScriptAnalyzer -Path windows/setup.ps1 -Recurse -ReportSummary"
 
       - name: Install Ansible collections
-        run: ansible-galaxy collection install community.general
+        run: uvx --from ansible-core ansible-galaxy collection install community.general
 
       - name: ansible-lint
         run: |
-          ansible-lint macOS/setup.yaml
-          ansible-lint ubuntu/setup.yaml
-          ansible-lint fedora/setup.yaml
-          ansible-lint debian/setup.yaml
+          uvx ansible-lint macOS/setup.yaml
+          uvx ansible-lint ubuntu/setup.yaml
+          uvx ansible-lint fedora/setup.yaml
+          uvx ansible-lint debian/setup.yaml
 
       - name: Ansible syntax check
         run: |
-          ansible-playbook --syntax-check macOS/setup.yaml
-          ansible-playbook --syntax-check ubuntu/setup.yaml
-          ansible-playbook --syntax-check fedora/setup.yaml
-          ansible-playbook --syntax-check debian/setup.yaml
+          uvx --from ansible-core ansible-playbook --syntax-check macOS/setup.yaml
+          uvx --from ansible-core ansible-playbook --syntax-check ubuntu/setup.yaml
+          uvx --from ansible-core ansible-playbook --syntax-check fedora/setup.yaml
+          uvx --from ansible-core ansible-playbook --syntax-check debian/setup.yaml
 
   integration-macos:
     needs: [detect-changes, validate]
