@@ -47,6 +47,45 @@ Test-Check "Pester installed (PowerShell module)" {
     if (-not $result) { throw "Pester not found" }
 }
 
+# Windows PowerShell module
+Test-Check "posh-git installed (Windows PowerShell module)" {
+    $r = powershell -Command "Get-Module -Name posh-git -ListAvailable"
+    if (-not $r) { throw "posh-git not found" }
+}
+
+# uv (Chocolatey package)
+Test-Check "uv installed (Chocolatey package)" { Get-Command uv -ErrorAction Stop }
+
+# uv tool
+Test-Check "ruff installed (uv tool)" {
+    if (-not (Test-Path "$env:USERPROFILE\.local\bin\ruff.exe")) { throw "ruff.exe not found" }
+}
+
+# pipx
+Test-Check "cowsay installed (pipx)" {
+    if (-not (Test-Path "$env:USERPROFILE\.local\bin\cowsay.exe")) { throw "cowsay.exe not found" }
+}
+
+# npm global package
+Test-Check "semver installed (npm global)" {
+    if (-not (Test-Path (Join-Path (npm prefix -g) 'semver.cmd'))) { throw "semver.cmd not found" }
+}
+
+# pnpm global package
+Test-Check "json installed (pnpm global)" {
+    if (-not (Test-Path "$env:LOCALAPPDATA\pnpm\bin\json*")) { throw "json shim not found" }
+}
+
+# bun global package
+Test-Check "cowsay installed (bun global)" {
+    if (-not (Test-Path "$env:USERPROFILE\.bun\bin\cowsay*")) { throw "cowsay shim not found" }
+}
+
+# .NET global tool
+Test-Check "dotnetsay installed (.NET global tool)" {
+    if (-not (Test-Path "$env:USERPROFILE\.dotnet\tools\dotnetsay.exe")) { throw "dotnetsay.exe not found" }
+}
+
 # Git config
 Test-Equal "git user.email configured" `
     (git config --global user.email) "ci-test@example.com"
