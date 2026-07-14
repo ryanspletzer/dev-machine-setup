@@ -43,7 +43,7 @@ check "bun installed (npm global)" test -x "$HOME/.local/bin/bun"
 check "pnpm installed (npm global)" test -x "$HOME/.local/bin/pnpm"
 
 # pipx
-check "uv installed (pipx)" test -x "$HOME/.local/bin/uv"
+check "uv installed (pipx)" sh -c 'pipx list --short | grep -q "^uv "'
 
 # uv tool
 check "ruff installed (uv tool)" test -x "$HOME/.local/bin/ruff"

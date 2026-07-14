@@ -5,6 +5,7 @@ appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
 apt_packages_prereqs:
   - name: ca-certificates
   - name: curl
+  - name: python3-debian
 
 external_apt_repositories:
   - name: github-cli

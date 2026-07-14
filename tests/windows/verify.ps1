@@ -63,7 +63,8 @@ Test-Check "ruff installed (uv tool)" {
 
 # pipx
 Test-Check "cowsay installed (pipx)" {
-    if (-not (Test-Path "$env:USERPROFILE\.local\bin\cowsay.exe")) { throw "cowsay.exe not found" }
+    $list = pipx list --short | Out-String
+    if ($list -notmatch '(?m)^cowsay ') { throw "cowsay not in pipx list" }
 }
 
 # npm global package
