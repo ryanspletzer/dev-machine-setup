@@ -22,7 +22,7 @@ param (
     [ValidateNotNullOrEmpty()]
     [Alias('n')]
     [string]
-    $GitUserName = (Get-LocalUser -Name $env:USERNAME).FullName
+    $GitUserName = $(try { (Get-LocalUser -Name $env:USERNAME -ErrorAction Stop).FullName } catch { '' })
 )
 
 #region Transcript Setup
@@ -62,12 +62,12 @@ $gitPackageInYaml = (
 # | `[^:]+:`     | everything up to (and including) the first colon               | skips the key name                   |
 # | `\s*`        | optional spaces                                                | ignore padding                       |
 # | `(["'']?)`   | **group 1** – an optional `'` or `"`                           | remembers opening quote if present   |
-# | `([^#'"]+?)` | **group 2** – one or more chars that are **not** `#`, `'`, `"` | captures the value itself            |
+# | `([^#'"]*?)` | **group 2** – zero or more chars that are **not** `#`, `'`, `"` | captures the value itself            |
 # | `\1`         | the same quote captured in group 1                             | ensures we close the quote we opened |
 # | `\s*`        | optional spaces                                                | ignore padding                       |
 # | `(?:#.*)?`   | an optional comment starting with `#` to EOL                   | discards right-hand comments         |
 # | `$`          | end of line                                                    | anchor                               |
-$pattern = '^\s*[^:]+:\s*(["'']?)([^#''"]+?)\1\s*(?:#.*)?$'
+$pattern = '^\s*[^:]+:\s*(["'']?)([^#''"]*?)\1\s*(?:#.*)?$'
 
 # If git.config --global user.email is not set, ensure that one was provided or that the vars.yaml file has a
 # git_user_email entry
@@ -76,7 +76,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch 
     [string]::IsNullOrWhiteSpace(
         (
             Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match 'git_user_email' } |
+                Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
                 ForEach-Object -Process { $_ -replace $pattern, '$2' }
         )
     ) -and
@@ -91,7 +91,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch 
 if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
     $gitUserEmailFromVars = (
         Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match 'git_user_email' } |
+            Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
             ForEach-Object -Process { $_ -replace $pattern, '$2' }
     )
     if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
@@ -108,7 +108,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
     [string]::IsNullOrWhiteSpace(
         (
             Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match 'git_user_name' } |
+                Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
                 ForEach-Object -Process { $_ -replace $pattern, '$2' }
         )
     ) -and
@@ -123,7 +123,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
 if ([string]::IsNullOrWhiteSpace($GitUserName)) {
     $gitUserNameFromVars = (
         Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match 'git_user_name' } |
+            Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
             ForEach-Object -Process { $_ -replace $pattern, '$2' }
     )
     if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
@@ -148,7 +148,7 @@ $totalSteps = (
 ).Count
 
 # Single quotes need to be on the outside
-$statusText = '"Step $($step.ToString().PadLeft($totalSteps.Count.ToString().Length)) of $totalSteps | $stepText"'
+$statusText = '"Step $($step.ToString().PadLeft($totalSteps.ToString().Length)) of $totalSteps | $stepText"'
 
 # This script block allows the string above to use the current values of embedded values each time it's run
 $statusBlock = [ScriptBlock]::Create($statusText)
@@ -419,9 +419,15 @@ $nuGetPackageProvider = powershell -Command {
     Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue
 }
 
+# Get-PackageProvider -ListAvailable can return multiple versions; take the highest.
+$nuGetProviderVersion = $nuGetPackageProvider |
+    ForEach-Object -Process { [version]$_.Version } |
+    Sort-Object -Descending |
+    Select-Object -First 1
+
 # Test
 Write-Verbose -Message '[Test] Windows PowerShell NuGet Package Provider...'
-if (($null -eq $nuGetPackageProvider) -or ($nuGetPackageProvider.Version -lt 2.8.5.201)) {
+if (($null -eq $nuGetProviderVersion) -or ($nuGetProviderVersion -lt [version]'2.8.5.201')) {
     # Set
     Write-Verbose -Message '[Set] Windows PowerShell NuGet Package Provider is not installed, installing...'
     powershell -Command {
@@ -570,6 +576,12 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
     # Get the list of currently installed pipx packages
     Write-Verbose -Message '[Get] Currently installed pipx packages...'
     $pipxPackagesInstalled = pipx list --json | ConvertFrom-Json
+    # pipx list --json returns one object whose venvs property is keyed by package name
+    $pipxInstalledNames = @()
+    if ($pipxPackagesInstalled -and $pipxPackagesInstalled.venvs) {
+        $pipxInstalledNames = @($pipxPackagesInstalled.venvs.PSObject.Properties.Name)
+    }
+
     foreach ($package in $pipxPackages) {
         Write-Progress -Activity $activity -Status (
             & $StatusBlock
@@ -578,11 +590,11 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
         # Get
         Write-Verbose -Message "[Get] pipx package: $package"
-        $pipxPackageInstalled = $pipxPackagesInstalled | Where-Object { $_.name -eq $package }
+        $pipxPackageInstalled = $pipxInstalledNames -contains $package
 
         # Test
         Write-Verbose -Message "[Test] pipx package: $package"
-        if ($null -eq $pipxPackageInstalled) {
+        if (-not $pipxPackageInstalled) {
             # Set
             Write-Verbose -Message "[Set] pipx package $package is not installed, installing..."
             try {
@@ -1074,8 +1086,8 @@ if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and
     Write-Verbose -Message "[Set] Git user.name is now set to '$GitUserName'."
     Write-Information -MessageData "Set Git user.name to '$GitUserName'."
 } elseif (-not (Get-Command -Name git -ErrorAction SilentlyContinue)) {
-    Write-Warning -Message 'Git is not installed, cannot set user.email.'
-}  elseif ([string]::IsNullOrWhiteSpace($GitUserName)) {
+    Write-Warning -Message 'Git is not installed, cannot set user.name.'
+} elseif ([string]::IsNullOrWhiteSpace($GitUserName)) {
     Write-Error -Message 'Git user.name is not set and no name was provided.'
 } else {
     Write-Information -MessageData "Git user.name is already set to '$currentGitUserName'."

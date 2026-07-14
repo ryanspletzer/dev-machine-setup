@@ -230,20 +230,24 @@ if [ -z "$GIT_EMAIL" ]; then
   fi
 fi
 
-# Build extra vars for Git email and name if provided
+# Build extra vars as JSON so values with spaces or quotes survive parsing
+json_escape() {
+  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+}
+
 EXTRA_VARS=""
 if [ -n "$GIT_EMAIL" ]; then
   echo "Using provided Git email: $GIT_EMAIL" | tee -a "$LOG_FILE"
-  EXTRA_VARS="$EXTRA_VARS git_user_email='$GIT_EMAIL'"
+  EXTRA_VARS="\"git_user_email\": \"$(json_escape "$GIT_EMAIL")\""
 fi
 if [ -n "$GIT_NAME" ]; then
   echo "Using provided Git name: $GIT_NAME" | tee -a "$LOG_FILE"
-  EXTRA_VARS="$EXTRA_VARS git_user_name='$GIT_NAME'"
+  EXTRA_VARS="${EXTRA_VARS:+$EXTRA_VARS, }\"git_user_name\": \"$(json_escape "$GIT_NAME")\""
 fi
 
 if [ -n "$EXTRA_VARS" ]; then
   /opt/homebrew/bin/ansible-playbook $VERBOSITY \
-    --extra-vars "$EXTRA_VARS" "$PLAYBOOK_FILE"
+    --extra-vars "{$EXTRA_VARS}" "$PLAYBOOK_FILE"
 else
   /opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
 fi
