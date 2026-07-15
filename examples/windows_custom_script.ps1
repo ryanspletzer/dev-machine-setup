@@ -1,4 +1,4 @@
-# Set pwsh as the default shell in Windows Terminal
+﻿# Set pwsh as the default shell in Windows Terminal
 
 Write-Output -InputObject "Setting pwsh as the default shell in Windows Terminal"
 

@@ -6,10 +6,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$ExtensionsJson = Join-Path $ScriptDir '.vscode' 'extensions.json'
+$ExtensionsJson = Join-Path -Path $ScriptDir -ChildPath '.vscode' -AdditionalChildPath 'extensions.json'
 
 if (-not (Test-Path $ExtensionsJson)) {
-    Write-Warning 'No .vscode/extensions.json found — launching VS Code normally.'
+    Write-Warning 'No .vscode/extensions.json found - launching VS Code normally.'
     code $ScriptDir
     return
 }

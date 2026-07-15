@@ -9,18 +9,11 @@ env:
   UV_EXCLUDE_NEWER: "2026-07-14"
 
 on:
+  # No paths filter on push: validate lints the whole repo (docs, examples,
+  # root dotfiles), so any change is lint-relevant. Integration jobs still
+  # skip via detect-changes.
   push:
     branches: [main]
-    paths:
-      - "macOS/**"
-      - "ubuntu/**"
-      - "windows/**"
-      - "fedora/**"
-      - "debian/**"
-      - "tests/**"
-      - ".github/workflows/**"
-      - ".yamllint.yaml"
-      - ".ansible-lint"
   # No paths filter on pull_request: required status checks deadlock as
   # "Expected" when the workflow never triggers, so validate must run on
   # every PR. Integration jobs still skip via detect-changes.
@@ -89,22 +82,27 @@ jobs:
         run: echo "UV_OFFLINE=1" >> "$GITHUB_ENV"
 
       - name: YAML lint
-        run: uvx yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml debian/vars.yaml
-
-      - name: YAML lint (test fixtures)
-        run: uvx yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml tests/debian/vars.yaml
+        run: uvx yamllint .
 
       - name: shellcheck
-        run: |
-          shellcheck macOS/setup.sh
-          shellcheck ubuntu/setup.sh
-          shellcheck fedora/setup.sh
-          shellcheck debian/setup.sh
+        run: git ls-files '*.sh' | xargs shellcheck
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2@0.23.0 "**/*.md"
+
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.7 -color
+
+      - name: zizmor
+        run: uvx zizmor .github/workflows/
 
       - name: PSScriptAnalyzer
+        shell: pwsh
         run: |
-          pwsh -Command "Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository"
-          pwsh -Command "Invoke-ScriptAnalyzer -Path windows/setup.ps1 -Recurse -ReportSummary"
+          Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository
+          $findings = Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 -ReportSummary
+          $findings | Format-Table -AutoSize
+          if ($findings) { exit 1 }
 
       - name: Install Ansible collections
         run: uvx --from ansible-core ansible-galaxy collection install community.general
