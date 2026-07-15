@@ -1,37 +1,62 @@
 is_wsl: false
 
+appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
+
 apt_packages_prereqs:
   - name: ca-certificates
   - name: curl
+  - name: python3-debian
 
-external_apt_repositories: []
+external_apt_repositories:
+  - name: github-cli
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
 
 apt_packages:
+  - name: gh
   - name: git
   - name: git-lfs
   - name: jq
   - name: nodejs
   - name: npm
+  - name: pipx
 
-snap_packages: []
+snap_packages:
+  - name: hello
 
 powershell_modules: []
 
 pipx_packages:
+  - uv
 
 uv_tools:
+  - ruff
 
 npm_global_packages:
   - bun
   - pnpm
 
 pnpm_global_packages:
+  - json
 
 bun_global_packages:
+  - cowsay
 
-dotnet_tools: []
+dotnet_tools:
+  - dotnetsay
 
 vscode_extensions: []
+
+appimage_packages:
+  - name: appimagetool
+    url: "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+    comment: "AppImage packaging tool (CI fixture)"
+    categories: "Development;"
+    supported_architectures:
+      - amd64
 
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"

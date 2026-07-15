@@ -1,9 +1,11 @@
 install_rosetta: false
 
-homebrew_taps: []
+homebrew_taps:
+  - hashicorp/tap
 
 homebrew_casks:
   - iterm2
+  - visual-studio-code
 
 homebrew_formulae:
   - bun
@@ -19,7 +21,8 @@ pipx_packages:
 uv_tools:
   - ruff
 
-npm_global_packages: []
+npm_global_packages:
+  - semver
 
 pnpm_global_packages:
   - json
@@ -27,9 +30,11 @@ pnpm_global_packages:
 bun_global_packages:
   - cowsay
 
-dotnet_tools: []
+dotnet_tools:
+  - dotnetsay
 
-vscode_extensions: []
+vscode_extensions:
+  - codezombiech.gitignore
 
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"

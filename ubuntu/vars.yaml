@@ -39,6 +39,8 @@ apt_packages_prereqs:
   - name: libfuse2
   # For Wine
   - name: libfaudio0
+  # Required by ansible.builtin.deb822_repository
+  - name: python3-debian
 
 # External package repositories using deb822 format
 # This uses the newer ansible.builtin.deb822_repository module

@@ -133,6 +133,17 @@
         - apt
         - repositories
 
+    # Refresh indexes so packages that exist only in the just-added external
+    # repositories are resolvable on the first run
+    - name: Update APT cache after adding external repositories
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
+      when: (external_apt_repositories | default([], true)) | length > 0
+      tags:
+        - apt
+        - repositories
+
     # Install APT packages
     - name: Install APT packages
       ansible.builtin.apt:
@@ -204,7 +215,7 @@
     - name: Check if npm packages are already installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        npm list -g {{ item }}
+        npm list -g --depth=0 {{ item }}
       register: npm_check_result
       changed_when: false
       failed_when: false
@@ -234,7 +245,7 @@
     - name: Check if pnpm is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which pnpm
+        command -v pnpm
       register: pnpm_check
       changed_when: false
       failed_when: false
@@ -273,6 +284,7 @@
       when:
         - pnpm_check.rc == 0
         - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies', default={}) | map('list') | flatten)
+      failed_when: false
       register: pnpm_install_result
       changed_when: "pnpm_install_result.rc == 0"
       loop_control:
@@ -285,7 +297,7 @@
     - name: Check if bun is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which bun
+        command -v bun
       register: bun_check
       changed_when: false
       failed_when: false
@@ -316,6 +328,7 @@
         - bun_check.rc == 0
         # bun pm ls -g prints "── <name>@<version>"; anchor with space+@ to avoid substring false matches
         - (' ' ~ item ~ '@') not in (bun_list_result.stdout | default(''))
+      failed_when: false
       register: bun_install_result
       changed_when: "bun_install_result.rc == 0"
       loop_control:
@@ -422,7 +435,7 @@
     - name: Check if uv is installed
       ansible.builtin.shell: |
         export PATH=~/.local/bin:$PATH
-        which uv
+        command -v uv
       register: uv_check
       changed_when: false
       failed_when: false
@@ -540,9 +553,8 @@
         - appimage
 
     # Cursor extension setup
-    - name: Check if Cursor CLI is available
-      ansible.builtin.command:
-        cmd: which cursor
+    - name: Check if Cursor CLI is available # noqa: command-instead-of-shell (command -v is a shell builtin)
+      ansible.builtin.shell: command -v cursor
       environment:
         PATH: "{{ appimage_install_dir }}:{{ ansible_env.PATH }}"
       register: cursor_cli_check
