@@ -55,13 +55,33 @@ check "hello installed (snap)" sh -c 'snap list hello'
 check "json installed (pnpm global)" test -e "$HOME/.local/share/pnpm/bin/json"
 check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
 
-# .NET global tool
-check "dotnetsay installed (.NET global tool)" test -x "$HOME/.dotnet/tools/dotnetsay"
+# .NET global tool (mirrors the playbook guard: skipped when dotnet is absent,
+# e.g. on the reduced-toolset ARM runner image)
+if command -v dotnet >/dev/null 2>&1; then
+  check "dotnetsay installed (.NET global tool)" test -x "$HOME/.dotnet/tools/dotnetsay"
+fi
 
-# AppImage
-check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
-check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
-check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+# AppImage (appimagetool is amd64-only; on other architectures the
+# supported_architectures guard must skip it entirely)
+if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+  check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
+  check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
+  check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+else
+  check "appimagetool skipped on non-amd64" test ! -e "$HOME/.local/bin/appimagetool.AppImage"
+fi
+
+# AppImage checksum probe (exercises checksum, no_sandbox, mime_types)
+check "checksum-probe AppImage downloaded" test -x "$HOME/.local/bin/checksum-probe.AppImage"
+check "checksum-probe CLI symlink created" test -L "$HOME/.local/bin/checksum-probe"
+check "checksum-probe desktop entry has --no-sandbox" \
+  grep -q -- "--no-sandbox" "$HOME/.local/share/applications/checksum-probe.desktop"
+check "checksum-probe desktop entry has MimeType" \
+  grep -q "^MimeType=text/plain;$" "$HOME/.local/share/applications/checksum-probe.desktop"
+
+# Custom commands (sentinel files prove they ran)
+check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
+check "elevated custom command ran" test -f /etc/dms-ci-elevated-command-ran
 
 # Git config
 check_equal "git user.email configured" \

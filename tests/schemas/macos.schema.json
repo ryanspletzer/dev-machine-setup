@@ -6,15 +6,41 @@
   "additionalProperties": false,
   "$defs": {
     "stringArrayOrNull": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }
     },
     "customCommandStringArrayOrNull": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
-        "type": "string"
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "type": "string"
+              },
+              "creates": {
+                "type": "string",
+                "description": "Optional file path; the command is skipped when it exists (keeps reruns idempotent)"
+              }
+            }
+          }
+        ]
       }
     }
   },

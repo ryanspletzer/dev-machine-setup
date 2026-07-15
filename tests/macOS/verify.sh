@@ -59,6 +59,10 @@ check "semver installed (npm global)" command -v semver
 # .NET global tool
 check "dotnetsay installed (.NET global tool)" test -x "$HOME/.dotnet/tools/dotnetsay"
 
+# Custom commands (sentinel files prove they ran)
+check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
+check "elevated custom command ran" test -f /etc/dms-ci-elevated-command-ran
+
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"

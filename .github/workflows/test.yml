@@ -209,6 +209,51 @@ jobs:
       - name: Copy test fixtures
         run: cp tests/ubuntu/vars.yaml ubuntu/vars.yaml
 
+      - name: Prereqs-only run (-p installs Ansible, skips the playbook)
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -p
+          command -v ansible-playbook
+          test ! -f "$HOME/.ansible/ansible.cfg"
+
+      - name: Run setup
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/ubuntu/verify.sh
+          tests/ubuntu/verify.sh
+
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: ubuntu
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
+  # ARM runner exercises the supported_architectures skip logic the amd64
+  # jobs can never reach: amd64-only packages must be skipped cleanly, not
+  # attempted and failed.
+  integration-ubuntu-arm:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.ubuntu == 'true'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Copy test fixtures
+        run: cp tests/ubuntu/vars.yaml ubuntu/vars.yaml
+
       - name: Run setup
         working-directory: ubuntu
         run: |

@@ -40,6 +40,9 @@ npm_global_packages:
   - pnpm
 
 pnpm_global_packages:
+  # Regression guard (19e6c60): a failing global install must not abort
+  # the play, and must not report changed on reruns
+  - dms-ci-package-that-does-not-exist
   - json
 
 bun_global_packages:
@@ -57,16 +60,30 @@ appimage_packages:
     categories: "Development;"
     supported_architectures:
       - amd64
+  # Exercises checksum verification, no_sandbox, and mime_types handling
+  # deterministically: get_url supports file:// and installation never
+  # executes the payload (download + chmod + symlink + desktop entry only)
+  - name: checksum-probe
+    url: "file://{{ playbook_dir }}/../LICENSE"
+    comment: "Checksum/no_sandbox/mime_types fixture (not a real AppImage)"
+    categories: "Utility;"
+    mime_types: "text/plain;"
+    no_sandbox: true
+    checksum: "sha256:b5065838cbac452dfc855ba6e6e031481ad2c68406f70d21ead9321374653e6c"
 
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"
 
+# Sentinel files let verify.sh prove the commands actually ran; creates
+# keeps reruns idempotent (the task skips once the file exists)
 custom_commands_user:
-  - command: echo "CI test user command"
-    description: CI test user command
+  - command: touch "$HOME/.dms-ci-user-command-ran"
+    description: Write user custom-command sentinel
+    creates: "{{ ansible_env.HOME }}/.dms-ci-user-command-ran"
 
 custom_commands_elevated:
-  - command: echo "CI test elevated command"
-    description: CI test elevated command
+  - command: touch /etc/dms-ci-elevated-command-ran
+    description: Write elevated custom-command sentinel
+    creates: /etc/dms-ci-elevated-command-ran
 
 custom_script: ""

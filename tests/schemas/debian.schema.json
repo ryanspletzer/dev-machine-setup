@@ -7,7 +7,10 @@
   "$defs": {
     "architecture": {
       "type": "string",
-      "enum": ["amd64", "arm64"]
+      "enum": [
+        "amd64",
+        "arm64"
+      ]
     },
     "architectureArray": {
       "type": "array",
@@ -16,7 +19,10 @@
       }
     },
     "stringArrayOrNull": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }
@@ -24,7 +30,9 @@
     "packageEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string"
@@ -37,7 +45,10 @@
     "appimagePackageEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "url"],
+      "required": [
+        "name",
+        "url"
+      ],
       "properties": {
         "name": {
           "type": "string"
@@ -68,7 +79,14 @@
     "externalAptRepositoryEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "signed_by", "uris", "suites", "components", "architectures"],
+      "required": [
+        "name",
+        "signed_by",
+        "uris",
+        "suites",
+        "components",
+        "architectures"
+      ],
       "properties": {
         "name": {
           "type": "string"
@@ -97,18 +115,28 @@
     "customCommandEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["command", "description"],
+      "required": [
+        "command",
+        "description"
+      ],
       "properties": {
         "command": {
           "type": "string"
         },
         "description": {
           "type": "string"
+        },
+        "creates": {
+          "type": "string",
+          "description": "Optional file path; the command is skipped when it exists (keeps reruns idempotent)"
         }
       }
     },
     "customCommandArrayOrNull": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$ref": "#/$defs/customCommandEntry"
       }
@@ -123,7 +151,10 @@
       "type": "string"
     },
     "appimage_packages": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$ref": "#/$defs/appimagePackageEntry"
       }
@@ -135,7 +166,10 @@
       }
     },
     "external_apt_repositories": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$ref": "#/$defs/externalAptRepositoryEntry"
       }
@@ -147,7 +181,10 @@
       }
     },
     "flatpak_packages": {
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$ref": "#/$defs/packageEntry"
       }

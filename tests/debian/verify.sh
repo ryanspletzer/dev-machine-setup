@@ -57,6 +57,10 @@ check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.
 check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
 check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
 
+# Custom commands (sentinel files prove they ran)
+check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
+check "elevated custom command ran" test -f /etc/dms-ci-elevated-command-ran
+
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"

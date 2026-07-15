@@ -617,10 +617,14 @@
 
     # Custom user commands
     - name: Execute custom user commands # noqa: command-instead-of-shell
-      ansible.builtin.shell: "{{ item.command }}"
+      ansible.builtin.shell:
+        cmd: "{{ item.command }}"
+        creates: "{{ item.creates | default(omit) }}"
       loop: "{{ custom_commands_user | default([], true) }}"
       register: custom_command_user_result
-      changed_when: custom_command_user_result.rc == 0
+      changed_when: >-
+        custom_command_user_result.rc == 0 and
+        'Did not run command since' not in (custom_command_user_result.msg | default(''))
       failed_when: false
       loop_control:
         label: "Executing: {{ item.description }}"
@@ -630,11 +634,15 @@
 
     # Custom elevated commands
     - name: Execute custom elevated commands # noqa: command-instead-of-shell
-      ansible.builtin.shell: "{{ item.command }}"
+      ansible.builtin.shell:
+        cmd: "{{ item.command }}"
+        creates: "{{ item.creates | default(omit) }}"
       become: true
       loop: "{{ custom_commands_elevated | default([], true) }}"
       register: custom_command_elevated_result
-      changed_when: custom_command_elevated_result.rc == 0
+      changed_when: >-
+        custom_command_elevated_result.rc == 0 and
+        'Did not run command since' not in (custom_command_elevated_result.msg | default(''))
       failed_when: false
       loop_control:
         label: "Executing: {{ item.description }}"
