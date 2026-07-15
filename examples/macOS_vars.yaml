@@ -501,6 +501,10 @@ custom_commands_user:
   - git config --global push.default current
   - git config --global push.autoSetupRemote true
   - git config --global user.signingKey 787AEF0BAE232359
+  # Re-assert the codex-config git clean filter used by the home dotfiles repo
+  # (defined in the tracked ~/.gitconfig; strips Codex-written machine state
+  #  from the tracked .codex/config.toml)
+  - git config --global filter.codex-config.clean '~/.agents/bin/codex-config-clean.py'
   # Configure GPG agent to use pinentry-mac (native macOS dialog for YubiKey PIN)
   - echo "Configuring GPG agent to use pinentry-mac..."
   - mkdir -p ~/.gnupg
