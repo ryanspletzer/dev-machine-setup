@@ -11,7 +11,9 @@ appimage_install_dir: "{{ ansible_env.HOME }}/.local/bin"
 # AppImage packages
 appimage_packages:
   - name: cursor
-    url: "https://downloader.cursor.sh/linux/appImage/x64"
+    # Cursor publishes only hash-versioned direct URLs; refresh from
+    # https://cursor.com/api/download?platform=linux-x64&releaseTrack=stable
+    url: "https://downloads.cursor.com/production/bf249e6efb5b097f23d7e21d7283429f0760b74a/linux/x64/Cursor-3.11.19-x86_64.AppImage"
     comment: "Cursor AI Code Editor"
     categories: "Development;IDE;"
     mime_types: "text/plain;"
@@ -112,6 +114,14 @@ external_apt_repositories:
     signed_by: https://packages.microsoft.com/keys/microsoft.asc
     uris: "https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod"
     suites: "{{ ansible_distribution_release }}"
+    components: main
+    architectures: "{{ deb_architecture }}"
+  # ngrok agent repository (provides the ngrok package below; ngrok uses
+  # the fixed 'buster' suite for all Debian-family releases)
+  - name: ngrok
+    signed_by: https://ngrok-agent.s3.amazonaws.com/ngrok.asc
+    uris: https://ngrok-agent.s3.amazonaws.com
+    suites: buster
     components: main
     architectures: "{{ deb_architecture }}"
   # NodeSource repository for Node.js LTS
