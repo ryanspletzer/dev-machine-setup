@@ -37,7 +37,13 @@ dnf_packages_prereqs:
 
 # External DNF repositories
 # This uses the ansible.builtin.yum_repository module
-external_dnf_repositories: []
+external_dnf_repositories:
+  # Visual Studio Code repository (provides the code package below)
+  - name: vscode
+    description: Visual Studio Code
+    baseurl: https://packages.microsoft.com/yumrepos/vscode
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: true
 
 # DNF packages
 dnf_packages:
