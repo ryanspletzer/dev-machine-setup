@@ -37,7 +37,9 @@ Package lists are flat YAML arrays grouped by category:
   `npm_global_packages`, `pnpm_global_packages`, `bun_global_packages`,
   `dotnet_tools`, `vscode_extensions`
 - **Git config**: `git_user_email`, `git_user_name`
-- **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo)
+- **Custom commands**: `custom_commands_user` (non-elevated), `custom_commands_elevated` (sudo).
+  Entries support an optional `creates` file path;
+  the command is skipped once that file exists (keeps reruns idempotent)
 - **Custom script**: `custom_script` (path to a script run at the end)
 
 ### Key Differences Between Platforms

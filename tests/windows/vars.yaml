@@ -35,7 +35,9 @@ vscode_extensions: []
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"
 
+# Sentinel file lets verify.ps1 prove the command actually ran; -Force
+# keeps the rerun-based idempotency check green
 custom_commands:
-  - Write-Output "CI test custom command"
+  - New-Item -ItemType File -Path "$env:USERPROFILE\.dms-ci-custom-command-ran" -Force | Out-Null
 
 custom_script: ""

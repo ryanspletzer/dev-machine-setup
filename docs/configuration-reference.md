@@ -101,6 +101,18 @@ custom_commands_elevated:
   - echo "/opt/homebrew/bin/fish" | sudo tee -a /etc/shells
 ```
 
+macOS entries are plain strings,
+but a mapping form with `command` and `creates` keys is also accepted;
+`creates` names a file path,
+and once that file exists the command is skipped on later runs,
+which keeps reruns idempotent:
+
+```yaml
+custom_commands_user:
+  - command: touch "$HOME/.example-ran-once"
+    creates: "{{ ansible_env.HOME }}/.example-ran-once"
+```
+
 ## Windows Configuration Reference
 
 ### Chocolatey Packages
@@ -243,7 +255,10 @@ appimage_packages:
 
 ### Custom Commands
 
-Ubuntu uses objects with `command` and `description` keys:
+Ubuntu uses objects with `command` and `description` keys.
+An optional `creates` key names a file path;
+once that file exists the command is skipped on later runs,
+which keeps reruns idempotent:
 
 ```yaml
 # Commands executed as the current user
@@ -252,6 +267,9 @@ custom_commands_user:
     description: Ensure pipx is in PATH
   - command: git lfs install
     description: Install Git LFS
+  - command: touch "$HOME/.example-ran-once"
+    description: Run once, then skip on reruns
+    creates: "{{ ansible_env.HOME }}/.example-ran-once"
 
 # Commands executed with sudo privileges
 custom_commands_elevated:
@@ -327,7 +345,10 @@ appimage_packages:
 
 ### Custom Commands
 
-Fedora uses objects with `command` and `description` keys:
+Fedora uses objects with `command` and `description` keys.
+An optional `creates` key names a file path;
+once that file exists the command is skipped on later runs,
+which keeps reruns idempotent:
 
 ```yaml
 # Commands executed as the current user
@@ -431,7 +452,10 @@ appimage_packages:
 
 ### Custom Commands
 
-Debian uses objects with `command` and `description` keys:
+Debian uses objects with `command` and `description` keys.
+An optional `creates` key names a file path;
+once that file exists the command is skipped on later runs,
+which keeps reruns idempotent:
 
 ```yaml
 # Commands executed as the current user

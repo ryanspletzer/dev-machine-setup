@@ -3,24 +3,22 @@ name: Test
 permissions:
   contents: read
 
+# Cancel superseded runs of the same PR; never cancel main-branch runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   # Pins uv's view of PyPI and keys the uv cache in the validate job.
   # Bump this date to pick up newer tool releases and invalidate the cache.
-  UV_EXCLUDE_NEWER: "2026-07-14"
+  UV_EXCLUDE_NEWER: "2026-07-15"
 
 on:
+  # No paths filter on push: validate lints the whole repo (docs, examples,
+  # root dotfiles), so any change is lint-relevant. Integration jobs still
+  # skip via detect-changes.
   push:
     branches: [main]
-    paths:
-      - "macOS/**"
-      - "ubuntu/**"
-      - "windows/**"
-      - "fedora/**"
-      - "debian/**"
-      - "tests/**"
-      - ".github/workflows/**"
-      - ".yamllint.yaml"
-      - ".ansible-lint"
   # No paths filter on pull_request: required status checks deadlock as
   # "Expected" when the workflow never triggers, so validate must run on
   # every PR. Integration jobs still skip via detect-changes.
@@ -29,6 +27,7 @@ on:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       macos: ${{ steps.filter.outputs.macos }}
       ubuntu: ${{ steps.filter.outputs.ubuntu }}
@@ -66,6 +65,7 @@ jobs:
 
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -89,22 +89,44 @@ jobs:
         run: echo "UV_OFFLINE=1" >> "$GITHUB_ENV"
 
       - name: YAML lint
-        run: uvx yamllint macOS/vars.yaml ubuntu/vars.yaml windows/vars.yaml fedora/vars.yaml debian/vars.yaml
+        run: uvx yamllint .
 
-      - name: YAML lint (test fixtures)
-        run: uvx yamllint tests/macOS/vars.yaml tests/ubuntu/vars.yaml tests/windows/vars.yaml tests/fedora/vars.yaml tests/debian/vars.yaml
+      - name: Validate vars.yaml against schemas
+        run: |
+          uvx check-jsonschema --schemafile tests/schemas/macos.schema.json macOS/vars.yaml tests/macOS/vars.yaml examples/macOS_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/ubuntu.schema.json ubuntu/vars.yaml tests/ubuntu/vars.yaml examples/ubuntu_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/debian.schema.json debian/vars.yaml tests/debian/vars.yaml examples/debian_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/fedora.schema.json fedora/vars.yaml tests/fedora/vars.yaml examples/fedora_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/windows.schema.json windows/vars.yaml tests/windows/vars.yaml examples/windows_vars.yaml
+
+      - name: Check vars.yaml alphabetical order
+        run: python3 tests/check-vars-sorted.py ./*/vars.yaml ./tests/*/vars.yaml ./examples/*_vars.yaml
+
+      - name: Check examples match real vars keys
+        run: python3 tests/check-example-drift.py
 
       - name: shellcheck
-        run: |
-          shellcheck macOS/setup.sh
-          shellcheck ubuntu/setup.sh
-          shellcheck fedora/setup.sh
-          shellcheck debian/setup.sh
+        run: git ls-files '*.sh' | xargs shellcheck
+
+      - name: bats tests (setup.sh argument handling)
+        run: npx --yes bats@1.11.0 tests/shell
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2@0.23.0 "**/*.md"
+
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.7 -color
+
+      - name: zizmor
+        run: uvx zizmor .github/workflows/
 
       - name: PSScriptAnalyzer
+        shell: pwsh
         run: |
-          pwsh -Command "Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository"
-          pwsh -Command "Invoke-ScriptAnalyzer -Path windows/setup.ps1 -Recurse -ReportSummary"
+          Install-PSResource PSScriptAnalyzer -Scope CurrentUser -TrustRepository
+          $findings = Invoke-ScriptAnalyzer -Path . -Recurse -Settings PSScriptAnalyzerSettings.psd1 -ReportSummary
+          $findings | Format-Table -AutoSize
+          if ($findings) { exit 1 }
 
       - name: Install Ansible collections
         run: uvx --from ansible-core ansible-galaxy collection install community.general
@@ -123,10 +145,37 @@ jobs:
           uvx --from ansible-core ansible-playbook --syntax-check fedora/setup.yaml
           uvx --from ansible-core ansible-playbook --syntax-check debian/setup.yaml
 
+  unit-windows:
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.windows == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Windows PowerShell 5.1 first: that's the engine a fresh Windows 11
+      # machine bootstraps setup.ps1 from (5.1 ships with Pester 3.4, so a
+      # modern Pester must be installed and imported explicitly).
+      - name: Run Pester tests (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          Install-Module -Name Pester -MinimumVersion 5.5.0 -Force -SkipPublisherCheck -Scope CurrentUser
+          Import-Module -Name Pester -MinimumVersion 5.5.0
+          Invoke-Pester -Path tests/windows -CI -Output Detailed
+
+      - name: Run Pester tests (PowerShell 7)
+        shell: pwsh
+        run: |
+          Install-PSResource -Name Pester -Scope CurrentUser -TrustRepository -Reinstall
+          Invoke-Pester -Path tests/windows -CI -Output Detailed
+
   integration-macos:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.macos == 'true'
     runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -146,10 +195,68 @@ jobs:
           chmod 700 tests/macOS/verify.sh
           tests/macOS/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: macOS
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-ubuntu:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.ubuntu == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Copy test fixtures
+        run: cp tests/ubuntu/vars.yaml ubuntu/vars.yaml
+
+      - name: Prereqs-only run (-p installs Ansible, skips the playbook)
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -p
+          command -v ansible-playbook
+          test ! -f "$HOME/.ansible/ansible.cfg"
+
+      - name: Run setup
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/ubuntu/verify.sh
+          tests/ubuntu/verify.sh
+
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: ubuntu
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
+  # ARM runner exercises the supported_architectures skip logic the amd64
+  # jobs can never reach: amd64-only packages must be skipped cleanly, not
+  # attempted and failed.
+  integration-ubuntu-arm:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.ubuntu == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -169,10 +276,22 @@ jobs:
           chmod 700 tests/ubuntu/verify.sh
           tests/ubuntu/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: ubuntu
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-fedora:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.fedora == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container: fedora:43
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -196,10 +315,22 @@ jobs:
           chmod 700 tests/fedora/verify.sh
           tests/fedora/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: fedora
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-debian:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.debian == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     container: debian:13
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -223,10 +354,22 @@ jobs:
           chmod 700 tests/debian/verify.sh
           tests/debian/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: debian
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-windows:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.windows == 'true'
     runs-on: windows-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -235,9 +378,20 @@ jobs:
       - name: Copy test fixtures
         run: Copy-Item tests/windows/vars.yaml windows/vars.yaml
 
+      # shell: powershell (Windows PowerShell 5.1) — a fresh Windows 11
+      # machine bootstraps from stock 5.1, so that's what setup.ps1 must
+      # run on. The default pwsh would mask 5.1-only breakage.
       - name: Run setup
         working-directory: windows
+        shell: powershell
         run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"
 
       - name: Verify installation
         run: .\tests\windows\verify.ps1
+
+      # Native PowerShell engine has no change-count recap; assert a rerun
+      # completes cleanly, which exercises every step's Get/Test/Set guard.
+      - name: Idempotency check (second run succeeds)
+        working-directory: windows
+        shell: powershell
+        run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"

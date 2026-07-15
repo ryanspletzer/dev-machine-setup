@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "macOS vars.yaml schema",
+  "description": "Validates macOS/vars.yaml, tests/macOS/vars.yaml, and examples/macOS_vars.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "stringArrayOrNull": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "customCommandStringArrayOrNull": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "type": "string"
+              },
+              "creates": {
+                "type": "string",
+                "description": "Optional file path; the command is skipped when it exists (keeps reruns idempotent)"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "properties": {
+    "install_rosetta": {
+      "type": "boolean",
+      "description": "Set to true to install Rosetta 2 (required for some Intel-based applications on Apple Silicon)"
+    },
+    "homebrew_taps": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Homebrew taps to add before installing formulae/casks"
+    },
+    "homebrew_casks": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Homebrew cask package names (flat strings, macOS-only format)"
+    },
+    "homebrew_formulae": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Homebrew formula package names (flat strings, macOS-only format)"
+    },
+    "powershell_modules": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pipx_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "uv_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "npm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pnpm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if pnpm is present"
+    },
+    "bun_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if bun is present"
+    },
+    "dotnet_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "vscode_extensions": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "git_user_email": {
+      "type": "string",
+      "description": "May be empty; can be set via -e flag instead"
+    },
+    "git_user_name": {
+      "type": "string",
+      "description": "May be empty or a Jinja2 lookup expression"
+    },
+    "custom_commands_user": {
+      "$ref": "#/$defs/customCommandStringArrayOrNull",
+      "description": "Non-elevated shell commands (macOS uses plain strings, unlike Linux platforms)"
+    },
+    "custom_commands_elevated": {
+      "$ref": "#/$defs/customCommandStringArrayOrNull",
+      "description": "Elevated (sudo) shell commands (macOS uses plain strings, unlike Linux platforms)"
+    },
+    "custom_script": {
+      "type": "string",
+      "description": "Path to a custom script run at the end of setup; may be empty"
+    }
+  },
+  "required": [
+    "install_rosetta"
+  ]
+}

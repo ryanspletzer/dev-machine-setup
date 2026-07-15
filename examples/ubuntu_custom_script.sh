@@ -8,7 +8,7 @@ arch="$(dpkg --print-architecture 2>/dev/null || uname -m)"
 if [[ "$arch" == "arm64" || "$arch" == "aarch64" ]]; then
   tmpdir="$(mktemp -d)"
   trap 'rm -rf "$tmpdir"' EXIT
-  cd "$tmpdir"
+  cd "$tmpdir" || exit 1
 
   # aarch64 == arm64
   curl -fsSLO https://downloads.1password.com/linux/tar/stable/aarch64/1password-latest.tar.gz

@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Debian vars.yaml schema",
+  "description": "Validates debian/vars.yaml, tests/debian/vars.yaml, and examples/debian_vars.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "architecture": {
+      "type": "string",
+      "enum": [
+        "amd64",
+        "arm64"
+      ]
+    },
+    "architectureArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/architecture"
+      }
+    },
+    "stringArrayOrNull": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "packageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "appimagePackageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "string"
+        },
+        "mime_types": {
+          "type": "string"
+        },
+        "no_sandbox": {
+          "type": "boolean"
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "externalAptRepositoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "signed_by",
+        "uris",
+        "suites",
+        "components",
+        "architectures"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "signed_by": {
+          "type": "string"
+        },
+        "uris": {
+          "type": "string"
+        },
+        "suites": {
+          "type": "string"
+        },
+        "components": {
+          "type": "string"
+        },
+        "architectures": {
+          "type": "string",
+          "description": "Usually the Jinja2 expression {{ deb_architecture }}"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "customCommandEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "description"
+      ],
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "creates": {
+          "type": "string",
+          "description": "Optional file path; the command is skipped when it exists (keeps reruns idempotent)"
+        }
+      }
+    },
+    "customCommandArrayOrNull": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/customCommandEntry"
+      }
+    }
+  },
+  "properties": {
+    "is_wsl": {
+      "type": "boolean",
+      "description": "Set to true if running in WSL; the playbook overwrites this via set_fact regardless"
+    },
+    "appimage_install_dir": {
+      "type": "string"
+    },
+    "appimage_packages": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/appimagePackageEntry"
+      }
+    },
+    "apt_packages_prereqs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "external_apt_repositories": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/externalAptRepositoryEntry"
+      }
+    },
+    "apt_packages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "flatpak_packages": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "powershell_modules": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pipx_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "uv_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "npm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pnpm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if pnpm is present"
+    },
+    "bun_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if bun is present"
+    },
+    "dotnet_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "vscode_extensions": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "git_user_email": {
+      "type": "string"
+    },
+    "git_user_name": {
+      "type": "string"
+    },
+    "custom_commands_user": {
+      "$ref": "#/$defs/customCommandArrayOrNull"
+    },
+    "custom_commands_elevated": {
+      "$ref": "#/$defs/customCommandArrayOrNull"
+    },
+    "custom_script": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "appimage_install_dir",
+    "apt_packages_prereqs",
+    "apt_packages"
+  ]
+}

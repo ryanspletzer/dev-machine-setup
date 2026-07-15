@@ -87,11 +87,16 @@ Test-Check "dotnetsay installed (.NET global tool)" {
     if (-not (Test-Path "$env:USERPROFILE\.dotnet\tools\dotnetsay.exe")) { throw "dotnetsay.exe not found" }
 }
 
+# Custom command (sentinel file proves it ran)
+Test-Check "custom command ran (sentinel file)" {
+    if (-not (Test-Path "$env:USERPROFILE\.dms-ci-custom-command-ran")) { throw "sentinel not found" }
+}
+
 # Git config
-Test-Equal "git user.email configured" `
-    (git config --global user.email) "ci-test@example.com"
-Test-Equal "git user.name configured" `
-    (git config --global user.name) "CI Test User"
+Test-Equal -Description "git user.email configured" `
+    -Actual (git config --global user.email) -Expected "ci-test@example.com"
+Test-Equal -Description "git user.name configured" `
+    -Actual (git config --global user.name) -Expected "CI Test User"
 
 Write-Output ""
 if ($Failures -gt 0) {

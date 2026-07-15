@@ -101,44 +101,42 @@ external_dnf_repositories:
 # DNF packages
 dnf_packages:
   # Development tools (replaces build-essential)
+  - name: autoconf
+  - name: automake
+  - name: cmake
   - name: gcc
   - name: gcc-c++
   - name: glibc-devel
-  - name: cmake
+  - name: libtool
   - name: make
   - name: pkg-config
-  - name: autoconf
-  - name: automake
-  - name: libtool
   - name: unzip
   # Python dependencies
-  - name: openssl-devel
-  - name: zlib-devel
   - name: bzip2-devel
-  - name: readline-devel
-  - name: sqlite-devel
+  - name: libffi-devel
   - name: llvm
   - name: ncurses-devel
-  - name: tk-devel
-  - name: libffi-devel
-  - name: xz-devel
+  - name: openssl-devel
   - name: python3-pip
+  - name: readline-devel
+  - name: sqlite-devel
+  - name: tk-devel
+  - name: xz-devel
+  - name: zlib-devel
   # Git and version control
   - name: git
   - name: git-lfs
   # Shell tools
-  - name: zsh
-  - name: fish
   - name: bash-completion
+  - name: fish
+  - name: zsh
   # Other tools
-  - name: jq
-  - name: maven
-  - name: direnv
   - name: azure-cli
+  - name: containerd.io
+  - name: direnv
+  - name: docker-buildx-plugin
   - name: docker-ce
   - name: docker-ce-cli
-  - name: containerd.io
-  - name: docker-buildx-plugin
   - name: docker-compose-plugin
   - name: dotnet-sdk-9.0
   - name: ffmpeg-free
@@ -148,25 +146,27 @@ dnf_packages:
   - name: google-chrome-stable
     supported_architectures:
       - x86_64
+  - name: jq
+  - name: maven
   - name: microsoft-edge-stable
     supported_architectures:
       - x86_64
   # Node.js from NodeSource repository
+  - name: cargo
   - name: nodejs
   - name: packer
   - name: pipx
   - name: ruby
   - name: ruby-devel
   - name: rust
-  - name: cargo
   # QEMU virtualization packages
-  - name: qemu-system-x86
-  - name: qemu-user-static
+  - name: bridge-utils
+  - name: libvirt
   - name: qemu-img
   - name: qemu-kvm
-  - name: libvirt
+  - name: qemu-system-x86
+  - name: qemu-user-static
   - name: virt-manager
-  - name: bridge-utils
   # amd64 only, arm64 not supported
   - name: steam
     supported_architectures:

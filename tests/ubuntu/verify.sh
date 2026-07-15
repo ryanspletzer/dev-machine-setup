@@ -3,30 +3,8 @@
 # Post-integration verification for Ubuntu setup
 set -e
 
-FAILURES=0
-
-check() {
-  description="$1"
-  shift
-  if "$@" >/dev/null 2>&1; then
-    echo "PASS: $description"
-  else
-    echo "FAIL: $description"
-    FAILURES=$((FAILURES + 1))
-  fi
-}
-
-check_equal() {
-  description="$1"
-  actual="$2"
-  expected="$3"
-  if [ "$actual" = "$expected" ]; then
-    echo "PASS: $description"
-  else
-    echo "FAIL: $description (expected '$expected', got '$actual')"
-    FAILURES=$((FAILURES + 1))
-  fi
-}
+# shellcheck source=tests/lib/assert.sh
+. "$(dirname "$0")/../lib/assert.sh"
 
 # APT prereqs
 check "ca-certificates installed (APT prereq)" dpkg -l ca-certificates
@@ -55,13 +33,33 @@ check "hello installed (snap)" sh -c 'snap list hello'
 check "json installed (pnpm global)" test -e "$HOME/.local/share/pnpm/bin/json"
 check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
 
-# .NET global tool
-check "dotnetsay installed (.NET global tool)" test -x "$HOME/.dotnet/tools/dotnetsay"
+# .NET global tool (mirrors the playbook guard: skipped when dotnet is absent,
+# e.g. on the reduced-toolset ARM runner image)
+if command -v dotnet >/dev/null 2>&1; then
+  check "dotnetsay installed (.NET global tool)" test -x "$HOME/.dotnet/tools/dotnetsay"
+fi
 
-# AppImage
-check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
-check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
-check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+# AppImage (appimagetool is amd64-only; on other architectures the
+# supported_architectures guard must skip it entirely)
+if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+  check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
+  check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
+  check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+else
+  check "appimagetool skipped on non-amd64" test ! -e "$HOME/.local/bin/appimagetool.AppImage"
+fi
+
+# AppImage checksum probe (exercises checksum, no_sandbox, mime_types)
+check "checksum-probe AppImage downloaded" test -x "$HOME/.local/bin/checksum-probe.AppImage"
+check "checksum-probe CLI symlink created" test -L "$HOME/.local/bin/checksum-probe"
+check "checksum-probe desktop entry has --no-sandbox" \
+  grep -q -- "--no-sandbox" "$HOME/.local/share/applications/checksum-probe.desktop"
+check "checksum-probe desktop entry has MimeType" \
+  grep -q "^MimeType=text/plain;$" "$HOME/.local/share/applications/checksum-probe.desktop"
+
+# Custom commands (sentinel files prove they ran)
+check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
+check "elevated custom command ran" test -f /etc/dms-ci-elevated-command-ran
 
 # Git config
 check_equal "git user.email configured" \
@@ -69,10 +67,4 @@ check_equal "git user.email configured" \
 check_equal "git user.name configured" \
   "$(git config --global user.name)" "CI Test User"
 
-echo ""
-if [ "$FAILURES" -gt 0 ]; then
-  echo "$FAILURES check(s) failed"
-  exit 1
-else
-  echo "All checks passed"
-fi
+finish

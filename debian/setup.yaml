@@ -139,6 +139,7 @@
       ansible.builtin.apt:
         update_cache: true
       become: true
+      changed_when: false
       when: (external_apt_repositories | default([], true)) | length > 0
       tags:
         - apt
@@ -424,7 +425,7 @@
         pipx install {{ item }}
       loop: "{{ pipx_packages | default([], true) }}"
       register: pipx_install_result
-      changed_when: "'already installed' not in pipx_install_result.stdout"
+      changed_when: "'already' not in pipx_install_result.stdout"
       loop_control:
         label: "Installing pipx module: {{ item }}"
       tags:
@@ -584,11 +585,24 @@
         - extensions
 
     # Git LFS setup
+    # git lfs install prints the same output every run, so check for the
+    # config it writes and only run when it is absent
+    - name: Check if Git LFS is initialized # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: git config --global --get filter.lfs.smudge
+      register: git_lfs_check
+      changed_when: false
+      failed_when: false
+      tags:
+        - git
+        - lfs
+
     - name: Ensure Git LFS is initialized # noqa: command-instead-of-module
       ansible.builtin.command:
         cmd: git lfs install
       register: git_lfs_result
-      changed_when: "'Already initialized' not in git_lfs_result.stdout"
+      when: git_lfs_check.rc != 0
+      changed_when: git_lfs_result.rc == 0
       tags:
         - git
         - lfs
@@ -617,10 +631,14 @@
 
     # Custom user commands
     - name: Execute custom user commands # noqa: command-instead-of-shell
-      ansible.builtin.shell: "{{ item.command }}"
+      ansible.builtin.shell:
+        cmd: "{{ item.command }}"
+        creates: "{{ item.creates | default(omit) }}"
       loop: "{{ custom_commands_user | default([], true) }}"
       register: custom_command_user_result
-      changed_when: custom_command_user_result.rc == 0
+      changed_when: >-
+        custom_command_user_result.rc == 0 and
+        'Did not run command since' not in (custom_command_user_result.msg | default(''))
       failed_when: false
       loop_control:
         label: "Executing: {{ item.description }}"
@@ -630,11 +648,15 @@
 
     # Custom elevated commands
     - name: Execute custom elevated commands # noqa: command-instead-of-shell
-      ansible.builtin.shell: "{{ item.command }}"
+      ansible.builtin.shell:
+        cmd: "{{ item.command }}"
+        creates: "{{ item.creates | default(omit) }}"
       become: true
       loop: "{{ custom_commands_elevated | default([], true) }}"
       register: custom_command_elevated_result
-      changed_when: custom_command_elevated_result.rc == 0
+      changed_when: >-
+        custom_command_elevated_result.rc == 0 and
+        'Did not run command since' not in (custom_command_elevated_result.msg | default(''))
       failed_when: false
       loop_control:
         label: "Executing: {{ item.description }}"

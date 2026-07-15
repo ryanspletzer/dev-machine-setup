@@ -39,10 +39,15 @@ vscode_extensions:
 git_user_email: "ci-test@example.com"
 git_user_name: "CI Test User"
 
+# Mapping form exercises the command/creates entry shape: sentinel files
+# let verify.sh prove the commands ran, and creates keeps reruns
+# idempotent (the task skips once the file exists)
 custom_commands_user:
-  - echo "CI test user command"
+  - command: touch "$HOME/.dms-ci-user-command-ran"
+    creates: "{{ ansible_env.HOME }}/.dms-ci-user-command-ran"
 
 custom_commands_elevated:
-  - echo "CI test elevated command"
+  - command: touch /etc/dms-ci-elevated-command-ran
+    creates: /etc/dms-ci-elevated-command-ran
 
 custom_script: ""

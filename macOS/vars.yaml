@@ -76,8 +76,8 @@ homebrew_formulae:
   - ruff
   - rustup
   - uv
-  - ykman
   - wget2
+  - ykman
   - zsh-autocomplete
   - zsh-autosuggestions
   - zsh-syntax-highlighting

@@ -3,30 +3,8 @@
 # Post-integration verification for Fedora setup
 set -e
 
-FAILURES=0
-
-check() {
-  description="$1"
-  shift
-  if "$@" >/dev/null 2>&1; then
-    echo "PASS: $description"
-  else
-    echo "FAIL: $description"
-    FAILURES=$((FAILURES + 1))
-  fi
-}
-
-check_equal() {
-  description="$1"
-  actual="$2"
-  expected="$3"
-  if [ "$actual" = "$expected" ]; then
-    echo "PASS: $description"
-  else
-    echo "FAIL: $description (expected '$expected', got '$actual')"
-    FAILURES=$((FAILURES + 1))
-  fi
-}
+# shellcheck source=tests/lib/assert.sh
+. "$(dirname "$0")/../lib/assert.sh"
 
 # DNF prereqs
 check "ca-certificates installed (DNF prereq)" rpm -q ca-certificates
@@ -57,16 +35,14 @@ check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.
 check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
 check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
 
+# Custom commands (sentinel files prove they ran)
+check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
+check "elevated custom command ran" test -f /etc/dms-ci-elevated-command-ran
+
 # Git config
 check_equal "git user.email configured" \
   "$(git config --global user.email)" "ci-test@example.com"
 check_equal "git user.name configured" \
   "$(git config --global user.name)" "CI Test User"
 
-echo ""
-if [ "$FAILURES" -gt 0 ]; then
-  echo "$FAILURES check(s) failed"
-  exit 1
-else
-  echo "All checks passed"
-fi
+finish

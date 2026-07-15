@@ -46,11 +46,11 @@ choco_packages:
   - name: packer
   - name: pnpm
   # Required to for pipx_packages
-  - name: python
   - name: pwsh
+  - name: python
   - name: qemu
-  - name: ruff
   - name: rsat
+  - name: ruff
   - name: rustup.install
   - name: servicebusexplorer
   - name: slack

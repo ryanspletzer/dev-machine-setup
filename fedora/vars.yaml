@@ -42,39 +42,39 @@ external_dnf_repositories: []
 # DNF packages
 dnf_packages:
   # Development tools
-  - name: cmake
-  - name: make
-  - name: pkg-config
   - name: autoconf
   - name: automake
+  - name: cmake
   - name: libtool
+  - name: make
+  - name: pkg-config
   - name: unzip
   # Python dependencies
-  - name: openssl-devel
-  - name: zlib-devel
   - name: bzip2-devel
-  - name: readline-devel
-  - name: sqlite-devel
+  - name: libffi-devel
   - name: llvm
   - name: ncurses-devel
-  - name: tk-devel
-  - name: libffi-devel
-  - name: xz-devel
+  - name: openssl-devel
   - name: python3-pip
+  - name: readline-devel
+  - name: sqlite-devel
+  - name: tk-devel
+  - name: xz-devel
+  - name: zlib-devel
   # Git and version control
   - name: git
   - name: git-lfs
   # Shell tools
-  - name: zsh
-  - name: fish
   - name: bash-completion
+  - name: fish
+  - name: zsh
   # Other tools
-  - name: jq
   - name: direnv
   - name: dotnet-sdk-9.0
   - name: ffmpeg-free
   - name: fzf
   - name: golang
+  - name: jq
   # Node.js from Fedora repos
   - name: nodejs
   - name: npm
@@ -82,11 +82,11 @@ dnf_packages:
   - name: ruby
   - name: ruby-devel
   # QEMU virtualization packages
-  - name: qemu-system-x86
-  - name: qemu-user-static
+  - name: libvirt
   - name: qemu-img
   - name: qemu-kvm
-  - name: libvirt
+  - name: qemu-system-x86
+  - name: qemu-user-static
   - name: virt-manager
   # Visual Studio Code
   - name: code

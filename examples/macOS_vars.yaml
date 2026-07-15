@@ -18,8 +18,8 @@ homebrew_casks:
   - appcleaner
   - brave-browser
   - chatgpt
-  - claude-code
   - citrix-workspace
+  - claude-code
   - comet
   - copilot-cli
   - cursor
@@ -29,8 +29,8 @@ homebrew_casks:
   - elgato-camera-hub
   - firefox
   - font-caskaydia-cove-nerd-font
-  - git-credential-manager
   - ghostty
+  - git-credential-manager
   - google-chrome
   - gstreamer-runtime
   - handy
@@ -72,8 +72,8 @@ homebrew_formulae:
   - azure-functions-core-tools@4
   - basedpyright
   - bash
-  - bash-git-prompt
   - bash-completion
+  - bash-git-prompt
   - bash-language-server
   - bat
   - beads
@@ -145,13 +145,13 @@ homebrew_formulae:
   - typescript-language-server
   - uv
   - vscode-langservers-extracted
+  - weasyprint
+  - wget2
+  - xh
   - yaml-language-server
   - yamllint
   - ykman
   - yq
-  - weasyprint
-  - wget2
-  - xh
   - zoxide
   - zsh-autocomplete
   - zsh-autosuggestions

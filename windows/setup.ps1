@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 #Requires -Version 5.1
 
 # Installs prerequisites and runs the configuration
@@ -40,45 +40,25 @@ $script:InformationPreference = 'Continue'
 
 #endregion Transcript Setup
 
+#region Helper Functions
+
+# Pure text-parsing helpers (vars.yaml pre-parsing) live in a separate file
+# so the Pester suite in tests/windows can test them without running setup.
+. (Join-Path -Path (Split-Path -Path $MyInvocation.MyCommand.Path) -ChildPath 'setup-functions.ps1')
+
+#endregion Helper Functions
+
 #region Additional Input Validation
 
-# Strip everything outside the choco_packages block
-$gitPackageInYaml = (
-        (Get-Content -Path $VarsFilePath -Raw) -replace '(?ms)^.*?^choco_packages:\s*|^\S.*', ''
-    ) -split "`r?\n" |                  # break into lines
-    Where-Object {
-        # keep  - name: …  lines
-        $_ -match '^\s*-\s*name:'
-    } |
-    ForEach-Object {
-        # strip YAML syntax + quotes, leave only the raw name
-        ($_ -replace '^\s*-\s*name:\s*["'']?(?<pkg>[^"'']+)["'']?\s*$', '$1')
-    } |
+$gitPackageInYaml = Get-ChocoPackageName -Path $VarsFilePath |
     Where-Object -FilterScript { $_ -eq 'git' }
-
-# | Piece        | What it matches                                                | Purpose                              |
-# | ------------ | -------------------------------------------------------------- | ------------------------------------ |
-# | `^\s*`       | optional leading spaces at line start                          | anchor at the beginning              |
-# | `[^:]+:`     | everything up to (and including) the first colon               | skips the key name                   |
-# | `\s*`        | optional spaces                                                | ignore padding                       |
-# | `(["'']?)`   | **group 1** – an optional `'` or `"`                           | remembers opening quote if present   |
-# | `([^#'"]*?)` | **group 2** – zero or more chars that are **not** `#`, `'`, `"` | captures the value itself            |
-# | `\1`         | the same quote captured in group 1                             | ensures we close the quote we opened |
-# | `\s*`        | optional spaces                                                | ignore padding                       |
-# | `(?:#.*)?`   | an optional comment starting with `#` to EOL                   | discards right-hand comments         |
-# | `$`          | end of line                                                    | anchor                               |
-$pattern = '^\s*[^:]+:\s*(["'']?)([^#''"]*?)\1\s*(?:#.*)?$'
 
 # If git.config --global user.email is not set, ensure that one was provided or that the vars.yaml file has a
 # git_user_email entry
-if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch {})) -and
+if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction SilentlyContinue) { git config --global user.email })) -and
     [string]::IsNullOrWhiteSpace($GitUserEmail) -and
     [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
-                ForEach-Object -Process { $_ -replace $pattern, '$2' }
-        )
+        (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_email')
     ) -and
     $gitPackageInYaml) {
 
@@ -89,11 +69,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.email } catch 
 
 # If GitUserEmail is empty, check if it was supplied in the vars.yaml file
 if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
-    $gitUserEmailFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
-            ForEach-Object -Process { $_ -replace $pattern, '$2' }
-    )
+    $gitUserEmailFromVars = (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_email')
     if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
         Write-Verbose -Message "Using git_user_email from vars.yaml: $gitUserEmailFromVars"
         $GitUserEmail = $gitUserEmailFromVars
@@ -102,15 +78,11 @@ if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
 
 # If git.config --global user.name is not set, ensure that one was provided or that the default value is not empty
 # or the vars.yaml file has a git_user_name entry
-if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {})) -and
+if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction SilentlyContinue) { git config --global user.name })) -and
     [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
     [string]::IsNullOrWhiteSpace($GitUserName) -and
     [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
-                ForEach-Object -Process { $_ -replace $pattern, '$2' }
-        )
+        (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_name')
     ) -and
     $gitPackageInYaml) {
 
@@ -121,11 +93,7 @@ if ([string]::IsNullOrWhiteSpace($(try { git config --global user.name } catch {
 
 # If GitUserName is empty, check if it was supplied in the vars.yaml file
 if ([string]::IsNullOrWhiteSpace($GitUserName)) {
-    $gitUserNameFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
-            ForEach-Object -Process { $_ -replace $pattern, '$2' }
-    )
+    $gitUserNameFromVars = (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_name')
     if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
         Write-Verbose -Message "Using git_user_name from vars.yaml: $gitUserNameFromVars"
         $GitUserName = $gitUserNameFromVars
@@ -137,21 +105,18 @@ if ([string]::IsNullOrWhiteSpace($GitUserName)) {
 #region Progress Variables
 
 $activity = 'Setting Up Dev Machine'
-$step = 0 # Set this at the beginning of each step
-$stepText = 'Chocolatey Install' # Set this at the beginning of each step
+$step = 0 # Incremented at the beginning of each step, alongside $stepText
 
 # Get content of current script file to count of the total steps by looking at Step++ lines
-$scriptPath = $MyInvocation.MyCommand.Path
 $totalSteps = (
     Get-Content -Path $MyInvocation.MyCommand.Path |
     Where-Object -FilterScript { $_ -eq '$step++' }
 ).Count
 
-# Single quotes need to be on the outside
-$statusText = '"Step $($step.ToString().PadLeft($totalSteps.ToString().Length)) of $totalSteps | $stepText"'
-
-# This script block allows the string above to use the current values of embedded values each time it's run
-$statusBlock = [ScriptBlock]::Create($statusText)
+# Builds the progress status string from the current values of $step, $totalSteps, and $stepText each time it's called
+function Get-StatusText {
+    "Step $($step.ToString().PadLeft($totalSteps.ToString().Length)) of $totalSteps | $stepText"
+}
 
 #endregion Progress Variables
 
@@ -159,7 +124,7 @@ $statusBlock = [ScriptBlock]::Create($statusText)
 
 $step++
 $stepText = 'Chocolatey Install'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Chocolatey install...'
 
 # Get
@@ -171,9 +136,9 @@ Write-Verbose -Message '[Test] Chocolatey...'
 if ($null -eq $choco) {
     # Set
     Write-Verbose -Message '[Set] Chocolatey is not installed, installing...'
-    Invoke-Expression -Command (
+    & ([ScriptBlock]::Create(
         (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
-    )
+    ))
     Import-Module -Name $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
     Write-Verbose -Message '[Set] Chocolatey is now installed.'
     Write-Information -MessageData 'Installed Chocolatey.'
@@ -192,7 +157,7 @@ if ($env:ChocolateyInstall -and (Test-Path "$env:ChocolateyInstall\helpers\choco
 
 $step++
 $stepText = 'Install PowerShell (pwsh)'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for PowerShell (pwsh) install...'
 
 # Get
@@ -220,7 +185,7 @@ if ($null -eq $pwsh) {
 
 $step++
 $stepText = 'Set PSGallery to Trusted in PSResourceGet in PowerShell (pwsh)'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking if PSGallery is set to trusted...'
 
 # Get
@@ -249,13 +214,13 @@ if (-not $psResourceRepository.Trusted) {
 
 $step++
 $stepText = 'Install powershell-yaml in PowerShell (pwsh)'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for powershell-yaml module install...'
 
 # Get
 Write-Verbose -Message '[Get] powershell-yaml module...'
 $yamlPSResource = pwsh -Command {
-    Get-PSResource -Name 'powershell-yaml' -ErrorAction SilentlyContinue
+    Get-InstalledPSResource -Name 'powershell-yaml' -ErrorAction SilentlyContinue
 }
 
 # Test
@@ -278,7 +243,7 @@ if ($null -eq $yamlPSResource) {
 
 $step++
 $stepText = 'Import Vars file using powershell-yaml in PowerShell (pwsh)'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for vars.yaml file...'
 
 # Get
@@ -312,7 +277,7 @@ try {
 
 $step++
 $stepText = 'Install Chocolatey Packages from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Chocolatey packages to install...'
 
 # Get
@@ -324,7 +289,7 @@ Write-Verbose -Message '[Test] Chocolatey packages from Vars file import...'
 if ($chocoPackages -and $chocoPackages.Count -gt 0) {
     foreach ($package in $chocoPackages) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package.name -PercentComplete ($step / $totalSteps * 100)
 
         # Get / Test / Set
@@ -359,7 +324,7 @@ if ($chocoPackages -and $chocoPackages.Count -gt 0) {
 $step++
 $stepText = 'Install PowerShell (pwsh) Modules from Vars file via PSResourceGet'
 Write-Information -MessageData 'Checking for PowerShell (pwsh) modules to install via PSResourceGet...'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 
 # Get
 Write-Verbose -Message '[Get] PowerShell (pwsh) modules from Vars file import...'
@@ -370,7 +335,7 @@ Write-Verbose -Message '[Test] PowerShell (pwsh) modules from Vars file import..
 if ($powershellModules -and $powershellModules.Count -gt 0) {
     foreach ($module in $powershellModules) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for PowerShell (pwsh) module $module..."
 
@@ -410,7 +375,7 @@ if ($powershellModules -and $powershellModules.Count -gt 0) {
 
 $step++
 $stepText = 'Ensure Windows PowerShell NuGet Package Provider is Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Windows PowerShell NuGet Package Provider...'
 
 # Get
@@ -447,7 +412,7 @@ if (($null -eq $nuGetProviderVersion) -or ($nuGetProviderVersion -lt [version]'2
 
 $step++
 $stepText = 'Ensure Windows PowerShell PSGallery Package Source is Trusted'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking Ensure Windows PowerShell PSGallery Package Source is Trusted...'
 
 # Get
@@ -476,7 +441,7 @@ if (-not $packageSource.IsTrusted) {
 
 $step++
 $stepText = 'Install Windows PowerShell Modules from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Windows PowerShell modules to install...'
 
 # Get
@@ -488,7 +453,7 @@ Write-Verbose -Message '[Test] Windows PowerShell modules from Vars file import.
 if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
     foreach ($module in $windowsPowerShellModules) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for Windows PowerShell module $module..."
 
@@ -528,7 +493,7 @@ if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
 
 $step++
 $stepText = 'Ensure pipx is Installed if Python is Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for pipx installation...'
 
 # Get
@@ -565,7 +530,7 @@ if ($null -eq $pipx) {
 
 $step++
 $stepText = 'Ensure pipx Packages from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for pipx packages to install...'
 
 # Get
@@ -586,7 +551,7 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
     foreach ($package in $pipxPackages) {
         Write-Progress -Activity $activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for pipx package $package..."
 
@@ -620,7 +585,7 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
 $step++
 $stepText = 'Ensure uv Tools from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for uv tools to install...'
 
 # Get
@@ -641,7 +606,7 @@ if ($null -eq $uvCmd) {
     if ($uvTools -and $uvTools.Count -gt 0) {
         foreach ($tool in $uvTools) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Installing uv tool $tool..."
 
@@ -666,7 +631,7 @@ if ($null -eq $uvCmd) {
 
 $step++
 $stepText = 'Ensure npm global Packages from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for npm global packages to install...'
 
 # Get
@@ -681,7 +646,7 @@ if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
     $npmGlobalPackagesInstalled = npm list -g --depth=0 --json | ConvertFrom-Json
     foreach ($package in $npmGlobalPackages) {
         Write-Progress -Activity $activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for npm global package $package..."
 
@@ -715,7 +680,7 @@ if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
 
 $step++
 $stepText = 'Ensure pnpm global Packages from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for pnpm global packages to install...'
 
 # Get
@@ -761,7 +726,7 @@ if ($null -eq $pnpmCmd) {
             ForEach-Object -Process { $_.dependencies.PSObject.Properties.Name }
         foreach ($package in $pnpmGlobalPackages) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for pnpm global package $package..."
 
@@ -798,7 +763,7 @@ if ($null -eq $pnpmCmd) {
 
 $step++
 $stepText = 'Ensure bun global Packages from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for bun global packages to install...'
 
 # Get
@@ -819,10 +784,17 @@ if ($null -eq $bunCmd) {
     if ($bunGlobalPackages -and $bunGlobalPackages.Count -gt 0) {
         # Get the list of currently installed bun global packages
         Write-Verbose -Message '[Get] Currently installed bun global packages...'
-        $bunGlobalPackagesInstalled = bun pm ls -g 2>$null | Out-String
+        # Localize ErrorActionPreference: under Windows PowerShell 5.1 a
+        # redirected native stderr line becomes an ErrorRecord, and with an
+        # inherited 'Stop' preference (e.g. GitHub Actions' powershell shell)
+        # bun's "No package.json" notice would terminate the script.
+        $bunGlobalPackagesInstalled = & {
+            $ErrorActionPreference = 'Continue'
+            bun pm ls -g 2>$null
+        } | Out-String
         foreach ($package in $bunGlobalPackages) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for bun global package $package..."
 
@@ -859,7 +831,7 @@ if ($null -eq $bunCmd) {
 
 $step++
 $stepText = 'Ensure .NET Global Tools from Vars file are Installed'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for .NET global tools to install...'
 
 # Get
@@ -887,7 +859,7 @@ if (-not $dotnetCommand) {
 
     foreach ($tool in $dotnetTools) {
         Write-Progress -Activity $activity -Status (
-            & $statusBlock
+            Get-StatusText
         ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for .NET global tool $tool..."
 
@@ -921,7 +893,7 @@ if (-not $dotnetCommand) {
 
 $step++
 $stepText = 'Install Visual Studio Code Extensions from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Visual Studio Code extensions to install...'
 
 # Get
@@ -943,7 +915,7 @@ if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
         $vscodeExtensionsInstalled = code --list-extensions
         foreach ($extension in $vscodeExtensions) {
             Write-Progress -Activity $Activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for Visual Studio Code extension $extension..."
 
@@ -981,7 +953,7 @@ if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
 
 $step++
 $stepText = 'Install Cursor Extensions from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for Cursor extensions to install...'
 
 # Get
@@ -1003,7 +975,7 @@ if ($cursorExtensions -and $cursorExtensions.Count -gt 0) {
         $cursorExtensionsInstalled = cursor --list-extensions
         foreach ($extension in $cursorExtensions) {
             Write-Progress -Activity $Activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for Cursor extension $extension..."
 
@@ -1041,13 +1013,13 @@ if ($cursorExtensions -and $cursorExtensions.Count -gt 0) {
 
 $step++
 $stepText = 'Git user.email and user.name Config'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Configuring Git user.email and user.name...'
 
 # Get
 Write-Verbose -Message '[Get] Git user.email and user.name...'
-$currentGitUserEmail = try { git config --global user.email } catch {}
-$currentGitUserName = try { git config --global user.name } catch {}
+$currentGitUserEmail = if (Get-Command -Name git -ErrorAction SilentlyContinue) { git config --global user.email }
+$currentGitUserName = if (Get-Command -Name git -ErrorAction SilentlyContinue) { git config --global user.name }
 
 # Test
 Write-Verbose -Message '[Test] Git user.email...'
@@ -1101,7 +1073,7 @@ if (-not [string]::IsNullOrWhiteSpace($GitUserName) -and
 
 $step++
 $stepText = 'Execute Custom Commands from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for custom commands to execute from vars.yaml file...'
 
 # Get
@@ -1113,7 +1085,7 @@ Write-Verbose -Message '[Test] Custom commands from Vars file import...'
 if ($customCommands -and $customCommands.Count -gt 0) {
     foreach ($command in $customCommands) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $command -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Executing custom command: $command..."
 
@@ -1137,7 +1109,7 @@ if ($customCommands -and $customCommands.Count -gt 0) {
 
 $step++
 $stepText = 'Execute Custom Script from Vars file'
-Write-Progress -Activity $activity -Status (& $statusBlock) -PercentComplete ($step / $totalSteps * 100)
+Write-Progress -Activity $activity -Status (Get-StatusText) -PercentComplete ($step / $totalSteps * 100)
 Write-Information -MessageData 'Checking for custom script to execute from vars.yaml file...'
 
 # Get
@@ -1167,7 +1139,7 @@ if (-not [string]::IsNullOrWhiteSpace($customScript)) {
 
 Stop-Transcript
 
-Write-Host "`nSetup completed successfully!"
-Write-Host "Full log available at: $transcriptFile"
+Write-Information -MessageData "`nSetup completed successfully!"
+Write-Information -MessageData "Full log available at: $transcriptFile"
 
 #endregion Transcript Teardown
