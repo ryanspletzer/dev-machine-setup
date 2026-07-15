@@ -220,7 +220,7 @@ Write-Information -MessageData 'Checking for powershell-yaml module install...'
 # Get
 Write-Verbose -Message '[Get] powershell-yaml module...'
 $yamlPSResource = pwsh -Command {
-    Get-PSResource -Name 'powershell-yaml' -ErrorAction SilentlyContinue
+    Get-InstalledPSResource -Name 'powershell-yaml' -ErrorAction SilentlyContinue
 }
 
 # Test
