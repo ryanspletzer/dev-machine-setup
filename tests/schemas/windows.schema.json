@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Windows vars.yaml schema",
+  "description": "Validates windows/vars.yaml, tests/windows/vars.yaml, and examples/windows_vars.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "stringArrayOrNull": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "chocoPackageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "string"
+        },
+        "prerelease": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "properties": {
+    "choco_packages": {
+      "type": ["array", "null"],
+      "items": {
+        "$ref": "#/$defs/chocoPackageEntry"
+      }
+    },
+    "powershell_modules": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed via PSResourceGet in PowerShell (pwsh.exe)"
+    },
+    "windows_powershell_modules": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed via Install-Module in Windows PowerShell (powershell.exe); typically empty/commented out"
+    },
+    "pipx_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "uv_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "npm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pnpm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if pnpm is present"
+    },
+    "bun_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if bun is present"
+    },
+    "dotnet_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "vscode_extensions": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "git_user_email": {
+      "type": "string"
+    },
+    "git_user_name": {
+      "type": "string"
+    },
+    "custom_commands": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
+      },
+      "description": "PowerShell commands/statements executed after setup; a single list (Windows already runs as Administrator)"
+    },
+    "custom_script": {
+      "type": "string"
+    }
+  }
+}

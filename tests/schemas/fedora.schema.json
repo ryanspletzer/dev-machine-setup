@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fedora vars.yaml schema",
+  "description": "Validates fedora/vars.yaml, tests/fedora/vars.yaml, and examples/fedora_vars.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "architecture": {
+      "type": "string",
+      "enum": ["x86_64", "aarch64"]
+    },
+    "architectureArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/architecture"
+      }
+    },
+    "stringArrayOrNull": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "packageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "appimagePackageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "string"
+        },
+        "mime_types": {
+          "type": "string"
+        },
+        "no_sandbox": {
+          "type": "boolean"
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "externalDnfRepositoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "baseurl"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "baseurl": {
+          "type": "string"
+        },
+        "gpgkey": {
+          "type": "string"
+        },
+        "gpgcheck": {
+          "type": "boolean"
+        },
+        "supported_architectures": {
+          "$ref": "#/$defs/architectureArray"
+        }
+      }
+    },
+    "customCommandEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "description"],
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "customCommandArrayOrNull": {
+      "type": ["array", "null"],
+      "items": {
+        "$ref": "#/$defs/customCommandEntry"
+      }
+    }
+  },
+  "properties": {
+    "is_wsl": {
+      "type": "boolean",
+      "description": "Set to true if running in WSL; the playbook overwrites this via set_fact regardless"
+    },
+    "appimage_install_dir": {
+      "type": "string"
+    },
+    "appimage_packages": {
+      "type": ["array", "null"],
+      "items": {
+        "$ref": "#/$defs/appimagePackageEntry"
+      }
+    },
+    "dnf_packages_prereqs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "external_dnf_repositories": {
+      "type": ["array", "null"],
+      "items": {
+        "$ref": "#/$defs/externalDnfRepositoryEntry"
+      }
+    },
+    "dnf_packages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "flatpak_packages": {
+      "type": ["array", "null"],
+      "items": {
+        "$ref": "#/$defs/packageEntry"
+      }
+    },
+    "powershell_modules": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pipx_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "uv_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "npm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "pnpm_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if pnpm is present"
+    },
+    "bun_global_packages": {
+      "$ref": "#/$defs/stringArrayOrNull",
+      "description": "Installed only if bun is present"
+    },
+    "dotnet_tools": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "vscode_extensions": {
+      "$ref": "#/$defs/stringArrayOrNull"
+    },
+    "git_user_email": {
+      "type": "string"
+    },
+    "git_user_name": {
+      "type": "string"
+    },
+    "custom_commands_user": {
+      "$ref": "#/$defs/customCommandArrayOrNull"
+    },
+    "custom_commands_elevated": {
+      "$ref": "#/$defs/customCommandArrayOrNull"
+    },
+    "custom_script": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "appimage_install_dir",
+    "dnf_packages_prereqs",
+    "dnf_packages"
+  ]
+}

@@ -84,6 +84,14 @@ jobs:
       - name: YAML lint
         run: uvx yamllint .
 
+      - name: Validate vars.yaml against schemas
+        run: |
+          uvx check-jsonschema --schemafile tests/schemas/macos.schema.json macOS/vars.yaml tests/macOS/vars.yaml examples/macOS_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/ubuntu.schema.json ubuntu/vars.yaml tests/ubuntu/vars.yaml examples/ubuntu_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/debian.schema.json debian/vars.yaml tests/debian/vars.yaml examples/debian_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/fedora.schema.json fedora/vars.yaml tests/fedora/vars.yaml examples/fedora_vars.yaml
+          uvx check-jsonschema --schemafile tests/schemas/windows.schema.json windows/vars.yaml tests/windows/vars.yaml examples/windows_vars.yaml
+
       - name: shellcheck
         run: git ls-files '*.sh' | xargs shellcheck
 
