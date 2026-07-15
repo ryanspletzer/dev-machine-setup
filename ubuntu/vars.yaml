@@ -131,15 +131,6 @@ external_apt_repositories:
     suites: nodistro
     components: main
     architectures: "{{ deb_architecture }}"
-  # Steam repository (provides the steam-launcher package below)
-  - name: steam
-    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
-    uris: https://repo.steampowered.com/steam
-    suites: stable
-    components: steam
-    architectures: "{{ deb_architecture }}"
-    supported_architectures:
-      - amd64
   - name: virtualbox
     signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
     uris: https://download.virtualbox.org/virtualbox/debian
@@ -241,10 +232,7 @@ apt_packages:
   - name: qemu-utils
   - name: snapd
   - name: virt-manager
-  # amd64 only, arm64 not supported
-  - name: steam-launcher
-    supported_architectures:
-      - amd64
+  # HashiCorp tools
   - name: terraform
   - name: vault
   # Oracle VirtualBox
@@ -591,6 +579,17 @@ custom_commands_user:
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
+  # Steam self-manages its APT source: the steam-launcher package writes
+  # its own sources file and keyring, which conflicts with a pre-added
+  # repo entry (apt refuses duplicate sources with differing Signed-By).
+  # Bootstrap from Valve's standalone .deb instead; amd64 only.
+  - command: >-
+      if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+      curl -fsSL -o /tmp/steam_latest.deb
+      https://repo.steampowered.com/steam/archive/stable/steam_latest.deb
+      && apt-get install -y /tmp/steam_latest.deb; fi
+    description: Install Steam from Valve's standalone .deb (amd64 only)
+    creates: /usr/bin/steam
   # Add Docker User
   - command: usermod -aG docker {{ ansible_user_id }}
     description: Add current user to Docker group
