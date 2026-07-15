@@ -360,9 +360,10 @@ custom_commands:
   - Write-Output -InputObject "Enabling Dark Mode for System and Apps..."
   - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name SystemUsesLightTheme -Value 0 -Type Dword -Force
   - Set-ItemProperty -Path HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize -Name AppsUseLightTheme -Value 0
-  # Enable sudo
+  # Enable sudo (built-in on Windows 11 24H2+; skip where absent, e.g.
+  # older builds or Windows Server)
   - Write-Output -InputObject "Enabling sudo..."
-  - sudo config --enable normal
+  - if (Get-Command -Name sudo -ErrorAction SilentlyContinue) { sudo config --enable normal } else { Write-Output -InputObject "sudo not available; skipping." }
   # Restart Explorer to apply the theme changes
   - Write-Output -InputObject  "Restarting Explorer to apply theme changes..."
   - Stop-Process -Name explorer
