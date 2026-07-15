@@ -11,7 +11,7 @@ concurrency:
 env:
   # Pins uv's view of PyPI and keys the uv cache in the validate job.
   # Bump this date to pick up newer tool releases and invalidate the cache.
-  UV_EXCLUDE_NEWER: "2026-07-14"
+  UV_EXCLUDE_NEWER: "2026-07-15"
 
 on:
   # No paths filter on push: validate lints the whole repo (docs, examples,
