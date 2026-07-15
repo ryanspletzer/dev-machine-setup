@@ -101,6 +101,9 @@ jobs:
       - name: shellcheck
         run: git ls-files '*.sh' | xargs shellcheck
 
+      - name: bats tests (setup.sh argument handling)
+        run: npx --yes bats@1.11.0 tests/shell
+
       - name: Markdown lint
         run: npx --yes markdownlint-cli2@0.23.0 "**/*.md"
 
