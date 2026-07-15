@@ -129,6 +129,31 @@ jobs:
           uvx --from ansible-core ansible-playbook --syntax-check fedora/setup.yaml
           uvx --from ansible-core ansible-playbook --syntax-check debian/setup.yaml
 
+  unit-windows:
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.windows == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Windows PowerShell 5.1 first: that's the engine a fresh Windows 11
+      # machine bootstraps setup.ps1 from (5.1 ships with Pester 3.4, so a
+      # modern Pester must be installed and imported explicitly).
+      - name: Run Pester tests (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          Install-Module -Name Pester -MinimumVersion 5.5.0 -Force -SkipPublisherCheck -Scope CurrentUser
+          Import-Module -Name Pester -MinimumVersion 5.5.0
+          Invoke-Pester -Path tests/windows -CI -Output Detailed
+
+      - name: Run Pester tests (PowerShell 7)
+        shell: pwsh
+        run: |
+          Install-PSResource -Name Pester -Scope CurrentUser -TrustRepository -Reinstall
+          Invoke-Pester -Path tests/windows -CI -Output Detailed
+
   integration-macos:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.macos == 'true'

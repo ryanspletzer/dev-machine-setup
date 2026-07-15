@@ -40,45 +40,25 @@ $script:InformationPreference = 'Continue'
 
 #endregion Transcript Setup
 
+#region Helper Functions
+
+# Pure text-parsing helpers (vars.yaml pre-parsing) live in a separate file
+# so the Pester suite in tests/windows can test them without running setup.
+. (Join-Path -Path (Split-Path -Path $MyInvocation.MyCommand.Path) -ChildPath 'setup-functions.ps1')
+
+#endregion Helper Functions
+
 #region Additional Input Validation
 
-# Strip everything outside the choco_packages block
-$gitPackageInYaml = (
-        (Get-Content -Path $VarsFilePath -Raw) -replace '(?ms)^.*?^choco_packages:\s*|^\S.*', ''
-    ) -split "`r?\n" |                  # break into lines
-    Where-Object {
-        # keep  - name: …  lines
-        $_ -match '^\s*-\s*name:'
-    } |
-    ForEach-Object {
-        # strip YAML syntax + quotes, leave only the raw name
-        ($_ -replace '^\s*-\s*name:\s*["'']?(?<pkg>[^"'']+)["'']?\s*$', '$1')
-    } |
+$gitPackageInYaml = Get-ChocoPackageName -Path $VarsFilePath |
     Where-Object -FilterScript { $_ -eq 'git' }
-
-# | Piece        | What it matches                                                | Purpose                              |
-# | ------------ | -------------------------------------------------------------- | ------------------------------------ |
-# | `^\s*`       | optional leading spaces at line start                          | anchor at the beginning              |
-# | `[^:]+:`     | everything up to (and including) the first colon               | skips the key name                   |
-# | `\s*`        | optional spaces                                                | ignore padding                       |
-# | `(["'']?)`   | **group 1** – an optional `'` or `"`                           | remembers opening quote if present   |
-# | `([^#'"]*?)` | **group 2** – zero or more chars that are **not** `#`, `'`, `"` | captures the value itself            |
-# | `\1`         | the same quote captured in group 1                             | ensures we close the quote we opened |
-# | `\s*`        | optional spaces                                                | ignore padding                       |
-# | `(?:#.*)?`   | an optional comment starting with `#` to EOL                   | discards right-hand comments         |
-# | `$`          | end of line                                                    | anchor                               |
-$pattern = '^\s*[^:]+:\s*(["'']?)([^#''"]*?)\1\s*(?:#.*)?$'
 
 # If git.config --global user.email is not set, ensure that one was provided or that the vars.yaml file has a
 # git_user_email entry
 if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction SilentlyContinue) { git config --global user.email })) -and
     [string]::IsNullOrWhiteSpace($GitUserEmail) -and
     [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
-                ForEach-Object -Process { $_ -replace $pattern, '$2' }
-        )
+        (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_email')
     ) -and
     $gitPackageInYaml) {
 
@@ -89,11 +69,7 @@ if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction Silent
 
 # If GitUserEmail is empty, check if it was supplied in the vars.yaml file
 if ([string]::IsNullOrWhiteSpace($GitUserEmail)) {
-    $gitUserEmailFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match '^\s*git_user_email\s*:' } |
-            ForEach-Object -Process { $_ -replace $pattern, '$2' }
-    )
+    $gitUserEmailFromVars = (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_email')
     if (-not [string]::IsNullOrWhiteSpace($gitUserEmailFromVars)) {
         Write-Verbose -Message "Using git_user_email from vars.yaml: $gitUserEmailFromVars"
         $GitUserEmail = $gitUserEmailFromVars
@@ -106,11 +82,7 @@ if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction Silent
     [string]::IsNullOrWhiteSpace($PSBoundParameters['GitUserName']) -and
     [string]::IsNullOrWhiteSpace($GitUserName) -and
     [string]::IsNullOrWhiteSpace(
-        (
-            Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-                Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
-                ForEach-Object -Process { $_ -replace $pattern, '$2' }
-        )
+        (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_name')
     ) -and
     $gitPackageInYaml) {
 
@@ -121,11 +93,7 @@ if ([string]::IsNullOrWhiteSpace($(if (Get-Command -Name git -ErrorAction Silent
 
 # If GitUserName is empty, check if it was supplied in the vars.yaml file
 if ([string]::IsNullOrWhiteSpace($GitUserName)) {
-    $gitUserNameFromVars = (
-        Get-Content -Path $VarsFilePath -ErrorAction SilentlyContinue |
-            Where-Object -FilterScript { $_ -match '^\s*git_user_name\s*:' } |
-            ForEach-Object -Process { $_ -replace $pattern, '$2' }
-    )
+    $gitUserNameFromVars = (Get-VarsYamlScalar -Path $VarsFilePath -Key 'git_user_name')
     if (-not [string]::IsNullOrWhiteSpace($gitUserNameFromVars)) {
         Write-Verbose -Message "Using git_user_name from vars.yaml: $gitUserNameFromVars"
         $GitUserName = $gitUserNameFromVars
