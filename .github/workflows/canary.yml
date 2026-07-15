@@ -110,6 +110,28 @@ jobs:
           }
           Get-PSDrive -Name C | Format-Table -Property Used, Free -AutoSize
 
+      # Correctness-driven exclusions, not size-driven: run-4 timing showed
+      # the big packages are cheap (office 4m, SSMS 9.5m); these four cannot
+      # install on a hosted runner or are broken upstream.
+      - name: Exclude packages that cannot install on a hosted runner
+        shell: pwsh
+        run: |
+          $exclude = @(
+            'gnupg'            # installer hangs headless until choco's 45-min timeout
+            'nvm'              # its nvm.install dependency hangs the same way
+            'awssamcli'        # MSI error 1603 on the runner image (pending-reboot class)
+            'windows-app-sdk'  # upstream checksum mismatch as of 2026-07-15; re-include when fixed
+          )
+          $out = New-Object System.Collections.Generic.List[string]
+          $skip = $false
+          foreach ($line in Get-Content windows/vars.yaml) {
+            if ($line -match '^  - name: (\S+)') { $skip = $exclude -contains $Matches[1] }
+            elseif ($line -match '^\S') { $skip = $false }
+            if (-not $skip) { $out.Add($line) }
+          }
+          Set-Content -Path windows/vars.yaml -Value $out
+          Write-Host "Excluded: $($exclude -join ', ')"
+
       # Windows PowerShell 5.1 — same rationale as the integration job:
       # a fresh Windows 11 machine bootstraps from stock 5.1.
       - name: Run setup with production vars.yaml
