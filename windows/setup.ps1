@@ -289,7 +289,7 @@ Write-Verbose -Message '[Test] Chocolatey packages from Vars file import...'
 if ($chocoPackages -and $chocoPackages.Count -gt 0) {
     foreach ($package in $chocoPackages) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package.name -PercentComplete ($step / $totalSteps * 100)
 
         # Get / Test / Set
@@ -335,7 +335,7 @@ Write-Verbose -Message '[Test] PowerShell (pwsh) modules from Vars file import..
 if ($powershellModules -and $powershellModules.Count -gt 0) {
     foreach ($module in $powershellModules) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for PowerShell (pwsh) module $module..."
 
@@ -453,7 +453,7 @@ Write-Verbose -Message '[Test] Windows PowerShell modules from Vars file import.
 if ($windowsPowerShellModules -and $windowsPowerShellModules.Count -gt 0) {
     foreach ($module in $windowsPowerShellModules) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $module -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for Windows PowerShell module $module..."
 
@@ -551,7 +551,7 @@ if ($pipxPackages -and $pipxPackages.Count -gt 0) {
 
     foreach ($package in $pipxPackages) {
         Write-Progress -Activity $activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for pipx package $package..."
 
@@ -606,7 +606,7 @@ if ($null -eq $uvCmd) {
     if ($uvTools -and $uvTools.Count -gt 0) {
         foreach ($tool in $uvTools) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Installing uv tool $tool..."
 
@@ -646,7 +646,7 @@ if ($npmGlobalPackages -and $npmGlobalPackages.Count -gt 0) {
     $npmGlobalPackagesInstalled = npm list -g --depth=0 --json | ConvertFrom-Json
     foreach ($package in $npmGlobalPackages) {
         Write-Progress -Activity $activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for npm global package $package..."
 
@@ -726,7 +726,7 @@ if ($null -eq $pnpmCmd) {
             ForEach-Object -Process { $_.dependencies.PSObject.Properties.Name }
         foreach ($package in $pnpmGlobalPackages) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for pnpm global package $package..."
 
@@ -787,7 +787,7 @@ if ($null -eq $bunCmd) {
         $bunGlobalPackagesInstalled = bun pm ls -g 2>$null | Out-String
         foreach ($package in $bunGlobalPackages) {
             Write-Progress -Activity $activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $package -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for bun global package $package..."
 
@@ -852,7 +852,7 @@ if (-not $dotnetCommand) {
 
     foreach ($tool in $dotnetTools) {
         Write-Progress -Activity $activity -Status (
-            & $statusBlock
+            Get-StatusText
         ) -CurrentOperation $tool -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Checking for .NET global tool $tool..."
 
@@ -908,7 +908,7 @@ if ($vscodeExtensions -and $vscodeExtensions.Count -gt 0) {
         $vscodeExtensionsInstalled = code --list-extensions
         foreach ($extension in $vscodeExtensions) {
             Write-Progress -Activity $Activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for Visual Studio Code extension $extension..."
 
@@ -968,7 +968,7 @@ if ($cursorExtensions -and $cursorExtensions.Count -gt 0) {
         $cursorExtensionsInstalled = cursor --list-extensions
         foreach ($extension in $cursorExtensions) {
             Write-Progress -Activity $Activity -Status (
-                & $StatusBlock
+                Get-StatusText
             ) -CurrentOperation $extension -PercentComplete ($step / $totalSteps * 100)
             Write-Information -MessageData "Checking for Cursor extension $extension..."
 
@@ -1078,7 +1078,7 @@ Write-Verbose -Message '[Test] Custom commands from Vars file import...'
 if ($customCommands -and $customCommands.Count -gt 0) {
     foreach ($command in $customCommands) {
         Write-Progress -Activity $Activity -Status (
-            & $StatusBlock
+            Get-StatusText
         ) -CurrentOperation $command -PercentComplete ($step / $totalSteps * 100)
         Write-Information -MessageData "Executing custom command: $command..."
 
