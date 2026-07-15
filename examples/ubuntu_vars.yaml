@@ -146,14 +146,6 @@ external_apt_repositories:
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
-  - name: steam
-    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
-    uris: https://repo.steampowered.com/steam
-    suites: stable
-    components: steam
-    architectures: "{{ deb_architecture }}"
-    supported_architectures:
-      - amd64
   - name: tailscale
     signed_by: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
     uris: https://pkgs.tailscale.com/stable/ubuntu
@@ -268,10 +260,6 @@ apt_packages:
   - name: virt-manager
   # Ookla Speedtest CLI - correct package name
   - name: speedtest-cli
-  # amd64 only, arm64 not supported
-  - name: steam-launcher
-    supported_architectures:
-      - amd64
   - name: tailscale
   - name: terraform
   - name: vault
@@ -626,6 +614,17 @@ custom_commands_user:
 # These commands will be executed with elevated privileges (sudo)
 custom_commands_elevated:
   # Add commands to execute with elevated privileges
+  # Steam self-manages its APT source: the steam-launcher package writes
+  # its own sources file and keyring, which conflicts with a pre-added
+  # repo entry (apt refuses duplicate sources with differing Signed-By).
+  # Bootstrap from Valve's standalone .deb instead; amd64 only.
+  - command: >-
+      if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+      curl -fsSL -o /tmp/steam_latest.deb
+      https://repo.steampowered.com/steam/archive/stable/steam_latest.deb
+      && apt-get install -y /tmp/steam_latest.deb; fi
+    description: Install Steam from Valve's standalone .deb (amd64 only)
+    creates: /usr/bin/steam
   # Add Docker User
   - command: usermod -aG docker $USER
     description: Add current user to Docker group
