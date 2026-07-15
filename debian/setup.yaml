@@ -273,6 +273,7 @@
       when:
         - pnpm_check.rc == 0
         - item not in (pnpm_list_result.stdout | default('[]', true) | from_json | map(attribute='dependencies', default={}) | map('list') | flatten)
+      failed_when: false
       register: pnpm_install_result
       changed_when: "pnpm_install_result.rc == 0"
       loop_control:
@@ -316,6 +317,7 @@
         - bun_check.rc == 0
         # bun pm ls -g prints "── <name>@<version>"; anchor with space+@ to avoid substring false matches
         - (' ' ~ item ~ '@') not in (bun_list_result.stdout | default(''))
+      failed_when: false
       register: bun_install_result
       changed_when: "bun_install_result.rc == 0"
       loop_control:
