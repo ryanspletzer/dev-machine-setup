@@ -784,7 +784,14 @@ if ($null -eq $bunCmd) {
     if ($bunGlobalPackages -and $bunGlobalPackages.Count -gt 0) {
         # Get the list of currently installed bun global packages
         Write-Verbose -Message '[Get] Currently installed bun global packages...'
-        $bunGlobalPackagesInstalled = bun pm ls -g 2>$null | Out-String
+        # Localize ErrorActionPreference: under Windows PowerShell 5.1 a
+        # redirected native stderr line becomes an ErrorRecord, and with an
+        # inherited 'Stop' preference (e.g. GitHub Actions' powershell shell)
+        # bun's "No package.json" notice would terminate the script.
+        $bunGlobalPackagesInstalled = & {
+            $ErrorActionPreference = 'Continue'
+            bun pm ls -g 2>$null
+        } | Out-String
         foreach ($package in $bunGlobalPackages) {
             Write-Progress -Activity $activity -Status (
                 Get-StatusText
