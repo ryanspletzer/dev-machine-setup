@@ -14,14 +14,22 @@ external_apt_repositories:
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
+  # Debian 13's archive ships Node.js 20, too old for current pnpm (needs
+  # >= 22.13); mirror the real vars and pull Node 22 from NodeSource.
+  - name: nodesource
+    signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    uris: https://deb.nodesource.com/node_22.x
+    suites: nodistro
+    components: main
+    architectures: "{{ deb_architecture }}"
 
 apt_packages:
   - name: gh
   - name: git
   - name: git-lfs
   - name: jq
+  # NodeSource nodejs bundles npm
   - name: nodejs
-  - name: npm
   - name: pipx
 
 flatpak_packages: []
