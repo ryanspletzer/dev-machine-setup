@@ -144,6 +144,17 @@ jobs:
           chmod 700 tests/macOS/verify.sh
           tests/macOS/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: macOS
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-ubuntu:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.ubuntu == 'true'
@@ -166,6 +177,17 @@ jobs:
         run: |
           chmod 700 tests/ubuntu/verify.sh
           tests/ubuntu/verify.sh
+
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: ubuntu
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
 
   integration-fedora:
     needs: [detect-changes, validate]
@@ -194,6 +216,17 @@ jobs:
           chmod 700 tests/fedora/verify.sh
           tests/fedora/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: fedora
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-debian:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.debian == 'true'
@@ -221,6 +254,17 @@ jobs:
           chmod 700 tests/debian/verify.sh
           tests/debian/verify.sh
 
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: debian
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-windows:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.windows == 'true'
@@ -233,9 +277,20 @@ jobs:
       - name: Copy test fixtures
         run: Copy-Item tests/windows/vars.yaml windows/vars.yaml
 
+      # shell: powershell (Windows PowerShell 5.1) — a fresh Windows 11
+      # machine bootstraps from stock 5.1, so that's what setup.ps1 must
+      # run on. The default pwsh would mask 5.1-only breakage.
       - name: Run setup
         working-directory: windows
+        shell: powershell
         run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"
 
       - name: Verify installation
         run: .\tests\windows\verify.ps1
+
+      # Native PowerShell engine has no change-count recap; assert a rerun
+      # completes cleanly, which exercises every step's Get/Test/Set guard.
+      - name: Idempotency check (second run succeeds)
+        working-directory: windows
+        shell: powershell
+        run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"

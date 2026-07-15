@@ -1,0 +1,96 @@
+name: Canary
+
+# Weekly run of each platform's REAL vars.yaml (the PR pipeline only
+# exercises the minimal fixtures in tests/, so a green PR never proves the
+# production package lists still install). Catches upstream breakage:
+# renamed Homebrew formulae, moved APT/DNF repos, dead AppImage URLs,
+# removed Chocolatey packages. Non-blocking: failures notify, but never
+# gate PRs.
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  canary-macos:
+    runs-on: macos-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run setup with production vars.yaml
+        working-directory: macOS
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+  canary-ubuntu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run setup with production vars.yaml
+        working-directory: ubuntu
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+  canary-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:43
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: dnf install -y sudo findutils
+
+      - name: Run setup with production vars.yaml
+        working-directory: fedora
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+  canary-debian:
+    runs-on: ubuntu-latest
+    container: debian:13
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: apt-get update && apt-get install -y sudo findutils
+
+      - name: Run setup with production vars.yaml
+        working-directory: debian
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+  canary-windows:
+    runs-on: windows-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Windows PowerShell 5.1 — same rationale as the integration job:
+      # a fresh Windows 11 machine bootstraps from stock 5.1.
+      - name: Run setup with production vars.yaml
+        working-directory: windows
+        shell: powershell
+        run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"
