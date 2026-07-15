@@ -362,6 +362,8 @@
         path: ~/.bashrc
         line: 'export PATH="$HOME/.dotnet/tools:$PATH"'
         state: present
+        create: true
+        mode: "0644"
       when: dotnet_check.rc == 0
       tags:
         - dotnet
