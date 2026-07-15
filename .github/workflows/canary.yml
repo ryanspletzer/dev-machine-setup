@@ -88,9 +88,36 @@ jobs:
         with:
           persist-credentials: false
 
+      # The production choco list needs more free space than the runner
+      # image ships with (~14 GB): three canary runs died with the runner
+      # agent itself crashing on a full C: drive. Delete the largest
+      # preinstalled toolchains this job never uses.
+      - name: Free disk space
+        shell: pwsh
+        run: |
+          Get-PSDrive -Name C | Format-Table -Property Used, Free -AutoSize
+          $targets = @(
+            'C:\Android'                          # Android SDK, ~12 GB
+            'C:\hostedtoolcache\windows\CodeQL'   # CodeQL bundle, ~5 GB
+            'C:\selenium'
+            'C:\SeleniumWebDrivers'
+          )
+          foreach ($target in $targets) {
+            if (Test-Path $target) {
+              Write-Host "Removing $target"
+              Remove-Item -Recurse -Force $target -ErrorAction SilentlyContinue
+            }
+          }
+          Get-PSDrive -Name C | Format-Table -Property Used, Free -AutoSize
+
       # Windows PowerShell 5.1 — same rationale as the integration job:
       # a fresh Windows 11 machine bootstraps from stock 5.1.
       - name: Run setup with production vars.yaml
         working-directory: windows
         shell: powershell
         run: .\setup.ps1 -e ci-test@example.com -n "CI Test User"
+
+      - name: Report disk space after setup
+        if: always()
+        shell: pwsh
+        run: Get-PSDrive -Name C | Format-Table -Property Used, Free -AutoSize
