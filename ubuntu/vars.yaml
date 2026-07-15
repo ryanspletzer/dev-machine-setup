@@ -131,6 +131,15 @@ external_apt_repositories:
     suites: nodistro
     components: main
     architectures: "{{ deb_architecture }}"
+  # Steam repository (provides the steam-launcher package below)
+  - name: steam
+    signed_by: https://repo.steampowered.com/steam/archive/stable/steam.gpg
+    uris: https://repo.steampowered.com/steam
+    suites: stable
+    components: steam
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
   - name: virtualbox
     signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
     uris: https://download.virtualbox.org/virtualbox/debian
