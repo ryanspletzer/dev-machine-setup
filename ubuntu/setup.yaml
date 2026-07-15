@@ -133,6 +133,17 @@
         - apt
         - repositories
 
+    # Refresh indexes so packages that exist only in the just-added external
+    # repositories are resolvable on the first run
+    - name: Update APT cache after adding external repositories
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
+      when: (external_apt_repositories | default([], true)) | length > 0
+      tags:
+        - apt
+        - repositories
+
     # Install APT packages
     - name: Install APT packages
       ansible.builtin.apt:
