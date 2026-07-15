@@ -102,44 +102,43 @@ external_apt_repositories:
 # APT packages
 apt_packages:
   # Development tools
-  - name: build-essential
-  - name: cmake
-  - name: make
-  - name: pkg-config
   - name: autoconf
   - name: automake
+  - name: build-essential
+  - name: cmake
   - name: libtool
+  - name: make
+  - name: pkg-config
   - name: unzip
   # Python dependencies
-  - name: libssl-dev
-  - name: zlib1g-dev
   - name: libbz2-dev
-  - name: libreadline-dev
-  - name: libsqlite3-dev
-  - name: llvm
-  - name: libncurses5-dev
-  - name: libncursesw5-dev
-  - name: tk-dev
   - name: libffi-dev
   - name: liblzma-dev
+  - name: libncurses5-dev
+  - name: libncursesw5-dev
+  - name: libreadline-dev
+  - name: libsqlite3-dev
+  - name: libssl-dev
+  - name: llvm
   - name: python3-openssl
   - name: python3-pip
   - name: python3-venv
+  - name: tk-dev
+  - name: zlib1g-dev
   # Git and version control
   - name: git
   - name: git-lfs
   # Shell tools
-  - name: zsh
-  - name: fish
   - name: bash-completion
+  - name: fish
+  - name: zsh
   # Other tools
-  - name: jq
-  - name: direnv
   - name: azure-cli
+  - name: containerd.io
+  - name: direnv
+  - name: docker-buildx-plugin
   - name: docker-ce
   - name: docker-ce-cli
-  - name: containerd.io
-  - name: docker-buildx-plugin
   - name: docker-compose-plugin
   - name: ffmpeg
   - name: fzf
@@ -148,6 +147,7 @@ apt_packages:
   - name: google-chrome-stable
     supported_architectures:
       - amd64
+  - name: jq
   # Extra codecs for multimedia support
   - name: libavcodec-extra
   # Node.js from NodeSource repository

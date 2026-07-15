@@ -121,6 +121,14 @@ external_apt_repositories:
     suites: nodistro
     components: main
     architectures: "{{ deb_architecture }}"
+  - name: virtualbox
+    signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+    uris: https://download.virtualbox.org/virtualbox/debian
+    suites: "{{ ansible_distribution_release }}"
+    components: contrib
+    architectures: "{{ deb_architecture }}"
+    supported_architectures:
+      - amd64
   - name: yubico
     signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x32CBA1A9"
     uris: http://ppa.launchpad.net/yubico/stable/ubuntu
@@ -134,14 +142,6 @@ external_apt_repositories:
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
-  - name: virtualbox
-    signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
-    uris: https://download.virtualbox.org/virtualbox/debian
-    suites: "{{ ansible_distribution_release }}"
-    components: contrib
-    architectures: "{{ deb_architecture }}"
-    supported_architectures:
-      - amd64
   - name: zoom
     signed_by: https://zoom.us/linux/download/pubkey
     uris: https://zoom.us/client/latest
@@ -160,45 +160,43 @@ external_apt_repositories:
 # APT packages
 apt_packages:
   # Development tools
-  - name: build-essential
-  - name: cmake
-  - name: make
-  - name: pkg-config
   - name: autoconf
   - name: automake
+  - name: build-essential
+  - name: cmake
   - name: libtool
+  - name: make
+  - name: pkg-config
   - name: unzip
   # Python dependencies
-  - name: libssl-dev
-  - name: zlib1g-dev
   - name: libbz2-dev
-  - name: libreadline-dev
-  - name: libsqlite3-dev
-  - name: llvm
-  - name: libncurses5-dev
-  - name: libncursesw5-dev
-  - name: tk-dev
   - name: libffi-dev
   - name: liblzma-dev
+  - name: libncurses5-dev
+  - name: libncursesw5-dev
+  - name: libreadline-dev
+  - name: libsqlite3-dev
+  - name: libssl-dev
+  - name: llvm
   - name: python3-openssl
   - name: python3-pip
   - name: python3-venv
+  - name: tk-dev
+  - name: zlib1g-dev
   # Git and version control
   - name: git
   - name: git-lfs
   # Shell tools
-  - name: zsh
-  - name: fish
   - name: bash-completion
+  - name: fish
+  - name: zsh
   # Other tools
-  - name: jq
-  - name: maven
-  - name: direnv
   - name: azure-cli
+  - name: containerd.io
+  - name: direnv
+  - name: docker-buildx-plugin
   - name: docker-ce
   - name: docker-ce-cli
-  - name: containerd.io
-  - name: docker-buildx-plugin
   - name: docker-compose-plugin
   - name: dotnet-sdk-9.0
   - name: ffmpeg
@@ -208,6 +206,8 @@ apt_packages:
   - name: google-chrome-stable
     supported_architectures:
       - amd64
+  - name: jq
+  - name: maven
   # Extra codecs for multimedia support
   - name: libavcodec-extra
   - name: microsoft-edge-stable
@@ -221,15 +221,15 @@ apt_packages:
   - name: ruby-full
   - name: rustup
   # QEMU virtualization packages
+  - name: bridge-utils
+  - name: libvirt-clients
+  - name: libvirt-daemon-system
+  - name: qemu-kvm
   - name: qemu-system
   - name: qemu-user-static
   - name: qemu-utils
-  - name: qemu-kvm
-  - name: libvirt-daemon-system
-  - name: libvirt-clients
-  - name: bridge-utils
-  - name: virt-manager
   - name: snapd
+  - name: virt-manager
   # amd64 only, arm64 not supported
   - name: steam-launcher
     supported_architectures:
@@ -261,9 +261,9 @@ apt_packages:
     supported_architectures:
       - amd64
   # Zulu OpenJDK
-  - name: zulu21-jdk
   - name: zsh-autosuggestions
   - name: zsh-syntax-highlighting
+  - name: zulu21-jdk
 
 # Snap packages
 snap_packages:

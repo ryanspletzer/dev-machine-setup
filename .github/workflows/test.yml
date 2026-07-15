@@ -92,6 +92,12 @@ jobs:
           uvx check-jsonschema --schemafile tests/schemas/fedora.schema.json fedora/vars.yaml tests/fedora/vars.yaml examples/fedora_vars.yaml
           uvx check-jsonschema --schemafile tests/schemas/windows.schema.json windows/vars.yaml tests/windows/vars.yaml examples/windows_vars.yaml
 
+      - name: Check vars.yaml alphabetical order
+        run: python3 tests/check-vars-sorted.py ./*/vars.yaml ./tests/*/vars.yaml ./examples/*_vars.yaml
+
+      - name: Check examples match real vars keys
+        run: python3 tests/check-example-drift.py
+
       - name: shellcheck
         run: git ls-files '*.sh' | xargs shellcheck
 

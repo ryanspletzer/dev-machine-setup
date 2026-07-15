@@ -88,13 +88,6 @@ external_apt_repositories:
     suites: nodistro
     components: main
     architectures: "{{ deb_architecture }}"
-  # Visual Studio Code repository
-  - name: vscode
-    signed_by: https://packages.microsoft.com/keys/microsoft.asc
-    uris: https://packages.microsoft.com/repos/code
-    suites: stable
-    components: main
-    architectures: "{{ deb_architecture }}"
   - name: virtualbox
     signed_by: https://www.virtualbox.org/download/oracle_vbox_2016.asc
     uris: https://download.virtualbox.org/virtualbox/debian
@@ -103,6 +96,13 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
     supported_architectures:
       - amd64
+  # Visual Studio Code repository
+  - name: vscode
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris: https://packages.microsoft.com/repos/code
+    suites: stable
+    components: main
+    architectures: "{{ deb_architecture }}"
   - name: zulu
     signed_by: https://www.azul.com/files/0xB1998361219BD9C9.txt
     uris: https://repos.azul.com/zulu/deb
@@ -113,45 +113,43 @@ external_apt_repositories:
 # APT packages
 apt_packages:
   # Development tools
-  - name: build-essential
-  - name: cmake
-  - name: make
-  - name: pkg-config
   - name: autoconf
   - name: automake
+  - name: build-essential
+  - name: cmake
   - name: libtool
+  - name: make
+  - name: pkg-config
   - name: unzip
   # Python dependencies
-  - name: libssl-dev
-  - name: zlib1g-dev
   - name: libbz2-dev
-  - name: libreadline-dev
-  - name: libsqlite3-dev
-  - name: llvm
-  - name: libncurses5-dev
-  - name: libncursesw5-dev
-  - name: tk-dev
   - name: libffi-dev
   - name: liblzma-dev
+  - name: libncurses5-dev
+  - name: libncursesw5-dev
+  - name: libreadline-dev
+  - name: libsqlite3-dev
+  - name: libssl-dev
+  - name: llvm
   - name: python3-openssl
   - name: python3-pip
   - name: python3-venv
+  - name: tk-dev
+  - name: zlib1g-dev
   # Git and version control
   - name: git
   - name: git-lfs
   # Shell tools
-  - name: zsh
-  - name: fish
   - name: bash-completion
+  - name: fish
+  - name: zsh
   # Other tools
-  - name: jq
-  - name: maven
-  - name: direnv
   - name: azure-cli
+  - name: containerd.io
+  - name: direnv
+  - name: docker-buildx-plugin
   - name: docker-ce
   - name: docker-ce-cli
-  - name: containerd.io
-  - name: docker-buildx-plugin
   - name: docker-compose-plugin
   - name: dotnet-sdk-9.0
   - name: ffmpeg
@@ -161,6 +159,8 @@ apt_packages:
   - name: google-chrome-stable
     supported_architectures:
       - amd64
+  - name: jq
+  - name: maven
   # Extra codecs for multimedia support
   - name: libavcodec-extra
   - name: microsoft-edge-stable
@@ -172,16 +172,16 @@ apt_packages:
   - name: pipx
   - name: ruby-full
   # QEMU virtualization packages
+  - name: bridge-utils
+  - name: libvirt-clients
+  - name: libvirt-daemon-system
+  - name: qemu-kvm
   - name: qemu-system
   - name: qemu-user-static
   - name: qemu-utils
-  - name: qemu-kvm
-  - name: libvirt-daemon-system
-  - name: libvirt-clients
-  - name: bridge-utils
-  - name: virt-manager
   - name: terraform
   - name: vault
+  - name: virt-manager
   # Oracle VirtualBox
   # amd64 only, arm64 not supported
   - name: virtualbox-7.1
@@ -192,9 +192,9 @@ apt_packages:
   # wget
   - name: wget
   # Zulu OpenJDK
-  - name: zulu21-jdk
   - name: zsh-autosuggestions
   - name: zsh-syntax-highlighting
+  - name: zulu21-jdk
 
 # Flatpak packages
 flatpak_packages:
