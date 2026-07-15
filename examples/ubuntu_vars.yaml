@@ -64,7 +64,7 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
   # .NET SDK 9.0 repository (replaces the dotnet/backports PPA)
   - name: dotnet-backports
-    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xA4B469963BF863CC"
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x45A3F127159BE9E5017811C62125B164E8E5D3FA"
     uris: http://ppa.launchpad.net/dotnet/backports/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
@@ -78,7 +78,7 @@ external_apt_repositories:
     architectures: "{{ deb_architecture }}"
   # Fish shell latest stable releases
   - name: fish-shell
-    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x59FDA1CE1B84B3FAD89366C027557F056DC33CA5
+    signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x88421E703EDC7AF54967DED473C9FCC9E2BB48DA
     uris: http://ppa.launchpad.net/fish-shell/release-4/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
@@ -171,14 +171,6 @@ external_apt_repositories:
     suites: stable
     components: main
     architectures: "{{ deb_architecture }}"
-  - name: zoom
-    signed_by: https://zoom.us/linux/download/pubkey
-    uris: https://zoom.us/client/latest
-    suites: "{{ ansible_distribution_release }}"
-    components: main
-    architectures: "{{ deb_architecture }}"
-    supported_architectures:
-      - amd64
   - name: zulu
     signed_by: https://www.azul.com/files/0xB1998361219BD9C9.txt
     uris: https://repos.azul.com/zulu/deb
@@ -290,9 +282,9 @@ apt_packages:
   # Zoom Workplace for Linux
   # amd64 only, arm64 not supported
   - name: yubikey-manager
-  - name: zoom
-    supported_architectures:
-      - amd64
+  # Zoom ships a standalone .deb (https://zoom.us/client/latest is a
+  # download path, not an APT repository), so it cannot be installed here;
+  # install it manually or via a custom command
   # Zulu OpenJDK
   - name: zsh-autosuggestions
   - name: zsh-syntax-highlighting
