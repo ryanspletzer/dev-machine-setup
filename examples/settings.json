@@ -145,7 +145,7 @@
     "gitlens.ai.vscode.model": "copilot:claude-sonnet-4",
     "gitlens.remotes": [
         {
-            "domain": "git.autodesk.com",
+            "domain": "{{put-github-enterprise-domain-here}}",
             "type": "GitHub"
         }
     ],
@@ -161,16 +161,18 @@
         }
     ],
     "mssql.connections": [
+        // Omit the password key: let the mssql extension prompt for it and
+        // save it in the OS credential store rather than inlining secrets
+        // in settings.json.
         {
             "database": "{{put-database-name-here}}",
-            "password": "{{put-password-here}}",
             "server": "{{put-server-name-here}}",
             "user": "{{put-username-here}}"
         }
     ],
     "omnisharp.enableRoslynAnalyzers": true,
     "parallels-desktop.brew.path": "/opt/homebrew/bin/brew",
-    "parallels-desktop.extension.path": "/Users/spletzr/.parallels-desktop-vscode",
+    "parallels-desktop.extension.path": "/Users/{{put-username-here}}/.parallels-desktop-vscode",
     "parallels-desktop.git.path": "/opt/homebrew/bin/git",
     "parallels-desktop.hashicorp.packer.path": "/opt/homebrew/bin/packer",
     "parallels-desktop.prlctl.path": "/usr/local/bin/prlctl",

@@ -82,7 +82,6 @@ if [ "$CI_MODE" = true ]; then
     echo "Error: CI mode requires passwordless sudo" | tee -a "$LOG_FILE"
     exit 1
   fi
-  export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely
   read -rs -p "Enter sudo password: " SUDO_PASSWORD
@@ -92,8 +91,12 @@ else
   ( while true; do sudo -k; echo "$SUDO_PASSWORD" | sudo -S -v >/dev/null 2>&1; sleep 15; done ) &
   SUDO_KEEP_ALIVE_PID=$!
 
-  # Export the sudo password as an environment variable for Ansible
-  export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
+  # Write the password to a 0600 temp file for ansible-playbook's
+  # --become-password-file flag, so it never enters the environment
+  # inherited by processes the playbook spawns.
+  BECOME_PASS_FILE=$(mktemp)
+  chmod 600 "$BECOME_PASS_FILE"
+  printf '%s\n' "$SUDO_PASSWORD" > "$BECOME_PASS_FILE"
 fi
 
 # Function to clean up before exit
@@ -103,10 +106,12 @@ cleanup() {
     if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
       kill "$SUDO_KEEP_ALIVE_PID" >/dev/null 2>&1 || true
     fi
-  fi
 
-  # Unset environment variables
-  unset ANSIBLE_SUDO_PASS
+    # Remove the become password file
+    if [ -n "$BECOME_PASS_FILE" ] && [ -f "$BECOME_PASS_FILE" ]; then
+      rm -f "$BECOME_PASS_FILE"
+    fi
+  fi
 }
 
 # Set up trap to ensure cleanup on exit
@@ -188,10 +193,17 @@ if [ -n "$VERBOSITY" ]; then
   echo "Using verbosity level: $VERBOSITY" | tee -a "$LOG_FILE"
 fi
 
+# Pass the become password via file instead of the environment so child
+# processes spawned by the playbook never inherit it.
+BECOME_ARGS=()
+if [ "$CI_MODE" != true ]; then
+  BECOME_ARGS=(--become-password-file "$BECOME_PASS_FILE")
+fi
+
 if [ -n "$EXTRA_VARS" ]; then
-  ansible-playbook $VERBOSITY --extra-vars "{$EXTRA_VARS}" "$PLAYBOOK_FILE"
+  ansible-playbook $VERBOSITY "${BECOME_ARGS[@]}" --extra-vars "{$EXTRA_VARS}" "$PLAYBOOK_FILE"
 else
-  ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
+  ansible-playbook $VERBOSITY "${BECOME_ARGS[@]}" "$PLAYBOOK_FILE"
 fi
 
 echo "Setup complete." | tee -a "$LOG_FILE"

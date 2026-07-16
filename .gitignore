@@ -1,0 +1,7 @@
+# Setup run logs and transcripts (full installer output; may capture
+# tokens or other sensitive values printed by tools during setup)
+setup_*.txt
+second-run.log
+
+# Local-only Claude Code permissions
+.claude/settings.local.json

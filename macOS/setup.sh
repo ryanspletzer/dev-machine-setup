@@ -80,7 +80,6 @@ run_and_log() {
 if [ "$CI_MODE" = true ]; then
   echo "CI mode: using passwordless sudo" | tee -a "$LOG_FILE"
   SUDO_PASSWORD=""
-  export ANSIBLE_SUDO_PASS=""
 else
   # Prompt for sudo password once and store it securely
   read -rs -p "Enter sudo password: " SUDO_PASSWORD
@@ -90,9 +89,15 @@ else
   KEYCHAIN_SERVICE="ansible-devmachinesetup-temp"
   KEYCHAIN_ACCOUNT="sudo-password"
 
-  # Store password in keychain (overwrite if exists)
+  # Store password in keychain (overwrite if exists). Feed the command to
+  # security's interactive mode over stdin: passing the password to -w as a
+  # command-line argument would expose it to every local process (via ps)
+  # while the command runs. security -i tokenizes like a shell, so escape
+  # backslashes and double quotes to round-trip the password intact.
   security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1 || true
-  security add-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w "$SUDO_PASSWORD"
+  printf 'add-generic-password -s "%s" -a "%s" -w "%s"\n' \
+    "$KEYCHAIN_SERVICE" "$KEYCHAIN_ACCOUNT" \
+    "$(printf '%s' "$SUDO_PASSWORD" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')" | security -i
 
   # Create a temporary askpass script that retrieves the password from keychain
   ASKPASS_SCRIPT=$(mktemp)
@@ -104,7 +109,6 @@ EOF
 
   # Set SUDO_ASKPASS and other environment variables
   export SUDO_ASKPASS="$ASKPASS_SCRIPT"
-  export ANSIBLE_SUDO_PASS="$SUDO_PASSWORD"
 
   # For Homebrew
   export HOMEBREW_SUDO_ASKPASS="$ASKPASS_SCRIPT"
@@ -120,9 +124,7 @@ fi
 cleanup() {
   echo "Performing cleanup..." | tee -a "$LOG_FILE"
 
-  if [ "$CI_MODE" = true ]; then
-    unset ANSIBLE_SUDO_PASS
-  else
+  if [ "$CI_MODE" != true ]; then
     # Kill the sudo refresh process if it exists
     if [ -n "$SUDO_KEEP_ALIVE_PID" ]; then
       echo "Killing sudo keep alive process (PID: $SUDO_KEEP_ALIVE_PID)" | tee -a "$LOG_FILE"
@@ -131,7 +133,6 @@ cleanup() {
 
     # Unset environment variables
     unset SUDO_ASKPASS
-    unset ANSIBLE_SUDO_PASS
     unset HOMEBREW_SUDO_ASKPASS
 
     # Remove the temporary askpass script
@@ -245,11 +246,20 @@ if [ -n "$GIT_NAME" ]; then
   EXTRA_VARS="${EXTRA_VARS:+$EXTRA_VARS, }\"git_user_name\": \"$(json_escape "$GIT_NAME")\""
 fi
 
+# Pass the become password via file instead of the environment so child
+# processes spawned by the playbook never inherit it. The askpass script
+# is executable, so ansible-playbook runs it and uses its stdout
+# (the password from the keychain) as the become password.
+BECOME_ARGS=()
+if [ "$CI_MODE" != true ]; then
+  BECOME_ARGS=(--become-password-file "$ASKPASS_SCRIPT")
+fi
+
 if [ -n "$EXTRA_VARS" ]; then
-  /opt/homebrew/bin/ansible-playbook $VERBOSITY \
+  /opt/homebrew/bin/ansible-playbook $VERBOSITY "${BECOME_ARGS[@]}" \
     --extra-vars "{$EXTRA_VARS}" "$PLAYBOOK_FILE"
 else
-  /opt/homebrew/bin/ansible-playbook $VERBOSITY "$PLAYBOOK_FILE"
+  /opt/homebrew/bin/ansible-playbook $VERBOSITY "${BECOME_ARGS[@]}" "$PLAYBOOK_FILE"
 fi
 
 echo "Setup complete." | tee -a "$LOG_FILE"
