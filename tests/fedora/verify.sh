@@ -30,10 +30,15 @@ check "ruff installed (uv tool)" test -x "$HOME/.local/bin/ruff"
 check "json installed (pnpm global)" test -e "$HOME/.local/share/pnpm/bin/json"
 check "cowsay installed (bun global)" test -e "$HOME/.bun/bin/cowsay"
 
-# AppImage
-check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
-check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
-check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+# AppImage (appimagetool is x86_64-only; on other architectures the
+# supported_architectures guard must skip it entirely)
+if [ "$(uname -m)" = "x86_64" ]; then
+  check "appimagetool AppImage downloaded" test -x "$HOME/.local/bin/appimagetool.AppImage"
+  check "appimagetool CLI symlink created" test -L "$HOME/.local/bin/appimagetool"
+  check "appimagetool desktop entry created" test -f "$HOME/.local/share/applications/appimagetool.desktop"
+else
+  check "appimagetool skipped on non-x86_64" test ! -e "$HOME/.local/bin/appimagetool.AppImage"
+fi
 
 # Custom commands (sentinel files prove they ran)
 check "user custom command ran" test -f "$HOME/.dms-ci-user-command-ran"
