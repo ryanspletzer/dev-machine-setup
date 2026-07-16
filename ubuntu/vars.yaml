@@ -13,15 +13,15 @@ appimage_packages:
   - name: cursor
     # Cursor publishes only hash-versioned direct URLs; refresh from
     # https://cursor.com/api/download?platform=linux-x64&releaseTrack=stable
-    url: "https://downloads.cursor.com/production/bf249e6efb5b097f23d7e21d7283429f0760b74a/linux/x64/Cursor-3.11.19-x86_64.AppImage"
+    url: "https://downloads.cursor.com/production/fc2563ec93d793fc275eef734405a4fdf8b47b26/linux/x64/Cursor-3.11.25-x86_64.AppImage"
     comment: "Cursor AI Code Editor"
     categories: "Development;IDE;"
     mime_types: "text/plain;"
     # The download URL is x64-only, so skip on other architectures
     supported_architectures:
       - amd64
-    # Optional: set to a checksum value (e.g. "sha256:abc123...") to verify the download
-    # checksum: "sha256:abc123..."
+    # sha256 of the pinned AppImage; refresh with url via scripts/bump-cursor.sh
+    checksum: "sha256:69e3f6e83c34ffdf6e1f0612690c16de8d66dfad1f40143fc01bf7ac31e444b0"
     # Set to true to pass --no-sandbox to the AppImage (disables Chromium sandbox)
     # no_sandbox: true
 
@@ -140,7 +140,7 @@ external_apt_repositories:
     supported_architectures:
       - amd64
   - name: yubico
-    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x32CBA1A9"
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x3653E21064B19D134466702E43D5C49532CBA1A9"
     uris: http://ppa.launchpad.net/yubico/stable/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
@@ -583,11 +583,16 @@ custom_commands_elevated:
   # its own sources file and keyring, which conflicts with a pre-added
   # repo entry (apt refuses duplicate sources with differing Signed-By).
   # Bootstrap from Valve's standalone .deb instead; amd64 only.
+  # Download to a random mktemp path rather than a fixed /tmp name so
+  # another local user cannot pre-create the file this root-run command
+  # writes through.
   - command: >-
       if [ "$(dpkg --print-architecture)" = "amd64" ]; then
-      curl -fsSL -o /tmp/steam_latest.deb
+      deb="$(mktemp --suffix=.deb)"
+      && curl -fsSL -o "$deb"
       https://repo.steampowered.com/steam/archive/stable/steam_latest.deb
-      && apt-get install -y /tmp/steam_latest.deb; fi
+      && apt-get install -y "$deb"
+      && rm -f "$deb"; fi
     description: Install Steam from Valve's standalone .deb (amd64 only)
     creates: /usr/bin/steam
   # Add Docker User
