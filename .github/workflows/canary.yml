@@ -62,8 +62,47 @@ jobs:
           chmod 700 ./setup.sh
           ./setup.sh -c -e ci-test@example.com -n "CI Test User"
 
+  # ARM canaries run the real vars.yaml on aarch64 — the only place that
+  # proves every non-arch-gated package and repo actually exists for
+  # aarch64/arm64 (fixtures on the PR ARM jobs only prove skip mechanics).
+  canary-fedora-arm:
+    runs-on: ubuntu-24.04-arm
+    container: fedora:43
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: dnf install -y sudo findutils
+
+      - name: Run setup with production vars.yaml
+        working-directory: fedora
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
   canary-debian:
     runs-on: ubuntu-latest
+    container: debian:13
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: apt-get update && apt-get install -y sudo findutils
+
+      - name: Run setup with production vars.yaml
+        working-directory: debian
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+  canary-debian-arm:
+    runs-on: ubuntu-24.04-arm
     container: debian:13
     timeout-minutes: 180
     steps:

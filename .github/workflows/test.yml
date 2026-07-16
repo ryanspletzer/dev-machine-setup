@@ -329,10 +329,96 @@ jobs:
             *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
           esac
 
+  # ARM runner exercises Fedora's own architecture mechanism (the
+  # rpm_architecture fact with x86_64/aarch64 values), which is distinct
+  # from the dpkg-based amd64/arm64 path the Ubuntu ARM job covers:
+  # aarch64-excluded packages must be skipped cleanly, not attempted and
+  # failed.
+  integration-fedora-arm:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.fedora == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    container: fedora:43
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: dnf install -y sudo findutils
+
+      - name: Copy test fixtures
+        run: cp tests/fedora/vars.yaml fedora/vars.yaml
+
+      - name: Run setup
+        working-directory: fedora
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/fedora/verify.sh
+          tests/fedora/verify.sh
+
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: fedora
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
   integration-debian:
     needs: [detect-changes, validate]
     if: needs.detect-changes.outputs.debian == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container: debian:13
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install container prerequisites
+        run: apt-get update && apt-get install -y sudo findutils
+
+      - name: Copy test fixtures
+        run: cp tests/debian/vars.yaml debian/vars.yaml
+
+      - name: Run setup
+        working-directory: debian
+        run: |
+          chmod 700 ./setup.sh
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User"
+
+      - name: Verify installation
+        run: |
+          chmod 700 tests/debian/verify.sh
+          tests/debian/verify.sh
+
+      - name: Idempotency check (second run reports zero changes)
+        working-directory: debian
+        run: |
+          ./setup.sh -c -e ci-test@example.com -n "CI Test User" | tee second-run.log
+          recap="$(grep 'localhost' second-run.log | grep 'ok=' | tail -1)"
+          echo "Recap: $recap"
+          case "$recap" in
+            *changed=0*failed=0*) echo "Playbook is idempotent" ;;
+            *) echo "Playbook reported changes or failures on a second run"; exit 1 ;;
+          esac
+
+  # ARM runner asserts the arm64 skip logic against Debian's vars: the
+  # mechanism is shared with Ubuntu, but the arch-gated entries (and the
+  # external repos templated on deb_architecture) are Debian's own.
+  integration-debian-arm:
+    needs: [detect-changes, validate]
+    if: needs.detect-changes.outputs.debian == 'true'
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
     container: debian:13
     steps:
