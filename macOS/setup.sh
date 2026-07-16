@@ -89,9 +89,15 @@ else
   KEYCHAIN_SERVICE="ansible-devmachinesetup-temp"
   KEYCHAIN_ACCOUNT="sudo-password"
 
-  # Store password in keychain (overwrite if exists)
+  # Store password in keychain (overwrite if exists). Feed the command to
+  # security's interactive mode over stdin: passing the password to -w as a
+  # command-line argument would expose it to every local process (via ps)
+  # while the command runs. security -i tokenizes like a shell, so escape
+  # backslashes and double quotes to round-trip the password intact.
   security delete-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" >/dev/null 2>&1 || true
-  security add-generic-password -s "$KEYCHAIN_SERVICE" -a "$KEYCHAIN_ACCOUNT" -w "$SUDO_PASSWORD"
+  printf 'add-generic-password -s "%s" -a "%s" -w "%s"\n' \
+    "$KEYCHAIN_SERVICE" "$KEYCHAIN_ACCOUNT" \
+    "$(printf '%s' "$SUDO_PASSWORD" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')" | security -i
 
   # Create a temporary askpass script that retrieves the password from keychain
   ASKPASS_SCRIPT=$(mktemp)
