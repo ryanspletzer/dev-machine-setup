@@ -115,7 +115,10 @@ jobs:
         run: npx --yes markdownlint-cli2@0.23.0 "**/*.md"
 
       - name: actionlint
-        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.7 -color
+        # Tag is documentation; the digest is what docker actually pulls.
+        # Refresh both together when bumping (Dependabot cannot see images
+        # inside run steps).
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.7@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 -color
 
       - name: zizmor
         run: uvx zizmor .github/workflows/
