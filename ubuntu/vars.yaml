@@ -63,14 +63,14 @@ external_apt_repositories:
   # .NET SDK 9.0 repository (replaces the dotnet/backports PPA)
   - name: dotnet-backports
     signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x45A3F127159BE9E5017811C62125B164E8E5D3FA"
-    uris: http://ppa.launchpad.net/dotnet/backports/ubuntu
+    uris: https://ppa.launchpadcontent.net/dotnet/backports/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
   # FEX emulator for ARM64
   - name: fex-emu
     signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0xEDB98BFE8A2310DC9C4A376E76DBFEBEA206F5AC"
-    uris: http://ppa.launchpad.net/fex-emu/fex/ubuntu
+    uris: https://ppa.launchpadcontent.net/fex-emu/fex/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
@@ -79,14 +79,14 @@ external_apt_repositories:
   # Fish shell latest stable releases
   - name: fish-shell
     signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x88421E703EDC7AF54967DED473C9FCC9E2BB48DA
-    uris: http://ppa.launchpad.net/fish-shell/release-4/ubuntu
+    uris: https://ppa.launchpadcontent.net/fish-shell/release-4/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
   # Git latest stable releases
   - name: git-core
     signed_by: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE1DD270288B4E6030699E45FA1715D88E1DF1F24
-    uris: http://ppa.launchpad.net/git-core/ppa/ubuntu
+    uris: https://ppa.launchpadcontent.net/git-core/ppa/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
@@ -141,7 +141,7 @@ external_apt_repositories:
       - amd64
   - name: yubico
     signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&exact=on&search=0x3653E21064B19D134466702E43D5C49532CBA1A9"
-    uris: http://ppa.launchpad.net/yubico/stable/ubuntu
+    uris: https://ppa.launchpadcontent.net/yubico/stable/ubuntu
     suites: "{{ ansible_distribution_release }}"
     components: main
     architectures: "{{ deb_architecture }}"
