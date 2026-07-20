@@ -11,24 +11,31 @@ homebrew_taps:
   - azure/functions
   - hashicorp/tap
   - microsoft/git
+  - oven-sh/bun
   - teamookla/speedtest
 
 homebrew_casks:
   - 1password
+  - antigravity-cli
   - appcleaner
   - brave-browser
   - chatgpt
   - citrix-workspace
   - claude-code
+  - claude-code@latest
+  - codex
   - comet
   - copilot-cli
   - cursor
+  - cursor-cli
   - docker-desktop
   - dotnet-sdk
   - drawio
   - elgato-camera-hub
+  - emacs-app
   - firefox
   - font-caskaydia-cove-nerd-font
+  - font-symbols-only-nerd-font
   - ghostty
   - git-credential-manager
   - google-chrome
@@ -38,10 +45,12 @@ homebrew_casks:
   - keybase
   - kitty
   - krita
+  - microsoft-auto-update
   - microsoft-azure-storage-explorer
   - microsoft-edge
   - microsoft-office
   - microsoft-teams
+  - neo-network-utility
   - netnewswire
   - netspot
   - ngrok
@@ -59,6 +68,7 @@ homebrew_casks:
   - vlc
   - windows-app
   - wine-stable
+  - zed
   # Doesn't work without Rosetta 2
   # - yubico-yubikey-manager
   - zoom
@@ -66,6 +76,10 @@ homebrew_casks:
 
 homebrew_formulae:
   - actionlint
+  # Bootstrapped by macOS/setup.sh so Ansible itself can run;
+  # deliberately excluded from package sync
+  # - ansible
+  - automake
   - aws-sam-cli
   - awscli
   - azure-cli
@@ -77,7 +91,9 @@ homebrew_formulae:
   - bash-language-server
   - bat
   - beads
+  - betterleaks
   - bicep
+  - bison
   - bun
   - cfn-lint
   - chruby
@@ -109,6 +125,7 @@ homebrew_formulae:
   - jq
   - kubernetes-cli
   - lazygit
+  - lua
   - lua-language-server
   - markdownlint-cli
   - markdownlint-cli2
@@ -116,6 +133,7 @@ homebrew_formulae:
   - mas
   - maven
   - mcp-inspector
+  - micro
   - mtr
   - neovim
   - node
@@ -136,6 +154,7 @@ homebrew_formulae:
   - ruff
   - rust-analyzer
   - rustup
+  - stylua
   - taplo
   - tdd-guard
   - teamookla/speedtest/speedtest
@@ -161,20 +180,29 @@ homebrew_formulae:
 powershell_modules:
   - AWS.Tools.Common
   - Az.Accounts
+  - BuildHelpers
+  - Deck
   - ExchangeOnlineManagement
+  - Microsoft.Graph.Applications
   - Microsoft.Graph.Authentication
+  - Microsoft.PowerShell.PSResourceGet
+  - PackageManagement
   - Pester
   - platyPS
   - posh-git
   - powershell-yaml
   - PowerShellBuild
+  - PowerShellGet
   - psake
   - PSGraphQL
   - PSJsonWebToken
+  - PSQR
   - PSReadLine
   - PSScriptAnalyzer
   - PSTcpIp
+  - PwshSpectreConsole
   - Terminal-Icons
+  - TextMate
 
 # pipx modules
 pipx_packages:
