@@ -76,7 +76,9 @@ homebrew_casks:
 
 homebrew_formulae:
   - actionlint
-  - ansible
+  # Bootstrapped by macOS/setup.sh so Ansible itself can run;
+  # deliberately excluded from package sync
+  # - ansible
   - automake
   - aws-sam-cli
   - awscli
