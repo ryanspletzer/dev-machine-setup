@@ -123,8 +123,6 @@ homebrew_formulae:
   - jq
   - kubernetes-cli
   - lazygit
-  - libffi
-  - libyaml
   - lua
   - lua-language-server
   - markdownlint-cli
@@ -139,7 +137,6 @@ homebrew_formulae:
   - node
   - nvm
   - oh-my-posh
-  - openssl@3
   - pandoc
   - pinentry-mac
   - pipx
@@ -148,7 +145,6 @@ homebrew_formulae:
   - pyenv-virtualenv
   - python
   - qemu
-  - readline
   - rip2
   - ripgrep
   - ruby-install
@@ -156,7 +152,6 @@ homebrew_formulae:
   - ruff
   - rust-analyzer
   - rustup
-  - shellcheck
   - stylua
   - taplo
   - tdd-guard
@@ -170,7 +165,6 @@ homebrew_formulae:
   - weasyprint
   - wget2
   - xh
-  - xz
   - yaml-language-server
   - yamllint
   - ykman
