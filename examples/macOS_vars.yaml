@@ -185,14 +185,17 @@ powershell_modules:
   - ExchangeOnlineManagement
   - Microsoft.Graph.Applications
   - Microsoft.Graph.Authentication
-  - Microsoft.PowerShell.PSResourceGet
-  - PackageManagement
+  # Ships with PowerShell 7 itself; deliberately excluded from sync
+  # - Microsoft.PowerShell.PSResourceGet
+  # Ships with PowerShell 7 itself; deliberately excluded from sync
+  # - PackageManagement
   - Pester
   - platyPS
   - posh-git
   - powershell-yaml
   - PowerShellBuild
-  - PowerShellGet
+  # Ships with PowerShell 7 itself; deliberately excluded from sync
+  # - PowerShellGet
   - psake
   - PSGraphQL
   - PSJsonWebToken
