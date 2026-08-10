@@ -85,15 +85,6 @@
         - apt
         - update
 
-    # apt upgrade
-    - name: Upgrade all packages
-      ansible.builtin.apt:
-        upgrade: true
-      become: true
-      tags:
-        - apt
-        - upgrade
-
     # Install prerequisite APT packages
     - name: Install prerequisite APT packages
       ansible.builtin.apt:
@@ -142,6 +133,18 @@
       tags:
         - apt
         - repositories
+
+    # apt upgrade — must come after the external repositories are configured:
+    # a package preinstalled on the machine that an external repo supersedes
+    # (e.g. gh on GitHub-hosted runners) is otherwise only upgraded on the
+    # second run, breaking idempotence
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: true
+      become: true
+      tags:
+        - apt
+        - upgrade
 
     # Install APT packages
     - name: Install APT packages
