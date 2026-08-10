@@ -74,16 +74,6 @@
         - dnf
         - update
 
-    # dnf upgrade
-    - name: Upgrade all packages # noqa: package-latest
-      ansible.builtin.dnf:
-        name: '*'
-        state: latest
-      become: true
-      tags:
-        - dnf
-        - upgrade
-
     # Install prerequisite DNF packages
     - name: Install prerequisite DNF packages
       ansible.builtin.dnf:
@@ -120,6 +110,18 @@
       tags:
         - dnf
         - repositories
+
+    # dnf upgrade — must come after the external repositories are configured:
+    # a package preinstalled on the machine that an external repo supersedes
+    # is otherwise only upgraded on the second run, breaking idempotence
+    - name: Upgrade all packages # noqa: package-latest
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+      become: true
+      tags:
+        - dnf
+        - upgrade
 
     # Install DNF packages
     - name: Install DNF packages
