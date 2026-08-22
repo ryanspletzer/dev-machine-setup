@@ -65,6 +65,35 @@
         - homebrew
         - taps
 
+    # Newer Homebrew (6.x) requires third-party taps to be explicitly
+    # trusted or it ignores their formulae/casks. Older brew has no
+    # `brew trust` subcommand and exits nonzero on the check below, so the
+    # trust task is guarded on the check succeeding and skipped there.
+    - name: Check which Homebrew taps are trusted
+      ansible.builtin.command:
+        cmd: brew trust --json v1
+      register: brew_trust_list
+      changed_when: false
+      failed_when: false
+      when: (homebrew_taps | default([], true)) | length > 0
+      tags:
+        - homebrew
+        - taps
+
+    - name: Ensure Homebrew taps are trusted
+      ansible.builtin.command:
+        cmd: brew trust --tap {{ item }}
+      changed_when: true
+      when:
+        - brew_trust_list.rc | default(1) == 0
+        - item not in ((brew_trust_list.stdout | from_json).taps | default([], true))
+      loop: "{{ homebrew_taps | default([], true) }}"
+      loop_control:
+        label: "Trusting tap: {{ item }}"
+      tags:
+        - homebrew
+        - taps
+
     - name: Check if Homebrew casks are already installed
       ansible.builtin.command:
         cmd: "brew list --cask {{ item }}"
