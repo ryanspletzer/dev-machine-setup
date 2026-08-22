@@ -13,6 +13,11 @@ check "git-lfs installed (Homebrew formula)" command -v git-lfs
 # Homebrew tap
 check "hashicorp/tap tapped (Homebrew tap)" sh -c 'brew tap | grep -q "^hashicorp/tap$"'
 
+# Homebrew tap trust (older brew has no `brew trust`; skip there)
+if brew trust --json v1 >/dev/null 2>&1; then
+  check "hashicorp/tap trusted (Homebrew tap trust)" sh -c 'brew trust --json v1 | grep -q "\"hashicorp/tap\""'
+fi
+
 # Homebrew cask
 check "iTerm2 installed (Homebrew cask)" test -d /Applications/iTerm.app
 check "VS Code installed (Homebrew cask)" test -d "/Applications/Visual Studio Code.app"

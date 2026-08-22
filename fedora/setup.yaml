@@ -489,6 +489,10 @@
         dest: "{{ appimage_install_dir }}/{{ item.0.name }}.AppImage"
         mode: '0755'
         checksum: "{{ item.0.checksum | default(omit) }}"
+      register: appimage_download
+      retries: 3
+      delay: 5
+      until: appimage_download is succeeded
       loop: "{{ appimage_packages | default([], true) | zip(appimage_stat.results | default([], true)) | list }}"
       when:
         - item.1.stat is defined
