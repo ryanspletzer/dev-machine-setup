@@ -15,7 +15,7 @@ env:
   # Pins the uv binary itself and keys the cache below; a floating "latest"
   # uv can change the cache format (as 0.11.30 did), which orphans the
   # restored cache and hard-fails under UV_OFFLINE=1. Bump with the date.
-  UV_VERSION: "0.12.10"
+  UV_VERSION: "0.12.13"
 
 on:
   # No paths filter on push: validate lints the whole repo (docs, examples,
@@ -80,7 +80,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
-      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
         id: setup-uv
         with:
           version: ${{ env.UV_VERSION }}
