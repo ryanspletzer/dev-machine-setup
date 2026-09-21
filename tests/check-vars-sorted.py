@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check that list entries in vars.yaml files are alphabetically sorted.
 
-The editing guideline in CLAUDE.md says package entries stay alphabetically
+The editing guideline in AGENTS.md says package entries stay alphabetically
 sorted within their group. Comment groups are invisible to a YAML parser, so
 this works on the raw text: any comment or blank line ends the current group,
 and entries between boundaries must be sorted case-insensitively.
