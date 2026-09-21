@@ -9,7 +9,7 @@ across multiple platforms.
 ```text
 dev-machine-setup/
 ├── README.md                    # Project overview and quick start
-├── CLAUDE.md                    # Claude Code project instructions
+├── AGENTS.md                    # AI coding agent project instructions
 ├── LICENSE                      # MIT license
 ├── .ansible-lint                # Ansible linting configuration
 ├── .markdownlint.yaml           # Markdown linting configuration

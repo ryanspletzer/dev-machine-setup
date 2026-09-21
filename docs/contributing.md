@@ -132,7 +132,7 @@ Understanding the project organization:
 ```text
 dev-machine-setup/
 ├── README.md              # Project overview
-├── CLAUDE.md              # Claude Code project instructions
+├── AGENTS.md              # AI coding agent project instructions
 ├── LICENSE                # MIT license
 ├── .ansible/              # Ansible collections, modules, and roles
 ├── .github/               # GitHub Actions CI workflows
