@@ -15,7 +15,7 @@ env:
   # Pins the uv binary itself and keys the cache below; a floating "latest"
   # uv can change the cache format (as 0.11.30 did), which orphans the
   # restored cache and hard-fails under UV_OFFLINE=1. Bump with the date.
-  UV_VERSION: "0.12.19"
+  UV_VERSION: "0.12.23"
 
 on:
   # No paths filter on push: validate lints the whole repo (docs, examples,
