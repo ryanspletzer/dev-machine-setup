@@ -11,11 +11,11 @@ concurrency:
 env:
   # Pins uv's view of PyPI and keys the uv cache in the validate job.
   # Bump this date to pick up newer tool releases and invalidate the cache.
-  UV_EXCLUDE_NEWER: "2026-09-27"
+  UV_EXCLUDE_NEWER: "2026-10-30"
   # Pins the uv binary itself and keys the cache below; a floating "latest"
   # uv can change the cache format (as 0.11.30 did), which orphans the
   # restored cache and hard-fails under UV_OFFLINE=1. Bump with the date.
-  UV_VERSION: "0.13.1"
+  UV_VERSION: "0.13.6"
 
 on:
   # No paths filter on push: validate lints the whole repo (docs, examples,
@@ -80,7 +80,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
-      - uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa # v10.3.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         id: setup-uv
         with:
           version: ${{ env.UV_VERSION }}
